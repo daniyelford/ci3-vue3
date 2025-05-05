@@ -6,9 +6,7 @@ class Includes extends MY_Controller
 		parent::__construct();
 	}
     public function fetch(){
-        for($i=1;$i<=5;$i++){
-            $this->get_price_url('https://call'.$i.'.tgju.org/ajax.json?rev=');
-        }
+		$this->get_price_url('https://example_price_refrence.com/ajax.json');
         $this->change_product_relation();
     }
     private function change_product_relation(){
