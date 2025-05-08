@@ -336,7 +336,8 @@ class Page_model extends CI_Model
     
     public function render_page($title,$path,$info=NULL){
         if(!empty($title)&&!empty($path)){
-            $this->load->driver('cache',['adapter'=>'apc','backup'=>'file','key_prefix'=>'my_']);
+            $this->load->driver('cache', ['adapter' => 'file', 'backup' => 'file', 'key_prefix' => 'my_']);
+            // $this->load->driver('cache',['adapter'=>'apc','backup'=>'file','key_prefix'=>'my_']);
             if(!$profile=$this->cache->file->get('panel'.$title)){
                 if(file_exists('panel'.$title)){
                     unlink('panel'.$title);

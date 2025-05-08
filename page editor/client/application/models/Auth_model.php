@@ -36,7 +36,7 @@ class Auth_model extends CI_Model{
         return $res;
     }
 
-    public function new_send($data=array(),$runfile){
+    public function new_send(array $data,$runfile){
         $contentType = 'application/x-www-form-urlencoded';
         $HTTPCustomHeaders[] = 'Content-Type: '.trim($contentType);
         $ch = curl_init();
@@ -51,80 +51,80 @@ class Auth_model extends CI_Model{
     }
 
     public function send_sms($phone,$text){
-// turn off the WSDL cache
-// ini_set('soap.wsdl_cache_enabled',0);
-//   try {
-	$user = "m_borji";
-	$pass = "8981";
-    $line_num="10003894";
-    // $url="http://panel.aladdinsms.ir/post/IncomingMessages.asmx?wsdl";
-    $url2="http://87.107.121.52/post/sendsms.ashx?from=".$line_num."&to=".$phone."&text=".$text."&password=".$pass."&username=".$user;
-    
-    // $url1=" http://87.107.121.52/post/sendsms.ashx?";
-//     $params= array(
-// 		'from' => $line_num,
-// 		'to' => $phone,
-// 		'text' => 'hi',
-// 		'password' => $pass,
-// 		'username' => $user,
-// 	);
-    
-    // $this->send_curl($url1,$params);
-    
-    header($url2);
-    
-    
-    // return $this->c_send($url2);
-//     $client = new SoapClient($url);
-// 	$getcredit_parameters = array(
-// 		"username"=>$user,
-// 		"password"=>$pass
-// 	);
-// 	$credit = $client->GetCredit($getcredit_parameters)->GetCreditResult;
-// 	echo "Credit: ".$credit."<br />";
-// 	$encoding = "UTF-8";//CP1256, CP1252
-// 	$textMessage = iconv($encoding, 'UTF-8//TRANSLIT',$text);
+        // turn off the WSDL cache
+        // ini_set('soap.wsdl_cache_enabled',0);
+        //   try {
+            // $user = "m_borji";
+            // $pass = "8981";
+            // $line_num="10003894";
+            // $url="http://panel.aladdinsms.ir/post/IncomingMessages.asmx?wsdl";
+            // $url2="http://87.107.121.52/post/sendsms.ashx?from=".$line_num."&to=".$phone."&text=".$text."&password=".$pass."&username=".$user;
+            
+            // $url1=" http://87.107.121.52/post/sendsms.ashx?";
+        //     $params= array(
+        // 		'from' => $line_num,
+        // 		'to' => $phone,
+        // 		'text' => 'hi',
+        // 		'password' => $pass,
+        // 		'username' => $user,
+        // 	);
+            
+            // $this->send_curl($url1,$params);
+            
+            // header($url2);
+            
+            
+            // return $this->c_send($url2);
+        //     $client = new SoapClient($url);
+        // 	$getcredit_parameters = array(
+        // 		"username"=>$user,
+        // 		"password"=>$pass
+        // 	);
+        // 	$credit = $client->GetCredit($getcredit_parameters)->GetCreditResult;
+        // 	echo "Credit: ".$credit."<br />";
+        // 	$encoding = "UTF-8";//CP1256, CP1252
+        // 	$textMessage = iconv($encoding, 'UTF-8//TRANSLIT',$text);
 
-// 	$sendsms_parameters = array(
-// 		'username' => $user,
-// 		'password' => $pass,
-// 		'from' => $line_num,
-// 		'to' => $phone,
-// 		'text' => $textMessage,
-// 		'isflash' => false,
-// 		'udh' => "",
-// 		'recId' => array(0),
-// 		'status' => 0
-// 	);
+        // 	$sendsms_parameters = array(
+        // 		'username' => $user,
+        // 		'password' => $pass,
+        // 		'from' => $line_num,
+        // 		'to' => $phone,
+        // 		'text' => $textMessage,
+        // 		'isflash' => false,
+        // 		'udh' => "",
+        // 		'recId' => array(0),
+        // 		'status' => 0
+        // 	);
 
-// 	$status = $client->SendSms($sendsms_parameters)->SendSmsResult;
-	
-// 	switch($status){
-// 	    case 1:
-// 	            echo "ok";
-// 	        break;
-	
-// 	    default:
-// 	        echo "no";
-// 	        break;
-// 	}
-	
-	
-// 	echo "Status: ".$status."<br />";
+        // 	$status = $client->SendSms($sendsms_parameters)->SendSmsResult;
+            
+        // 	switch($status){
+        // 	    case 1:
+        // 	            echo "ok";
+        // 	        break;
+            
+        // 	    default:
+        // 	        echo "no";
+        // 	        break;
+        // 	}
+            
+            
+        // 	echo "Status: ".$status."<br />";
 
-// 	$getnewmessage_parameters = array(
-// 		"username"=>$user,
-// 		"password"=>$pass,
-// 		"from"=>$line_num
-// 	);
-// 	$incomingMessagesClient = new SoapClient($url);
-// 	$res = $incomingMessagesClient->GetNewMessagesList($getnewmessage_parameters);
-//     $res->GetNewMessagesAResult->Message;
+        // 	$getnewmessage_parameters = array(
+        // 		"username"=>$user,
+        // 		"password"=>$pass,
+        // 		"from"=>$line_num
+        // 	);
+        // 	$incomingMessagesClient = new SoapClient($url);
+        // 	$res = $incomingMessagesClient->GetNewMessagesList($getnewmessage_parameters);
+        //     $res->GetNewMessagesAResult->Message;
 
-    //  }catch (SoapFault $ex) {
-    //     echo $ex->faultstring;
-    // }
-}
+            //  }catch (SoapFault $ex) {
+            //     echo $ex->faultstring;
+            // }
+    }
 
     public function s_alert($title,$text,$method,$btn,$url,$bgcos='#e6e9e6',$bgcis='',$bxsc='#e5d6f1'){
     	return '<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
