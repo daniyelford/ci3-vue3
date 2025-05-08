@@ -1,14 +1,11 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-use WebAuthn\PublicKeyCredentialSource;
 use WebAuthn\PublicKeyCredentialUserEntity;
+use WebAuthn\PublicKeyCredentialCreationOptions;
 use WebAuthn\Server;
 use WebAuthn\AuthenticatorSelectionCriteria;
 use WebAuthn\AttestationConveyancePreference;
-use WebAuthn\Extensions\ExtensionInterface;
-use WebAuthn\AuthenticatorAttestationResponse;
-use WebAuthn\CredentialRepository;
 
 class Webauthn extends CI_Controller {
 
@@ -17,41 +14,45 @@ class Webauthn extends CI_Controller {
     public function __construct() {
         parent::__construct();
         $this->load->library('session');
-        // Load WebAuthn library or autoloader
-        require_once APPPATH . 'third_party/WebAuthn/vendor/autoload.php';
         $this->load->model('User_model'); // فرض می‌کنیم که مدل کاربری دارید
     }
 
     // 1. ایجاد گزینه‌های WebAuthn (Challenge)
     public function options() {
-        $user = $this->User_model->getUser($this->session->user_id); // گرفتن کاربر از دیتابیس
-        
+        $user = $this->User_model->getUser($this->session->user_id); // دریافت اطلاعات کاربر از دیتابیس
+
+        // ساخت PublicKeyCredentialUserEntity برای کاربر
         $userEntity = new PublicKeyCredentialUserEntity(
-            $user['id'],  // ID کاربر
+            $user['id'], // شناسه کاربر
             $user['email'], // ایمیل یا شناسه کاربر
             $user['name']   // نام کاربر
         );
-        
+
+        // تنظیمات WebAuthn برای تولید گزینه‌ها
         $authenticatorSelection = new AuthenticatorSelectionCriteria(
-            true, // باید از دستگاه‌های قابل اطمینان استفاده کند
+            true, // انتخاب دستگاه‌های قابل اطمینان
             'cross-platform' // نوع انتخاب احراز هویت
         );
 
         $attestationPreference = AttestationConveyancePreference::DIRECT();
 
+        // ساخت WebAuthn Server
         $this->server = new Server(
-            $this->config->item('webauthn')['rp_name'],
-            $this->config->item('webauthn')['rp_id'],
-            $this->config->item('webauthn')['origin'],
-            $this->config->item('webauthn')['origin'],
+            $this->config->item('webauthn')['rp_name'], // نام RP
+            $this->config->item('webauthn')['rp_id'],   // شناسه RP
+            $this->config->item('webauthn')['origin'],   // URL مبدا
+            $this->config->item('webauthn')['origin'],   // همان URL مبدا برای attestation
             $authenticatorSelection,
             $attestationPreference
         );
 
+        // تولید گزینه‌های WebAuthn
         $options = $this->server->generatePublicKeyCredentialCreationOptions($userEntity);
 
+        // ذخیره چالش در سشن
         $this->session->set_userdata('challenge', $options->getChallenge());
 
+        // ارسال گزینه‌ها به کلاینت
         echo json_encode($options);
     }
 
@@ -62,6 +63,8 @@ class Webauthn extends CI_Controller {
         // پردازش پاسخ احراز هویت
         $assertionResponse = json_decode($assertionResponse);
         $response = $assertionResponse->response;
+
+        // اعتبارسنجی پاسخ WebAuthn
         $credential = $this->server->loadAndCheckAssertionResponse(
             $response->authenticatorData,
             $response->clientDataJSON,
