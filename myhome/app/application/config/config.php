@@ -23,9 +23,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | a PHP script and you can easily do that on your own.
 |
 */
-$http = $_SERVER['HTTP_HOST'] ?? 'localhost';
-$root = isset($_SERVER['HTTP_HOST']) ? "https://".$_SERVER['HTTP_HOST'] : 'http://localhost';
-$root .= str_replace(basename($_SERVER['SCRIPT_NAME']),"",$_SERVER['SCRIPT_NAME']);
+$is_localhost=!(isset($_SERVER['HTTP_HOST']) && !empty($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST']!=='localhost');
+$http=$is_localhost?'localhost':$_SERVER['HTTP_HOST'];
+$root = $is_localhost?'http://':'https://';
+$root=$root.$http.str_replace(basename($_SERVER['SCRIPT_NAME']),"",$_SERVER['SCRIPT_NAME']);
 $config['base_url']    = $root;
 
 $config['webauthn'] = [
