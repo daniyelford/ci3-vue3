@@ -436,7 +436,7 @@ class Click_actions
 	    return $ret;
 	}
 
-// check
+	// check
 
 	public function action($page){
 	    $ret = $this->action_function($this->url_array,$page);

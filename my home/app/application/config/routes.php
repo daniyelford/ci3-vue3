@@ -49,284 +49,284 @@ defined('BASEPATH') or exit('No direct script access allowed');
 | Examples:	my-controller/index	-> my_controller/index
 |		my-controller/my-method	-> my_controller/my_method
 */
-$route['default_controller'] = 'role';
-$route['(:any)']=function($str){
-    $a='';
-    switch($str){
-        case 'logout':
-            $a='users/users/log_out';
-            break;
-        case "home-page":
-            $a='home_page';
-            break;
-        case "map":
-            $a='role/map';
-            break;
-        case "exit_page":
-            $a='role/exit_page';
-            break;
-        case "add_wallet_value":
-            $a='includes/wallet/add_value';
-            break;
-        case "chat":
-            $a='chat/chat/manager';
-            break;
-        case "user_setting":
-            $a='users/dashbord/setting';
-            break;
-        case "company_manager":
-            $a='company/company/manage';
-            break;
-        case "wallet":
-            $a='includes/wallet/index';
-            break;
-        case "remove_wallet_value":
-            $a='includes/wallet/remove_value';
-            break;
-        case "wallet_payment":
-            $a='includes/wallet/wallet_payment';
-            break;
-        case "add_cart":
-            $a='includes/wallet/add_cart';
-            break;
-        case "company_one":
-            $a='company/company/one';
-            break;
-        case "company_users":
-            $a='company/company/users';
-            break;
-        case "company_resume":
-            $a='company/company/company_resume';
-            break;
-        case "user_in_company":
-            $a='company/company/company_user';
-            break;
-        case "all_support":
-            $a='home_page/new_support';
-            break;
-        case "all_pay_request":
-            $a='home_page/all_pay_request';
-            break;
-        case "all_wallet_changeing":
-            $a='home_page/all_wallet_changeing';
-            break;
-        case "all_category_manager":
-            $a='home_page/all_category_manager';
-            break;
-        case "all_company_manager":
-            $a='home_page/all_company_manager';
-            break;
-        case "all_user_manager":
-            $a='home_page/all_user_manager';
-            break;
-        case "all_support_manager":
-            $a='home_page/all_support_manager';
-            break;
-        case "all_product_manager":
-            $a='home_page/all_product_manager';
-            break;
-        case "all_position_manager":
-            $a='home_page/all_position_manager';
-            break;
-        case "company_meet":
-            $a='company/meet/meet/company_meet';
-            break;
-        case "meet_company_manager":
-            $a='company/meet/meet/meet_manager';
-            break;
-        case "company_task":
-            $a='company/task/task/my';
-            break;
-        case "product_company_manager":
-            $a='company/product/product/product_company_manager';
-            break;
-        case "product_company_order_manager":
-            $a='company/product/product/product_company_order_manager';
-            break;
-        case "position_company_reserve_manager":
-            $a='company/position/position/position_company_reserve_manager';
-            break;
-        case "position_company_manager":
-            $a='company/position/position/position_company_manager';
-            break;
-        case "company_position_one":
-            $a='company/position/position/one';
-            break;
-        case "company_position_setting":
-            $a='company/position/position/setting';
-            break;
-        case "company_product_one":
-            $a='company/product/product/one';
-            break;
-        case "company_product_setting":
-            $a='company/product/product/setting';
-            break;
-        case "company_promotions":
-            $a='company/dashbord/promotion';
-            break;
-        case "company_promotion_order":
-            $a='company/dashbord/promotion_order';
-            break;
-        case "search":
-            $a='role/search';
-            break;
-        case "shopping":
-            $a='users/dashbord/shopping';
-            break;
-        case "reserve":
-            $a='users/dashbord/reserve';
-            break;
-        case "resume":
-            $a='users/dashbord/resume';
-            break;
-        default:
-            $a='role/url/'.$str;
-            break;
-    }
-    return $a;
-};
-$route['(:any)/(:any)']=function($str,$y){
-    $a='';
-    switch($str){
-        case "assets":
-            $a='assets';
-            break;
-        case "category":
-            $a='category';
-            break;
-        case "chat":
-            $a='chat';
-            break;
-        case "company":
-            $a='company';
-            break;
-        case "includes":
-            $a='includes';
-            break;
-        case "chat":
-            $a='chat';
-            break;
-        case "role":
-            $a='role';
-            break;
-        case "product":
-            $a='product/dashbord/change_product_url';
-            break;
-        case "position":
-            $a='product/dashbord/change_position_url';
-            break;
-        case "users":
-            $a='users';
-            break;
-        case "map_category":
-            $a='role/map_category';
-            break;
-        case "manage_all_product":
-            $a='product/product/setting';
-            break;
-        case "show_company":
-            $a='company/company/show';
-            break;
-        case "manage_all_product_detail":
-            $a='product/product/detail_setting';
-            break;
-        case "cart_visit":
-            $a='chat/chat/visit';
-            break;
-        default:
-            $a='role/url_two/'.$str;
-            break;
-    }
-    return $a.DS.$y;
-};
-$route['(:any)/(:any)/(:any)']=function($str,$y,$z){
-    switch($str){
-        case "assets":
-            $a='assets';
-            break;
-        case "category":
-            $a='category';
-            break;
-        case "chat":
-            $a='chat';
-            break;
-        case "company":
-            $a='company';
-            break;
-        case "includes":
-            $a='includes';
-            break;
-        case "product":
-            $a='product';
-            break;
-        case "position":
-            $a='position';
-            break;
-        case "chat":
-            $a='chat';
-            break;
-        case "role":
-            $a='role';
-            break;
-        case "users":
-            $a='users';
-            break;
-        // case "company_product":
-        //     $a='product/dashbord/show_company_product';
-        //     break;
-        // case "company_position":
-        //     $a='product/dashbord/show_company_position';
-        //     break;
-        default:
-            $a='role/url_three/'.$str;
-            break;
-    }
-    return $a.DS.$y.DS.$z;
-};
-$route['(:any)/(:any)/(:any)/(:any)']=function($str,$x,$y,$z){
-        switch($str){
-        case "assets":
-            $a='assets';
-            break;
-        case "category":
-            $a='category';
-            break;
-        case "chat":
-            $a='chat';
-            break;
-        case "company":
-            $a='company';
-            break;
-        case "includes":
-            $a='includes';
-            break;
-        case "product":
-            $a='product';
-            break;
-        case "position":
-            $a='position';
-            break;
-        case "chat":
-            $a='chat';
-            break;
-        case "role":
-            $a='role';
-            break;
-        case "users":
-            $a='users';
-            break;
-        case "company_product":
-            $a='product/dashbord/show_company_product';
-            break;
-        case "company_position":
-            $a='product/dashbord/show_company_position';
-            break;
-        default:
-            $a='role/url_four/'.$str;
-            break;
-    }
-    return $a.DS.$x.DS.$y.DS.$z;
-};
+$route['default_controller'] = 'role/test';
+// $route['(:any)']=function($str){
+//     $a='';
+//     switch($str){
+//         case 'logout':
+//             $a='users/users/log_out';
+//             break;
+//         case "home-page":
+//             $a='home_page';
+//             break;
+//         case "map":
+//             $a='role/map';
+//             break;
+//         case "exit_page":
+//             $a='role/exit_page';
+//             break;
+//         case "add_wallet_value":
+//             $a='includes/wallet/add_value';
+//             break;
+//         case "chat":
+//             $a='chat/chat/manager';
+//             break;
+//         case "user_setting":
+//             $a='users/dashbord/setting';
+//             break;
+//         case "company_manager":
+//             $a='company/company/manage';
+//             break;
+//         case "wallet":
+//             $a='includes/wallet/index';
+//             break;
+//         case "remove_wallet_value":
+//             $a='includes/wallet/remove_value';
+//             break;
+//         case "wallet_payment":
+//             $a='includes/wallet/wallet_payment';
+//             break;
+//         case "add_cart":
+//             $a='includes/wallet/add_cart';
+//             break;
+//         case "company_one":
+//             $a='company/company/one';
+//             break;
+//         case "company_users":
+//             $a='company/company/users';
+//             break;
+//         case "company_resume":
+//             $a='company/company/company_resume';
+//             break;
+//         case "user_in_company":
+//             $a='company/company/company_user';
+//             break;
+//         case "all_support":
+//             $a='home_page/new_support';
+//             break;
+//         case "all_pay_request":
+//             $a='home_page/all_pay_request';
+//             break;
+//         case "all_wallet_changeing":
+//             $a='home_page/all_wallet_changeing';
+//             break;
+//         case "all_category_manager":
+//             $a='home_page/all_category_manager';
+//             break;
+//         case "all_company_manager":
+//             $a='home_page/all_company_manager';
+//             break;
+//         case "all_user_manager":
+//             $a='home_page/all_user_manager';
+//             break;
+//         case "all_support_manager":
+//             $a='home_page/all_support_manager';
+//             break;
+//         case "all_product_manager":
+//             $a='home_page/all_product_manager';
+//             break;
+//         case "all_position_manager":
+//             $a='home_page/all_position_manager';
+//             break;
+//         case "company_meet":
+//             $a='company/meet/meet/company_meet';
+//             break;
+//         case "meet_company_manager":
+//             $a='company/meet/meet/meet_manager';
+//             break;
+//         case "company_task":
+//             $a='company/task/task/my';
+//             break;
+//         case "product_company_manager":
+//             $a='company/product/product/product_company_manager';
+//             break;
+//         case "product_company_order_manager":
+//             $a='company/product/product/product_company_order_manager';
+//             break;
+//         case "position_company_reserve_manager":
+//             $a='company/position/position/position_company_reserve_manager';
+//             break;
+//         case "position_company_manager":
+//             $a='company/position/position/position_company_manager';
+//             break;
+//         case "company_position_one":
+//             $a='company/position/position/one';
+//             break;
+//         case "company_position_setting":
+//             $a='company/position/position/setting';
+//             break;
+//         case "company_product_one":
+//             $a='company/product/product/one';
+//             break;
+//         case "company_product_setting":
+//             $a='company/product/product/setting';
+//             break;
+//         case "company_promotions":
+//             $a='company/dashbord/promotion';
+//             break;
+//         case "company_promotion_order":
+//             $a='company/dashbord/promotion_order';
+//             break;
+//         case "search":
+//             $a='role/search';
+//             break;
+//         case "shopping":
+//             $a='users/dashbord/shopping';
+//             break;
+//         case "reserve":
+//             $a='users/dashbord/reserve';
+//             break;
+//         case "resume":
+//             $a='users/dashbord/resume';
+//             break;
+//         default:
+//             $a='role/url/'.$str;
+//             break;
+//     }
+//     return $a;
+// };
+// $route['(:any)/(:any)']=function($str,$y){
+//     $a='';
+//     switch($str){
+//         case "assets":
+//             $a='assets';
+//             break;
+//         case "category":
+//             $a='category';
+//             break;
+//         case "chat":
+//             $a='chat';
+//             break;
+//         case "company":
+//             $a='company';
+//             break;
+//         case "includes":
+//             $a='includes';
+//             break;
+//         case "chat":
+//             $a='chat';
+//             break;
+//         case "role":
+//             $a='role';
+//             break;
+//         case "product":
+//             $a='product/dashbord/change_product_url';
+//             break;
+//         case "position":
+//             $a='product/dashbord/change_position_url';
+//             break;
+//         case "users":
+//             $a='users';
+//             break;
+//         case "map_category":
+//             $a='role/map_category';
+//             break;
+//         case "manage_all_product":
+//             $a='product/product/setting';
+//             break;
+//         case "show_company":
+//             $a='company/company/show';
+//             break;
+//         case "manage_all_product_detail":
+//             $a='product/product/detail_setting';
+//             break;
+//         case "cart_visit":
+//             $a='chat/chat/visit';
+//             break;
+//         default:
+//             $a='role/url_two/'.$str;
+//             break;
+//     }
+//     return $a.DS.$y;
+// };
+// $route['(:any)/(:any)/(:any)']=function($str,$y,$z){
+//     switch($str){
+//         case "assets":
+//             $a='assets';
+//             break;
+//         case "category":
+//             $a='category';
+//             break;
+//         case "chat":
+//             $a='chat';
+//             break;
+//         case "company":
+//             $a='company';
+//             break;
+//         case "includes":
+//             $a='includes';
+//             break;
+//         case "product":
+//             $a='product';
+//             break;
+//         case "position":
+//             $a='position';
+//             break;
+//         case "chat":
+//             $a='chat';
+//             break;
+//         case "role":
+//             $a='role';
+//             break;
+//         case "users":
+//             $a='users';
+//             break;
+//         // case "company_product":
+//         //     $a='product/dashbord/show_company_product';
+//         //     break;
+//         // case "company_position":
+//         //     $a='product/dashbord/show_company_position';
+//         //     break;
+//         default:
+//             $a='role/url_three/'.$str;
+//             break;
+//     }
+//     return $a.DS.$y.DS.$z;
+// };
+// $route['(:any)/(:any)/(:any)/(:any)']=function($str,$x,$y,$z){
+//         switch($str){
+//         case "assets":
+//             $a='assets';
+//             break;
+//         case "category":
+//             $a='category';
+//             break;
+//         case "chat":
+//             $a='chat';
+//             break;
+//         case "company":
+//             $a='company';
+//             break;
+//         case "includes":
+//             $a='includes';
+//             break;
+//         case "product":
+//             $a='product';
+//             break;
+//         case "position":
+//             $a='position';
+//             break;
+//         case "chat":
+//             $a='chat';
+//             break;
+//         case "role":
+//             $a='role';
+//             break;
+//         case "users":
+//             $a='users';
+//             break;
+//         case "company_product":
+//             $a='product/dashbord/show_company_product';
+//             break;
+//         case "company_position":
+//             $a='product/dashbord/show_company_position';
+//             break;
+//         default:
+//             $a='role/url_four/'.$str;
+//             break;
+//     }
+//     return $a.DS.$x.DS.$y.DS.$z;
+// };
 // $route['(:any)/(:any)/(:any)/(:any)/(:any)']=function($str,$x,$y,$z,$w){
 //     if($str=="assets"||$str=="category"||$str=="chat"||$str=="company"||$str=="includes"||$str=="product"||$str=="chat"||$str=="role"||$str=="users")
 //         return $str.DS.$x.DS.$y.DS.$z.DS.$w;

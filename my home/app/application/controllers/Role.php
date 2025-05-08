@@ -5,6 +5,9 @@ class Role extends MY_Controller
 	public function __construct(){
 		parent::__construct();
 	}
+	public function test(){
+		echo 'hi';
+	}
 	private $id='';
 	private $lt='';
 	private $ln='';
