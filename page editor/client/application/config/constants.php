@@ -88,3 +88,5 @@ const DBNAME = 'landing';
 const USERNAME = 'root';
 const PASSWORD = '';
 const SITE_SERVER="manager";
+const COMPANY="manager";
+
