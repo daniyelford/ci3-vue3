@@ -1,5 +1,5 @@
 <?php
-defined('BASEPATH') OR exut('No direct script access allowed');
+defined('BASEPATH') OR exit('No direct script access allowed');
 class Api_model extends CI_Model
 {
     public $table='tbl_sample';
