@@ -531,3 +531,9 @@ $config['rewrite_short_tags'] = FALSE;
 | Array:		array('10.0.1.200', '192.168.5.0/24')
 */
 $config['proxy_ips'] = '';
+
+$config['webauthn'] = [
+    'origin' => 'https://example.com',  // دامنه وب‌سایت شما
+    'rp_name' => 'Example App',         // نام اپلیکیشن شما
+    'rp_id' => 'example.com',           // شناسه وب‌سایت
+];

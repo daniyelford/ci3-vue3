@@ -1,3 +1,4 @@
+const devMode = false;
 function changeUrlQueryToArray() {
     var pairs = window.location.search.substring(1).split("&"),obj = {},pair,i;
     for ( i in pairs ) {
@@ -193,168 +194,155 @@ function clickAction(p,v=''){
     sendJson(baseUrl('role/click_action'),a);
     return true;
 }
-function sendAjax(data,url,tag=''){
-    let siteKey=$('#site-key').val();
-    grecaptcha.ready(function() {
-        grecaptcha.execute(siteKey, {action: 'send'}).then(function(token) {
-    		$('#send').prepend('<input type="hidden" name="g-recaptcha-response" value="' + token + '">');
-    		$.post(url,{data:data, token: token}, function(result) {
-    			if(result == 0){
-        		    hideLoader();
-            		return not8();
-        		}else{
-    			    if(tag!==''){
-            		    if($.trim(result)!==''){
-                		    $(tag).html(result);
-                            hideLoader();
-            			}else{
-            			    $(tag).html('<div class="alert alert-danger text-dark rounded-10 text-center p-5">هیچ اطلاعاتی موجود نیست</div>');
-            			    hideLoader();
-            			}
-            	    }else{
-            	        switch(result){
-            	            case '1':
-            	                window.location.replace(baseUrl(''));
-            	                break;
-            	            case '11':
-            	                return not10();
-            	                break;
-            	            case '111':
-                		        window.location.reload();
-                		        return not10();
-                		        break;
-                		    case '1111':
-                		        window.location.replace(baseUrl('company_one'));
-            	                break;
-            	            case '11111':
-            	                window.location.replace(baseUrl(''));
-                        		return not10();
-            	                break;
-            	            case '111111':
-            	                window.location.replace(baseUrl('user_in_company'));
-            	                break;
-            	            case '1111111':
-            	                window.location.replace(baseUrl('company_users'));
-            	                return not10();
-            	                break;
-            	            case '11111111':
-            	                window.location.replace(baseUrl('company_manager'));
-            	                return not10();
-            	                break;
-            	            case '111111111':
-            	                window.location.replace(baseUrl('company_promotion_order'));
-            	                return not10();
-            	                break;
-            	            case '1111111111':
-            	                window.location.replace(baseUrl('company_position_one'));
-            	                break;
-            	            case '11111111111':
-            	                window.location.replace(baseUrl('company_position_setting'));
-            	                break;
-            	            case '111111111111':
-            	                window.location.replace(baseUrl('company_product_one'));
-            	                break;
-            	            case '1111111111111':
-            	                window.location.replace(baseUrl('company_product_setting'));
-            	                break;
-            	            case '11111111111111':
-            	                window.location.replace(baseUrl('reserve'));
-            	               // $('#reserveManagerShowErrorLog').removeClass('d-none');
-                                return not33();
-            	                break;
-            	            case '111111111111111':
-                		        window.location.reload();
-                		        break;
-                		    case '1111111111111111':
-                		        window.location.replace(baseUrl('product_company_manager'));
-                		        return not10();
-                		        break;
-                		    case '11111111111111111':
-                		        window.location.replace(baseUrl('position_company_manager'));
-                		        return not10();
-                		        break;
-                		  //  case '111111111111111111':
-                		  //      window.location.reload();
-                		  //      history.back();
-                		  //      return not10();
-                		  //      break;
-            	            case '2':
-            	                return not3();
-            	                break;
-            	            case '20':
-            	                return not2();
-            	                break;
-            	            case '21':
-            	                return not21();
-            	                break;
-            	            case '22':
-            	                return not22();
-            	                break;
-            	            case '23':
-            	                return not24();
-            	                break;
-            	            case '25':
-            	                return not25();
-            	                break;
-            	            case '26':
-            	                return not26();
-            	                break;
-            	            case '27':
-            	                return not27();
-            	                break;
-            	            case '28':
-            	                return not28();
-            	                break;
-            	            case '30':
-            	                return not30();
-            	                break;
-        	                case '34':
-            	                return not34();
-            	                break;
-            	            case '36':
-            	                return not36();
-            	                break;
-            	            case '37':
-            	                return not37();
-            	                break;
-            	            case '38':
-            	                return not38();
-            	                break;
-            	            case '39':
-            	                return not39();
-            	                break;
-            	            case '40':
-            	                return not40();
-            	                break;
-            	            case '41':
-            	                return not41();
-            	                break;
-            	            case '42':
-            	                return not42();
-            	                break;
-            	            case '43':
-            	                return not43();
-            	                break;
-            	            case '19':
-            	                return not19();
-            	                break;
-            	            case '10':
-            	                window.location.reload();
-            	                return not8();
-            	                break;
-            	            case 'ok':
-            	                break;
-            	            default:
-            	                console.log(result);
-            	                break;
-            	        }
-        			}
-                }
-        	});
+function sendAjax(data, url, tag = '') {
+    let siteKey = $('#site-key').val();
+    // حالت devMode (بدون recaptcha)
+    if (devMode) {
+        $.ajax({
+            url: url,
+            data: data,
+            method: 'POST',
+            success: function (result) {
+                handleAjaxResult(result, tag);
+            },
+            error: function (error) {
+                console.log(error);
+            }
         });
-    });
+    } else {
+        // حالت Production (با recaptcha)
+        grecaptcha.ready(function () {
+            grecaptcha.execute(siteKey, { action: 'send' }).then(function (token) {
+                $('#send').prepend('<input type="hidden" name="g-recaptcha-response" value="' + token + '">');
+                $.post(url, { data: data, token: token }, function (result) {
+                    handleAjaxResult(result, tag);
+                });
+            });
+        });
+    }
+
     return true;
 }
+
+// تابع مشترک برای مدیریت نتیجه Ajax
+function handleAjaxResult(result, tag) {
+    if (result == 0) {
+        hideLoader();
+        return not8();
+    } else {
+        if (tag !== '') {
+            if ($.trim(result) !== '') {
+                $(tag).html(result);
+                hideLoader();
+            } else {
+                $(tag).html('<div class="alert alert-danger text-dark rounded-10 text-center p-5">هیچ اطلاعاتی موجود نیست</div>');
+                hideLoader();
+            }
+        } else {
+            switch (result) {
+                case '1':
+                    window.location.replace(baseUrl(''));
+                    break;
+                case '11':
+                    return not10();
+                case '111':
+                    window.location.reload();
+                    return not10();
+                case '1111':
+                    window.location.replace(baseUrl('company_one'));
+                    break;
+                case '11111':
+                    window.location.replace(baseUrl(''));
+                    return not10();
+                case '111111':
+                    window.location.replace(baseUrl('user_in_company'));
+                    break;
+                case '1111111':
+                    window.location.replace(baseUrl('company_users'));
+                    return not10();
+                case '11111111':
+                    window.location.replace(baseUrl('company_manager'));
+                    return not10();
+                case '111111111':
+                    window.location.replace(baseUrl('company_promotion_order'));
+                    return not10();
+                case '1111111111':
+                    window.location.replace(baseUrl('company_position_one'));
+                    break;
+                case '11111111111':
+                    window.location.replace(baseUrl('company_position_setting'));
+                    break;
+                case '111111111111':
+                    window.location.replace(baseUrl('company_product_one'));
+                    break;
+                case '1111111111111':
+                    window.location.replace(baseUrl('company_product_setting'));
+                    break;
+                case '11111111111111':
+                    window.location.replace(baseUrl('reserve'));
+                    return not33();
+                case '111111111111111':
+                    window.location.reload();
+                    break;
+                case '1111111111111111':
+                    window.location.replace(baseUrl('product_company_manager'));
+                    return not10();
+                case '11111111111111111':
+                    window.location.replace(baseUrl('position_company_manager'));
+                    return not10();
+                case '2':
+                    return not3();
+                case '20':
+                    return not2();
+                case '21':
+                    return not21();
+                case '22':
+                    return not22();
+                case '23':
+                    return not24();
+                case '25':
+                    return not25();
+                case '26':
+                    return not26();
+                case '27':
+                    return not27();
+                case '28':
+                    return not28();
+                case '30':
+                    return not30();
+                case '34':
+                    return not34();
+                case '36':
+                    return not36();
+                case '37':
+                    return not37();
+                case '38':
+                    return not38();
+                case '39':
+                    return not39();
+                case '40':
+                    return not40();
+                case '41':
+                    return not41();
+                case '42':
+                    return not42();
+                case '43':
+                    return not43();
+                case '19':
+                    return not19();
+                case '10':
+                    window.location.reload();
+                    return not8();
+                case 'ok':
+                    break;
+                default:
+                    console.log(result);
+                    break;
+            }
+        }
+    }
+}
+
 // general
 function checkBackUrlFunction(){}
 function showVideoBigger(el){

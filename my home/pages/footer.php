@@ -1,4 +1,4 @@
-            </div>
+</div>
             <?php $date=new JDF();
         	$this->view('footer_includes/left_side.php'); ?>
         </div>

@@ -250,6 +250,8 @@ class Role extends MY_Controller
 	}
 	private $main;
 	public function index(){
+		var_dump('hi');
+        die();
 	    $this->page=(!empty($this->page)?$this->page:(!empty($_SESSION['page'])&&is_string($_SESSION['page'])?$_SESSION['page']:''));
 	    $this->id=(!empty($_SESSION['id']) && intval($_SESSION['id'])>0?intval($_SESSION['id']):0);
 	    if(intval($this->id)>0 && !empty($_SESSION['visit']) && intval($_SESSION['visit'])>0){
@@ -447,6 +449,7 @@ class Role extends MY_Controller
 			$this->err_404();
 	}
 	public function click_action(){
+		die('hi');
     	$a = (!empty($_POST['token']) ? trim(filter_input(INPUT_POST, 'token', FILTER_SANITIZE_STRING)) : null);
 	    $b = (!empty($_POST['data']) && is_string($_POST['data'])?$_POST['data']:null);
 	    if(!is_null($a) && !is_null($b) && $this->Include_model->chapcha($a) && ($c=explode(':',$b))!==false&&!empty($c) && !empty($c['0']) && !empty($c['1'])){
@@ -465,6 +468,7 @@ class Role extends MY_Controller
 	    return (!empty($str) && is_string($str) && ($a=str_replace(["/",'~','"',"'",':','#','@','!','|',';','?','<','>','.',',','&','*','and','=','%'],'',$str))!==false?$a:'');
 	}
 	public function url($str){
+		die('hi');
 	    if(!empty($str) && is_string($str) && ($str=$this->xss_link($str))!==false && !empty($str)){
 	        $this->click=new Click_actions();
 	        $this->page=$this->click->url_action_checker($str);

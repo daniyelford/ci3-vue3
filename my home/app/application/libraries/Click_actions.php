@@ -129,6 +129,10 @@ class Click_actions
             ]
         ],      
     ];
+	// 
+// check
+
+
     public function url_action_checker($url){
 	    $ret=[];
 	    $data=(!empty($_SESSION['id']) && intval($_SESSION['id'])>0?$this->url_user_array:$this->url_array);
@@ -140,6 +144,7 @@ class Click_actions
 	    }
 	    return $ret;
 	}
+
 	public function url_action_checker_two_arg($url,$prop){
 	    $ret=[];
 	    $data=(!empty($_SESSION['id']) && intval($_SESSION['id'])>0?$this->url_user_array:$this->url_array);
@@ -262,6 +267,9 @@ class Click_actions
 	    }
         return $ret;
 	}
+
+	//check
+
 	public function action_click($a,$b){
 	    $ret=[];
 	    $data=(!empty($_SESSION['id']) && intval($_SESSION['id'])>0?$this->url_user_array:$this->url_array);
@@ -354,6 +362,7 @@ class Click_actions
 	        }
 	    return $ret;
 	}
+	
 	// inner footer users js
     private function action_function($data,$page){
 	    $ret='';
@@ -426,6 +435,9 @@ class Click_actions
 	        }
 	    return $ret;
 	}
+
+// check
+
 	public function action($page){
 	    $ret = $this->action_function($this->url_array,$page);
 	    return (!empty($ret)?$ret:"processAjaxData('خانه',$('#content').html(),'".base_url('home')."');");
@@ -434,6 +446,8 @@ class Click_actions
         $ret = $this->action_function($this->url_user_array,$page);
         return (!empty($ret)?$ret:"processAjaxData('داشبورد',$('#content').html(),'".base_url('dashbord')."');");
 	}
+	
+	
 	// inner footer users js
 	private function url_control($str){
 	    return (!empty($str)&&is_string($str)?str_replace(' ','--',$str):'');
