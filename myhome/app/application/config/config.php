@@ -23,9 +23,17 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | a PHP script and you can easily do that on your own.
 |
 */
-$root  = "https://".$_SERVER['HTTP_HOST'];
+$http = $_SERVER['HTTP_HOST'] ?? 'localhost';
+$root = isset($_SERVER['HTTP_HOST']) ? "https://".$_SERVER['HTTP_HOST'] : 'http://localhost';
 $root .= str_replace(basename($_SERVER['SCRIPT_NAME']),"",$_SERVER['SCRIPT_NAME']);
 $config['base_url']    = $root;
+
+$config['webauthn'] = [
+    'origin' => $root,
+    'rp_name' => 'my home',
+    'rp_id' => $http,
+];
+
 /*
 |--------------------------------------------------------------------------
 | Index File
@@ -531,9 +539,3 @@ $config['rewrite_short_tags'] = FALSE;
 | Array:		array('10.0.1.200', '192.168.5.0/24')
 */
 $config['proxy_ips'] = '';
-
-$config['webauthn'] = [
-    'origin' => $root,
-    'rp_name' => 'my home',
-    'rp_id' => $_SERVER['HTTP_HOST'],
-];
