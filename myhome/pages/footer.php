@@ -16,9 +16,11 @@
         } ?>
         <div class="main-footer ht-70">
 			<div class="container-fluid pd-t-0-f ht-50p">
-                <span>
-        	        <a style="position: absolute;bottom: 11px;left: 76px;" referrerpolicy='origin' target='_blank' href='https://trustseal.enamad.ir/?id=369751&Code=SfGPiPIfCnG5I8TuhfG4UbpKTYngTWXy'><img style="width:50px;height:50px;" referrerpolicy='origin' src='https://trustseal.enamad.ir/logo.aspx?id=369751&Code=SfGPiPIfCnG5I8TuhfG4UbpKTYngTWXy' alt='' style='cursor:pointer' Code='SfGPiPIfCnG5I8TuhfG4UbpKTYngTWXy'></a>
-                </span>
+                <?php if(isset($_SERVER['HTTP_HOST']) && !empty($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST']!=='localhost'){ ?>
+                    <span>
+                        <a style="position: absolute;bottom: 11px;left: 76px;" referrerpolicy='origin' target='_blank' href='https://trustseal.enamad.ir/?id=369751&Code=SfGPiPIfCnG5I8TuhfG4UbpKTYngTWXy'><img style="width:50px;height:50px;" referrerpolicy='origin' src='https://trustseal.enamad.ir/logo.aspx?id=369751&Code=SfGPiPIfCnG5I8TuhfG4UbpKTYngTWXy' alt='' style='cursor:pointer' Code='SfGPiPIfCnG5I8TuhfG4UbpKTYngTWXy'></a>
+                    </span>
+                <?php }?>
                 <!--
 			    <p class="text-center">
 			        قیمت دلار:

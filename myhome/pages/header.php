@@ -7,7 +7,9 @@
     <meta name="Description" content="my home">
     <meta name="Author" content="DanialFrd">
     <meta name="Keywords" content="easier management companies"/>
-    <meta name="enamad" content="125152"/>
+    <?php if(isset($_SERVER['HTTP_HOST']) && !empty($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST']!=='localhost'){ ?>
+        <meta name="enamad" content="125152"/>
+    <?php } ?>
     <!--    Title -->
     <title><?= (!empty($title) ? $title : '') ?></title>
     <!--    Favicon -->
