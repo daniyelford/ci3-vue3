@@ -16,6 +16,7 @@
     ],
     "minimum-stability": "stable",
     "require": {
+        "web-auth/cose-lib": "^4.4",
         "web-auth/webauthn-lib": "^5.2"
     }
 }

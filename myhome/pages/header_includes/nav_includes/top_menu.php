@@ -185,6 +185,10 @@
 				    <img class="wd-30 hd-30 pd-1 rounded-10" src="<?= base_url('assets/svg/user/phone-luck.svg') ?>">
                     ورود با شماره همراه
 				</a>
+				<a class="google-login dropdown-item" href="<?= base_url('finger_login') ?>">
+				    <img class="wd-30 hd-30 pd-1 rounded-10" src="<?= base_url('assets/svg/user/google-login.svg') ?>">
+					webAuthn
+				</a>
 				<!-- login -->
 				<!--<a class="costum-login dropdown-item" data-target="#select2modal" data-toggle="modal" href="#">-->
 				<!--    <img class="wd-30 hd-30 pd-1 rounded-10" src="<?= base_url('assets/svg/user/costum-login.svg') ?>">-->

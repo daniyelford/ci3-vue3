@@ -3,7 +3,7 @@
         'name' => 'myhome/webauthn',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '09721bf3fde8ccb171a3ef6e5f76f371cb599711',
+        'reference' => '6a6449b95ceeb22d636eddf0e5b0e84f9ebace10',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -31,7 +31,7 @@
         'myhome/webauthn' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '09721bf3fde8ccb171a3ef6e5f76f371cb599711',
+            'reference' => '6a6449b95ceeb22d636eddf0e5b0e84f9ebace10',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

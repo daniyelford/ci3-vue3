@@ -1,82 +1,136 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
 
-use WebAuthn\PublicKeyCredentialUserEntity;
-use WebAuthn\PublicKeyCredentialCreationOptions;
-use WebAuthn\Server;
-use WebAuthn\AuthenticatorSelectionCriteria;
-use WebAuthn\AttestationConveyancePreference;
+use Webauthn\PublicKeyCredentialCreationOptions;
+use Webauthn\PublicKeyCredentialRequestOptions;
+use Webauthn\AuthenticatorAttestationResponseValidator;
+use Webauthn\AuthenticatorAssertionResponseValidator;
+use Cose\Algorithm\Manager as CoseManager;
+use Webauthn\PublicKeyCredentialUserEntity;
 
-class Webauthn extends CI_Controller {
+class Webauthn extends CI_Controller
+{
+    private $credentialRepository;
+    private $configWebauthn;
 
-    private $server;
-
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
-        $this->load->library('session');
-        $this->load->model('User_model'); // فرض می‌کنیم که مدل کاربری دارید
+
+        // Load config
+        $this->configWebauthn = $this->config->item('webauthn');
+
+        // Example repository (You will implement this)
+        // $this->load->model('YourCredentialRepository');
+        // $this->credentialRepository = new YourCredentialRepository();
     }
 
-    // 1. ایجاد گزینه‌های WebAuthn (Challenge)
-    public function options() {
-        $user = $this->User_model->getUser($this->session->user_id); // دریافت اطلاعات کاربر از دیتابیس
+    public function test()
+    {
+        die('hi');
+    }
 
-        // ساخت PublicKeyCredentialUserEntity برای کاربر
+    public function registerOptions()
+    {
+        $challenge = random_bytes(32);
+        $this->session->set_userdata('register_challenge', base64_encode($challenge));
+
         $userEntity = new PublicKeyCredentialUserEntity(
-            $user['id'], // شناسه کاربر
-            $user['email'], // ایمیل یا شناسه کاربر
-            $user['name']   // نام کاربر
+            'user@example.com',         // user name
+            random_bytes(16),           // user id (binary)
+            'Example User',             // display name
+            null                        // icon (optional)
         );
 
-        // تنظیمات WebAuthn برای تولید گزینه‌ها
-        $authenticatorSelection = new AuthenticatorSelectionCriteria(
-            true, // انتخاب دستگاه‌های قابل اطمینان
-            'cross-platform' // نوع انتخاب احراز هویت
+        $options = new PublicKeyCredentialCreationOptions(
+            $this->configWebauthn['rp_id'],          // Relying Party ID
+            $this->configWebauthn['rp_name'],        // Relying Party name
+            $challenge,
+            $userEntity,
+            [
+                [
+                    'type' => 'public-key',
+                    'alg' => -7 // ES256
+                ]
+            ],
+            null
         );
 
-        $attestationPreference = AttestationConveyancePreference::DIRECT();
-
-        // ساخت WebAuthn Server
-        $this->server = new Server(
-            $this->config->item('webauthn')['rp_name'], // نام RP
-            $this->config->item('webauthn')['rp_id'],   // شناسه RP
-            $this->config->item('webauthn')['origin'],   // URL مبدا
-            $this->config->item('webauthn')['origin'],   // همان URL مبدا برای attestation
-            $authenticatorSelection,
-            $attestationPreference
-        );
-
-        // تولید گزینه‌های WebAuthn
-        $options = $this->server->generatePublicKeyCredentialCreationOptions($userEntity);
-
-        // ذخیره چالش در سشن
-        $this->session->set_userdata('challenge', $options->getChallenge());
-
-        // ارسال گزینه‌ها به کلاینت
+        header('Content-Type: application/json');
         echo json_encode($options);
     }
 
-    // 2. تایید پاسخ WebAuthn (WebAuthn Assertion)
-    public function login() {
-        $assertionResponse = $this->input->raw_input_stream; // دریافت پاسخ WebAuthn از کلاینت
+    public function verifyRegister()
+    {
+        $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
 
-        // پردازش پاسخ احراز هویت
-        $assertionResponse = json_decode($assertionResponse);
-        $response = $assertionResponse->response;
-
-        // اعتبارسنجی پاسخ WebAuthn
-        $credential = $this->server->loadAndCheckAssertionResponse(
-            $response->authenticatorData,
-            $response->clientDataJSON,
-            $response->signature
+        $validator = new AuthenticatorAttestationResponseValidator(
+            $this->credentialRepository,
+            new CoseManager()
         );
 
-        if ($credential) {
-            // اگر اعتبارسنجی موفق بود، ورود را انجام دهید
-            $this->session->set_userdata('user_id', $credential->getUserEntity()->getId());
-            redirect('dashboard');
-        } else {
-            echo "Login failed!";
-        }
+        $challenge = base64_decode($this->session->userdata('register_challenge'));
+        $rpId = $this->configWebauthn['rp_id'];
+        $origin = $this->configWebauthn['origin'];
+
+        $publicKeyCredentialSource = $validator->check(
+            $data,
+            $challenge,
+            $rpId,
+            $origin,
+            null // tokenBinding (optional)
+        );
+
+        $this->credentialRepository->saveCredential($publicKeyCredentialSource);
+
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'ok']);
+    }
+
+    public function loginOptions()
+    {
+        $challenge = random_bytes(32);
+        $this->session->set_userdata('login_challenge', base64_encode($challenge));
+
+        $options = new PublicKeyCredentialRequestOptions(
+            $challenge,
+            60000,                                // timeout
+            $this->configWebauthn['rp_id'],       // rpId
+            null,                                 // allowCredentials
+            null,                                 // userVerification
+            null,                                 // extensions
+            null                                  // mediation
+        );
+
+        header('Content-Type: application/json');
+        echo json_encode($options);
+    }
+
+    public function verifyLogin()
+    {
+        $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
+
+        $validator = new AuthenticatorAssertionResponseValidator(
+            $this->credentialRepository,
+            new CoseManager()
+        );
+
+        $challenge = base64_decode($this->session->userdata('login_challenge'));
+        $rpId = $this->configWebauthn['rp_id'];
+        $origin = $this->configWebauthn['origin'];
+
+        $publicKeyCredentialSource = $validator->check(
+            $data,
+            $challenge,
+            $rpId,
+            $origin,
+            null
+        );
+
+        $this->session->set_userdata('user_id', $publicKeyCredentialSource->getUserHandle());
+
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'ok']);
     }
 }
