@@ -159,11 +159,12 @@ class Include_model extends CI_Model
         return json_decode($response, true);
 	}
 	public function chapcha($token){
-        // 
-        // if(ENVIRONMENT=='development') return true;
-	    return (!empty($token) && is_string($token) && 
-        ($a = json_decode(@file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=" . SECRET_KEY . "&response=" . $token . "&remoteip=" . $_SERVER['REMOTE_ADDR'], FILE_TEXT, stream_context_create(['ssl' =>['verify_peer' => false,'verify_peer_name' => false]]))))!==false && 
-        !empty($a) && $a->success);
+        if(isset($_SERVER['HTTP_HOST']) && !empty($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST']!=='localhost')
+	        return (!empty($token) && is_string($token) && 
+            ($a = json_decode(@file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=" . SECRET_KEY . "&response=" . $token . "&remoteip=" . $_SERVER['REMOTE_ADDR'], FILE_TEXT, stream_context_create(['ssl' =>['verify_peer' => false,'verify_peer_name' => false]]))))!==false && 
+            !empty($a) && $a->success);
+        else
+            return true;
 	}
 // 	other
     // site_api

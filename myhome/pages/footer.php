@@ -42,7 +42,8 @@
 <?php if(!empty($map)){ ?>
     <script src="<?= base_url('assets/js/includes/map.js') ?>"></script>
     <script>
-        maptilersdk.config.apiKey = 'kvXmcJTTN5s5LnvpEyP5';
+        let mapapi='<?= (isset($_SERVER['HTTP_HOST']) && !empty($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST']!=='localhost'?MAPAPI:MAPAPILOCAL) ?>';
+        maptilersdk.config.apiKey = '';
         let map = new maptilersdk.Map({
             container: 'map',
             style: maptilersdk.MapStyle.STREETS,

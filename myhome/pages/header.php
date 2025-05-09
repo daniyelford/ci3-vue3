@@ -70,6 +70,7 @@
         const productInfo=[];
         const positionInfo=[];
         let markerNumber=0;
+        const devMode = <?= (isset($_SERVER['HTTP_HOST']) && !empty($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST']!=='localhost'?'true':'false') ?>;
     </script>
     <!--pagination-->
     <script>

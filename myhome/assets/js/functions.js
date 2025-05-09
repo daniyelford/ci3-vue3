@@ -1,4 +1,3 @@
-const devMode = false;
 function changeUrlQueryToArray() {
     var pairs = window.location.search.substring(1).split("&"),obj = {},pair,i;
     for ( i in pairs ) {
