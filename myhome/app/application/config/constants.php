@@ -91,7 +91,7 @@ const PASSWORD = '';
 const SITEMAIL='info@my-home.ir';
 
 const WEATHER_API = '';
-const MAPAPI='kvXmcJTTN5s5LnvpEyP5';
+const MAPAPI='';
 const MAPAPILOCAL='hj2ALaB49G1aXYjNbHPY';
 // google
 const SITE_KEY='';
