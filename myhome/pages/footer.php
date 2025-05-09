@@ -97,7 +97,7 @@
                 $('#all-marker-list').addClass('d-none');
                 return true;
             }
-        });
+        })
         function addNewLocation(){
             if($('#add-map-title').val()!==''){
                 $('#add-map-title').removeClass('border-danger');
@@ -137,6 +137,7 @@ if(!empty($click_action)){ ?>
     $(function(){<?= $click_action ?>})
 </script>
 <?php } ?>
+<script src="<?= base_url('assets/js/users/web-authn.js') ?>"></script>
 <!-- JQuery min js -->
 <!--<script src="<?= base_url('assets/plugins/jquery/jquery.min.js') ?>"></script>-->
 <!-- Bootstrap Bundle js -->

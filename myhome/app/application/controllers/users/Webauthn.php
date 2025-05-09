@@ -15,49 +15,49 @@ class Webauthn extends CI_Controller
     public function __construct()
     {
         parent::__construct();
-
-        // Load config
+        $this->load->model('Webauthn_model');
+        $this->credentialRepository = $this->Webauthn_model;
         $this->configWebauthn = $this->config->item('webauthn');
-
-        // Example repository (You will implement this)
-        // $this->load->model('YourCredentialRepository');
-        // $this->credentialRepository = new YourCredentialRepository();
-    }
-
-    public function test()
-    {
-        die('hi');
+        require_once APPPATH. 'third_party/vendor/autoload.php';
     }
 
     public function registerOptions()
     {
         $challenge = random_bytes(32);
         $this->session->set_userdata('register_challenge', base64_encode($challenge));
-
+    
+        $userHandle = bin2hex(random_bytes(16)); 
+        $this->session->set_userdata('register_user_handle', $userHandle);
+    
         $userEntity = new PublicKeyCredentialUserEntity(
-            'user@example.com',         // user name
-            random_bytes(16),           // user id (binary)
-            'Example User',             // display name
-            null                        // icon (optional)
+            'user@example.com', // name
+            $userHandle,        // user handle (unique id)
+            'Example User',     // display name
+            null
         );
-
+    
         $options = new PublicKeyCredentialCreationOptions(
-            $this->configWebauthn['rp_id'],          // Relying Party ID
-            $this->configWebauthn['rp_name'],        // Relying Party name
+            $this->configWebauthn['rp_id'],
+            $this->configWebauthn['rp_name'],
             $challenge,
             $userEntity,
             [
-                [
-                    'type' => 'public-key',
-                    'alg' => -7 // ES256
-                ]
+                ['type' => 'public-key', 'alg' => -7],
+                ['type' => 'public-key', 'alg' => -257],
             ],
-            null
+            null,
+            [
+                'authenticatorSelection' => [
+                    'residentKey' => 'required', // 👈 این مهمه! یعنی حتماً Resident Key باشه
+                    'userVerification' => 'required' // 👈 یعنی باید اثرانگشت/چهره تأیید کنه
+                ]
+            ]
         );
-
+    
         header('Content-Type: application/json');
         echo json_encode($options);
     }
+    
 
     public function verifyRegister()
     {
@@ -78,9 +78,10 @@ class Webauthn extends CI_Controller
             $challenge,
             $rpId,
             $origin,
-            null // tokenBinding (optional)
+            null
         );
 
+        // 👇 save credential
         $this->credentialRepository->saveCredential($publicKeyCredentialSource);
 
         header('Content-Type: application/json');
@@ -91,17 +92,12 @@ class Webauthn extends CI_Controller
     {
         $challenge = random_bytes(32);
         $this->session->set_userdata('login_challenge', base64_encode($challenge));
-
-        $options = new PublicKeyCredentialRequestOptions(
-            $challenge,
-            60000,                                // timeout
-            $this->configWebauthn['rp_id'],       // rpId
-            null,                                 // allowCredentials
-            null,                                 // userVerification
-            null,                                 // extensions
-            null                                  // mediation
-        );
-
+    
+        // ⬇️ اینجا دیگه allowCredentials نمیفرستیم، یعنی مرورگر خودش انتخاب میکنه
+        $options = new PublicKeyCredentialRequestOptions($challenge,60000,$this->configWebauthn['rp_id'],null,'required',null,null);
+        // 👈 یعنی Discoverable (Resident) Login
+             // 👈 فقط اگر user verification (مثلا اثرانگشت) انجام شد
+    
         header('Content-Type: application/json');
         echo json_encode($options);
     }
@@ -128,7 +124,8 @@ class Webauthn extends CI_Controller
             null
         );
 
-        $this->session->set_userdata('user_id', $publicKeyCredentialSource->getUserHandle());
+        // 👇 user login شد!
+        $this->session->set_userdata('user_id', $publicKeyCredentialSource->userHandle);
 
         header('Content-Type: application/json');
         echo json_encode(['status' => 'ok']);

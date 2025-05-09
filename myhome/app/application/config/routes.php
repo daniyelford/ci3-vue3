@@ -179,9 +179,18 @@ $route['(:any)']=function($str){
         case "resume":
             $a='users/dashbord/resume';
             break;
-        case "finger_login":
-                $a='users/Webauthn/test';
-                break;
+        case "webauthn_register_options":
+            $a='users/Webauthn/registerOptions';
+            break;
+        case "webauthn_verify_register":
+            $a='users/Webauthn/verifyRegister';
+            break;
+        case "webauthn_login_options":
+            $a='users/Webauthn/loginOptions';
+            break;
+        case "webauthn_verify_login":
+            $a='users/Webauthn/verifyLogin';
+            break;
         default:
             $a='role/url/'.$str;
             break;

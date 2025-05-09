@@ -11,20 +11,18 @@ class Webauthn_model extends CI_Model
 
     public function saveCredential(PublicKeyCredentialSource $source)
     {
-        // تبدیل trustPath به فرمت قابل ذخیره‌سازی
         $trustPath = $source->trustPath instanceof EmptyTrustPath ? 'empty' : 'certificate';
 
-        // اگر trustPath از نوع Certificate باشد و مربوط به FIDO2 باشد، آن را به عنوان FIDO2 ذخیره کن
         $certificateType = ($source->trustPath instanceof CertificateTrustPath && $this->isFido2Certificate($source->trustPath)) ? 'fido2' : 'certificate';
 
         $data = [
-            'user_id'          => $_SESSION['id'], // به یوزر لاگین شده بچسبون (تغییر بده!)
+            'user_id'          => $_SESSION['id'],
             'credential_id'    => $source->publicKeyCredentialId,
             'type'             => $source->type,
             'transports'       => json_encode($source->transports),
             'attestation_type' => $source->attestationType,
-            'trust_path'       => $trustPath, // ذخیره کردن نوع trustPath
-            'certificate_type' => $certificateType, // ذخیره نوع FIDO2 یا Certificate
+            'trust_path'       => $trustPath,
+            'certificate_type' => $certificateType,
             'aaguid'           => $source->aaguid->toRfc4122(),
             'public_key'       => $source->credentialPublicKey,
             'counter'          => $source->counter,
@@ -43,13 +41,12 @@ class Webauthn_model extends CI_Model
             return null;
         }
 
-        // بازیابی trustPath و تبدیل آن به شیء مناسب
-        if ($row->trust_path === 'empty') {
-            $trustPath = new EmptyTrustPath();
-        } else {
-            // اگر نوع گواهی FIDO2 باشد، آن را به عنوان FIDO2 تشخیص بده
-            $trustPath = ($row->certificate_type === 'fido2') ? new CertificateTrustPath(['fido2_certificate_bytes']) : new CertificateTrustPath([]);
-        }
+        $trustPath = match($row->trust_path) {
+            'empty' => new EmptyTrustPath(),
+            default => ($row->certificate_type === 'fido2') 
+                ? new CertificateTrustPath(['fido2_certificate_bytes'])
+                : new CertificateTrustPath([]),
+        };
 
         return new PublicKeyCredentialSource(
             $row->credential_id,
@@ -57,7 +54,7 @@ class Webauthn_model extends CI_Model
             json_decode($row->transports, true),
             $row->attestation_type,
             $trustPath,
-            Uuid::fromString($row->aaguid), // تبدیل به Uuid
+            Uuid::fromString($row->aaguid),
             $row->public_key,
             $row->counter,
             $row->user_handle
@@ -70,13 +67,12 @@ class Webauthn_model extends CI_Model
         $result = [];
 
         foreach ($query->result() as $row) {
-            // بازیابی trustPath و تبدیل آن به شیء مناسب
-            if ($row->trust_path === 'empty') {
-                $trustPath = new EmptyTrustPath();
-            } else {
-                // اگر نوع گواهی FIDO2 باشد، آن را به عنوان FIDO2 تشخیص بده
-                $trustPath = ($row->certificate_type === 'fido2') ? new CertificateTrustPath(['fido2_certificate_bytes']) : new CertificateTrustPath([]);
-            }
+            $trustPath = match($row->trust_path) {
+                'empty' => new EmptyTrustPath(),
+                default => ($row->certificate_type === 'fido2') 
+                    ? new CertificateTrustPath(['fido2_certificate_bytes'])
+                    : new CertificateTrustPath([]),
+            };
 
             $result[] = new PublicKeyCredentialSource(
                 $row->credential_id,
@@ -84,7 +80,7 @@ class Webauthn_model extends CI_Model
                 json_decode($row->transports, true),
                 $row->attestation_type,
                 $trustPath,
-                Uuid::fromString($row->aaguid), // تبدیل به Uuid
+                Uuid::fromString($row->aaguid),
                 $row->public_key,
                 $row->counter,
                 $row->user_handle
@@ -100,11 +96,8 @@ class Webauthn_model extends CI_Model
         $this->db->update($this->tbl, ['counter' => $counter]);
     }
 
-    // تابع کمکی برای شناسایی FIDO2
     private function isFido2Certificate(CertificateTrustPath $trustPath): bool
     {
-        // اینجا می‌توانید شرایط خود را برای شناسایی گواهی FIDO2 اضافه کنید
-        // مثلا بررسی مشخصات یا بررسی فیلد خاصی در trustPath
-        return true; // برای نمونه همیشه به عنوان FIDO2 در نظر گرفته شده
+        return true; // برای تست همیشه fido2 درنظر گرفته میشه
     }
 }
