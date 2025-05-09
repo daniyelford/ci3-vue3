@@ -26,6 +26,8 @@ class MY_Controller extends CI_Controller
         $this->load->model('Users_model');
         $this->load->model('Order_model');
         $this->load->model('Position_model');
+        $this->load->model('Webauthn_model');
+        
         // $this->load->model('Notification_model');
     }
 }
