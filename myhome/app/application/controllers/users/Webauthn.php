@@ -28,82 +28,6 @@ class Webauthn extends CI_Controller
         require_once APPPATH. 'third_party/vendor/autoload.php';
     }
 
-    public function registerOptions()
-    {
-        if (empty($_SESSION['id'])) {
-            show_error('کاربر لاگین نیست', 401);
-            return;
-        }
-        $userId = $_SESSION['id'];
-        $userEntity = new PublicKeyCredentialUserEntity('user' . $userId, $userId, 'User name ' . $userId, null);
-        $challenge = random_bytes(32);
-        $_SESSION['register_challenge'] = base64_encode($challenge);
-        $rpEntity = new PublicKeyCredentialRpEntity($this->configWebauthn['rp_name'], $this->configWebauthn['rp_id'], null);
-        $authenticatorSelection = new AuthenticatorSelectionCriteria('required', 'cross-platform');
-        $options = new PublicKeyCredentialCreationOptions($rpEntity, $userEntity, $challenge, [PublicKeyCredentialParameters::createPk(-7), PublicKeyCredentialParameters::createPk(-257)], $authenticatorSelection, null, [], 60000);
-        $_SESSION['publicKeyCredentialCreationOptions'] = $options; // ذخیره‌سازی تنظیمات در session
-        header('Content-Type: application/json');
-        echo json_encode([
-            'rp' => ['name' => $this->configWebauthn['rp_name'], 'id' => $this->configWebauthn['rp_id']],
-            'user' => [
-                'id' => base64_encode($userEntity->id),
-                'name' => $userEntity->name,
-                'displayName' => $userEntity->displayName,
-            ],
-            'challenge' => base64_encode($options->challenge),
-            'pubKeyCredParams' => [
-                ['type' => 'public-key', 'alg' => -7],
-            ],
-            'timeout' => $options->timeout,
-            'attestation' => 'none',
-            'userVerification' => 'required',
-        ]);
-    }
-
-    public function verifyRegister()
-    {
-        if (empty($_SESSION['id'])) {
-            show_error('کاربر لاگین نیست', 401);
-            return;
-        }
-        $json = file_get_contents('php://input');
-        $data = json_decode($json, true);
-        if (!$data) {
-            show_error('داده‌های نامعتبر', 400);
-        }
-        $challenge = base64_decode($_SESSION['register_challenge']);
-        if ($challenge === false) {
-            show_error('چالش نامعتبر', 400);
-        }
-        $publicKeyCredential = new PublicKeyCredential(
-            $data['id'],
-            $data['rawId'],
-            $data['response'],
-            $data['type'],
-            $data['clientExtensionResults'] ?? []
-        );
-        $attestationResponse = new AuthenticatorAttestationResponse(
-            $data['response']['clientDataJSON'],
-            $data['response']['attestationObject']
-        );
-        $publicKeyCredentialCreationOptions = $_SESSION['publicKeyCredentialCreationOptions'];
-        $csmFactory = new CeremonyStepManagerFactory();
-        $creationCSM = $csmFactory->creationCeremony();
-        $validator = AuthenticatorAttestationResponseValidator::create($creationCSM);
-        try {
-            $publicKeyCredentialSource = $validator->check(
-                $attestationResponse,
-                $publicKeyCredentialCreationOptions,
-                $this->configWebauthn['origin']
-            );
-        } catch (\Throwable $e) {
-            show_error('خطا در تایید: ' . $e->getMessage(), 400);
-        }
-        $this->credentialRepository->saveCredential($publicKeyCredentialSource);
-        header('Content-Type: application/json');
-        echo json_encode(['status' => 'ok']);
-    }
-
     public function loginOptions()
     {
         $challenge = random_bytes(32);
@@ -203,6 +127,75 @@ class Webauthn extends CI_Controller
             show_error('کاربر پیدا نشد', 401);
         }    
         $this->session->set_userdata('user_id', $user->id);    
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'ok']);
+    }
+
+    public function registerOptions()
+    {
+        if (empty($_SESSION['id'])) {
+            show_error('کاربر لاگین نیست', 401);
+            return;
+        }
+        $userId = $_SESSION['id'];
+        $userEntity = new PublicKeyCredentialUserEntity('user' . $userId, $userId, 'User name ' . $userId, null);
+        $challenge = random_bytes(32);
+        $_SESSION['register_challenge'] = base64_encode($challenge);
+        $rpEntity = new PublicKeyCredentialRpEntity($this->configWebauthn['rp_name'], $this->configWebauthn['rp_id'], null);
+        $authenticatorSelection = new AuthenticatorSelectionCriteria('required', 'cross-platform');
+        $options = new PublicKeyCredentialCreationOptions($rpEntity, $userEntity, $challenge, [PublicKeyCredentialParameters::createPk(-7), PublicKeyCredentialParameters::createPk(-257)], $authenticatorSelection, null, [], 60000);
+        $_SESSION['publicKeyCredentialCreationOptions'] = $options; // ذخیره‌سازی تنظیمات در session
+        header('Content-Type: application/json');
+        echo json_encode([
+            'rp' => ['name' => $this->configWebauthn['rp_name'], 'id' => $this->configWebauthn['rp_id']],
+            'user' => [
+                'id' => base64_encode($userEntity->id),
+                'name' => $userEntity->name,
+                'displayName' => $userEntity->displayName,
+            ],
+            'challenge' => base64_encode($options->challenge),
+            'pubKeyCredParams' => [
+                ['type' => 'public-key', 'alg' => -7],
+            ],
+            'timeout' => $options->timeout,
+            'attestation' => 'none',
+            'userVerification' => 'required',
+        ]);
+    }
+
+    public function verifyRegister()
+    {
+        if (empty($_SESSION['id'])) {
+            show_error('کاربر لاگین نیست', 401);
+            return;
+        }
+        $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
+        if (!$data) {
+            show_error('داده‌های نامعتبر', 400);
+            return;
+        }
+        $challenge = base64_decode($_SESSION['register_challenge']);
+        if ($challenge === false) {
+            show_error('چالش نامعتبر', 400);
+            return;
+        }
+        $publicKeyCredential = new PublicKeyCredential($data['id'],$data['rawId'],$data['response'],$data['type'],$data['clientExtensionResults'] ?? []);
+        $attestationResponse = new AuthenticatorAttestationResponse($data['response']['clientDataJSON'],$data['response']['attestationObject']);
+        $publicKeyCredentialCreationOptions = $_SESSION['publicKeyCredentialCreationOptions'];
+        $csmFactory = new CeremonyStepManagerFactory();
+        $creationCSM = $csmFactory->creationCeremony();
+        $validator = AuthenticatorAttestationResponseValidator::create($creationCSM);
+        try {
+            $publicKeyCredentialSource = $validator->check(
+                $attestationResponse,
+                $publicKeyCredentialCreationOptions,
+                $this->configWebauthn['origin']
+            );
+        } catch (\Throwable $e) {
+            show_error('خطا در تایید: ' . $e->getMessage(), 400);
+        }
+        $this->credentialRepository->saveCredential($publicKeyCredentialSource);
         header('Content-Type: application/json');
         echo json_encode(['status' => 'ok']);
     }

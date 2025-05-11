@@ -21,4 +21,15 @@ final readonly class CertificateTrustPath implements TrustPath
     {
         return new self($certificates);
     }
+
+    public function isValid(): bool
+    {
+        return !empty($this->certificates);
+    }
+
+    public function hasFido2Attributes(): bool
+    {
+        return in_array('FIDO2', $this->certificates);
+    }
+
 }
