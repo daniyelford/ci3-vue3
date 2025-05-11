@@ -9,6 +9,33 @@ class Webauthn_model extends CI_Model
 {
     private $tbl = 'user_credentials';
 
+    public function findAll(): array
+    {
+        $query = $this->db->get($this->tbl);
+        $result = [];
+        foreach ($query->result() as $row) {
+            $trustPath = match($row->trust_path) {
+                'empty' => new EmptyTrustPath(),
+                default => ($row->type === 'fido2') 
+                    ? new CertificateTrustPath(['fido2_certificate_bytes'])
+                    : new CertificateTrustPath([]),
+            };
+            $result[] = new PublicKeyCredentialSource(
+                $row->credential_id,
+                $row->type,
+                json_decode($row->transports, true),
+                $row->attestation_type,
+                $trustPath,
+                Uuid::fromString($row->aaguid),
+                $row->public_key,
+                $row->user_handle,
+                $row->counter
+            );
+        }
+        return $result;
+    }
+    
+
     public function saveCredential(PublicKeyCredentialSource $source)
     {
         $trustPath = $source->trustPath instanceof EmptyTrustPath ? 'empty' : 'certificate';
@@ -99,5 +126,17 @@ class Webauthn_model extends CI_Model
     private function isFido2Certificate(CertificateTrustPath $trustPath): bool
     {
         return true; // برای تست همیشه fido2 درنظر گرفته میشه
+    }
+
+    public function findUserByUserHandle(string $userHandle)
+    {
+        $query = $this->db->get_where($this->tbl, ['user_handle' => $userHandle]);
+        $row = $query->row();
+        if (!$row) {
+            return null;
+        }
+        return (object) [
+            'id' => $row->user_id
+        ];
     }
 }

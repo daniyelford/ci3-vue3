@@ -23,17 +23,14 @@ function webauthnRegister() {
     });
 }
 function webauthnLogin() {
-    // 1. گرفتن challenge و allowCredentials از سرور
     $.getJSON('webauthn_login_options', function(options) {
         options.challenge = base64ToBuffer(options.challenge);
         options.allowCredentials = options.allowCredentials.map(function(cred) {
             cred.id = base64ToBuffer(cred.id);
             return cred;
         });
-
         navigator.credentials.get({ publicKey: options })
             .then(function(assertion) {
-                // 2. ارسال پاسخ به سرور
                 $.ajax({
                     url: 'webauthn_verify_login',
                     method: 'POST',
@@ -41,7 +38,6 @@ function webauthnLogin() {
                     data: JSON.stringify(prepareAssertionForServer(assertion)),
                     success: function(response) {
                         alert('ورود موفق بود!');
-                        // مثلا بری به داشبورد
                         window.location.href = '/dashboard';
                     }
                 });
@@ -52,7 +48,6 @@ function webauthnLogin() {
             });
     });
 }
-// 👇 تبدیل base64 به ArrayBuffer
 function base64ToBuffer(base64) {
     base64 = base64.replace(/-/g, '+').replace(/_/g, '/');
     const pad = base64.length % 4 ? 4 - base64.length % 4 : 0;
@@ -66,7 +61,6 @@ function base64ToBuffer(base64) {
     return buffer;
 }
 
-// 👇 تبدیل ArrayBuffer به base64url
 function bufferToBase64(buffer) {
     let binary = '';
     const bytes = new Uint8Array(buffer);
@@ -76,7 +70,6 @@ function bufferToBase64(buffer) {
     return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 }
 
-// 👇 آماده کردن داده ثبت (برای سرور)
 function prepareCredentialForServer(cred) {
     return {
         id: cred.id,
@@ -89,7 +82,6 @@ function prepareCredentialForServer(cred) {
     };
 }
 
-// 👇 آماده کردن داده ورود (برای سرور)
 function prepareAssertionForServer(assertion) {
     return {
         id: assertion.id,
