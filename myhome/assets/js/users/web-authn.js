@@ -60,7 +60,6 @@ function base64ToBuffer(base64) {
     }
     return buffer;
 }
-
 function bufferToBase64(buffer) {
     let binary = '';
     const bytes = new Uint8Array(buffer);
@@ -69,7 +68,6 @@ function bufferToBase64(buffer) {
     }
     return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 }
-
 function prepareCredentialForServer(cred) {
     return {
         id: cred.id,
@@ -81,7 +79,6 @@ function prepareCredentialForServer(cred) {
         }
     };
 }
-
 function prepareAssertionForServer(assertion) {
     return {
         id: assertion.id,

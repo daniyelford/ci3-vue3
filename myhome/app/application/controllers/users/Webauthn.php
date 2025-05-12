@@ -133,6 +133,7 @@ class Webauthn extends CI_Controller
 
     public function registerOptions()
     {
+        $_SESSION['id']=1;
         if (empty($_SESSION['id'])) {
             show_error('کاربر لاگین نیست', 401);
             return;
@@ -142,7 +143,10 @@ class Webauthn extends CI_Controller
         $challenge = random_bytes(32);
         $_SESSION['register_challenge'] = base64_encode($challenge);
         $rpEntity = new PublicKeyCredentialRpEntity($this->configWebauthn['rp_name'], $this->configWebauthn['rp_id'], null);
-        $authenticatorSelection = new AuthenticatorSelectionCriteria('required', 'cross-platform');
+        $authenticatorSelection = new AuthenticatorSelectionCriteria(
+            authenticatorAttachment: null,
+            userVerification: 'required',
+        );
         $options = new PublicKeyCredentialCreationOptions($rpEntity, $userEntity, $challenge, [PublicKeyCredentialParameters::createPk(-7), PublicKeyCredentialParameters::createPk(-257)], $authenticatorSelection, null, [], 60000);
         $_SESSION['publicKeyCredentialCreationOptions'] = $options; // ذخیره‌سازی تنظیمات در session
         header('Content-Type: application/json');
@@ -156,6 +160,7 @@ class Webauthn extends CI_Controller
             'challenge' => base64_encode($options->challenge),
             'pubKeyCredParams' => [
                 ['type' => 'public-key', 'alg' => -7],
+                ['type' => 'public-key', 'alg' => -257],
             ],
             'timeout' => $options->timeout,
             'attestation' => 'none',

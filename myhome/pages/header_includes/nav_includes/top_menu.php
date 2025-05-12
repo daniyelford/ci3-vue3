@@ -189,6 +189,10 @@
 				    <img class="wd-30 hd-30 pd-1 rounded-10" src="<?= base_url('assets/svg/user/google-login.svg') ?>">
 					webAuthn
 				</a>
+				<a class="google-login dropdown-item" onclick="webauthnRegister();">
+				    <img class="wd-30 hd-30 pd-1 rounded-10" src="<?= base_url('assets/svg/user/google-login.svg') ?>">
+					webAuthn register
+				</a>
 				<!-- login -->
 				<!--<a class="costum-login dropdown-item" data-target="#select2modal" data-toggle="modal" href="#">-->
 				<!--    <img class="wd-30 hd-30 pd-1 rounded-10" src="<?= base_url('assets/svg/user/costum-login.svg') ?>">-->
