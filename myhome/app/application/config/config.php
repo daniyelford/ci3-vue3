@@ -33,6 +33,7 @@ $config['webauthn'] = [
     'origin' => $root,
     'rp_name' => 'my home',
     'rp_id' => $http,
+    'attestation' => 'none'
 ];
 
 /*

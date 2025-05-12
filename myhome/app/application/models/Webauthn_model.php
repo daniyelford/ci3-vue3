@@ -35,12 +35,12 @@ class Webauthn_model extends CI_Model
         return $result;
     }
 
-    public function saveCredential(PublicKeyCredentialSource $source)
+    public function saveCredential(PublicKeyCredentialSource $source,int $user_id)
     {
         $trustPath = $source->trustPath instanceof EmptyTrustPath ? 'empty' : 'certificate';
         $certificateType = ($source->trustPath instanceof CertificateTrustPath && $this->isFido2Certificate($source->trustPath)) ? 'fido2' : 'certificate';
         $data = [
-            'user_id'          => $_SESSION['id'],
+            'user_id'          => $user_id,
             'credential_id'    => $source->publicKeyCredentialId,
             'type'             => $source->type,
             'transports'       => json_encode($source->transports),
@@ -76,8 +76,8 @@ class Webauthn_model extends CI_Model
             $trustPath,
             Uuid::fromString($row->aaguid),
             $row->public_key,
-            $row->counter,
-            $row->user_handle
+            $row->user_handle,
+            $row->counter
         );
     }
 
@@ -88,7 +88,7 @@ class Webauthn_model extends CI_Model
 
     public function findUserByUserHandle(string $userHandle)
     {
-        $query = $this->db->get_where($this->tbl, ['user_handle' => $userHandle]);
+        $query = $this->db->limit(1)->get_where($this->tbl, ['user_handle' => $userHandle]);
         $row = $query->row();
         if (!$row) {
             return null;
@@ -97,4 +97,31 @@ class Webauthn_model extends CI_Model
             'id' => $row->user_id
         ];
     }
+
+    public function findAllByUserId(int $userId): array
+    {
+        $query = $this->db->get_where($this->tbl, ['user_id' => $userId]);
+        $result = [];
+        foreach ($query->result() as $row) {
+            $trustPath = match($row->trust_path) {
+                'empty' => new EmptyTrustPath(),
+                default => ($row->certificate_type === 'fido2') 
+                    ? new CertificateTrustPath(['fido2_certificate_bytes'])
+                    : new CertificateTrustPath([]),
+            };
+            $result[] = new PublicKeyCredentialSource(
+                $row->credential_id,
+                $row->type,
+                json_decode($row->transports, true),
+                $row->attestation_type,
+                $trustPath,
+                Uuid::fromString($row->aaguid),
+                $row->public_key,
+                $row->user_handle,
+                $row->counter
+            );
+        }
+        return $result;
+    }
+
 }

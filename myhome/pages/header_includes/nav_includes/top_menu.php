@@ -185,11 +185,11 @@
 				    <img class="wd-30 hd-30 pd-1 rounded-10" src="<?= base_url('assets/svg/user/phone-luck.svg') ?>">
                     ورود با شماره همراه
 				</a>
-				<a class="google-login dropdown-item" onclick="webauthnLogin();">
+				<a class="google-login dropdown-item" id="webauthn-login" onclick="webauthnLogin();">
 				    <img class="wd-30 hd-30 pd-1 rounded-10" src="<?= base_url('assets/svg/user/google-login.svg') ?>">
 					webAuthn
 				</a>
-				<a class="google-login dropdown-item" onclick="webauthnRegister();">
+				<a class="google-login dropdown-item" id="webauthn-register" onclick="webauthnRegister();">
 				    <img class="wd-30 hd-30 pd-1 rounded-10" src="<?= base_url('assets/svg/user/google-login.svg') ?>">
 					webAuthn register
 				</a>
