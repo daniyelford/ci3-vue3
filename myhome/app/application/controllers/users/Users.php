@@ -59,7 +59,7 @@ class Users extends MY_Controller
 	}
 	public function check_add_user(){
 	    $a=(!empty($_POST['token']) ? trim(filter_input(INPUT_POST, 'token', FILTER_SANITIZE_STRING)) : null);
-	    $d=(!empty($_POST['phone'])?$_POST['phone']:null);
+	    $d=(!empty($_POST['phone']) && $this->validate_mobile_number($_POST['phone'])?$_POST['phone']:null);
 	    if(!is_null($a) &&
 	    !is_null($d)
 	    && $this->Include_model->chapcha($a)){
@@ -77,7 +77,7 @@ class Users extends MY_Controller
 	}
 	public function change_phone_code(){
 	    $a=(!empty($_POST['token']) ? trim(filter_input(INPUT_POST, 'token', FILTER_SANITIZE_STRING)) : null);
-	    $b=(!empty($_POST['data']['phone'])?$_POST['data']['phone']:null);
+	    $b=(!empty($_POST['data']['phone']) && $this->validate_mobile_number($_POST['data']['phone'])?$_POST['data']['phone']:null);
         if(!is_null($a) && !is_null($b) && $this->Include_model->chapcha($a)){
     	    $_SESSION['sms_register_code']=rand(100000,1000000);
     	    if($this->Include_model->send_sms_force_two($_SESSION['sms_register_code'],$b)) die('11');
@@ -90,7 +90,7 @@ class Users extends MY_Controller
 	    $a=(!empty($_POST['token']) ? trim(filter_input(INPUT_POST, 'token', FILTER_SANITIZE_STRING)) : null);
 	    $b=(!empty($_POST['name'])?$_POST['name']:null);
 	    $c=(!empty($_POST['family'])?$_POST['family']:null);
-	    $d=(!empty($_POST['phone'])?$_POST['phone']:null);
+	    $d=(!empty($_POST['phone']) && $this->validate_mobile_number($_POST['phone'])?$_POST['phone']:null);
 	    $e=(!empty($_POST['code'])?$_POST['code']:'');
 	    $f=(!empty($_POST['day'])?$_POST['day']:null);
 	    $g=(!empty($_POST['month'])?$_POST['month']:null);
@@ -141,7 +141,7 @@ class Users extends MY_Controller
 	}
 	public function send_sms_login(){
 	    $a=(!empty($_POST['token']) ? trim(filter_input(INPUT_POST, 'token', FILTER_SANITIZE_STRING)) : null);
-	    $b=(!empty($_POST['phone'])?$_POST['phone']:null);
+	    $b=(!empty($_POST['phone']) && $this->validate_mobile_number($_POST['phone'])?$_POST['phone']:null);
         if(!is_null($a) && !is_null($b) && $this->Include_model->chapcha($a))
             if(($c=$this->Users_model->select_info_where_phone($b))!==false && !empty($c) && !empty($c['0']) && !empty($c['0']['id']) && intval($c['0']['id'])>0){
         	    $_SESSION['sms_login_code']=rand(100000,1000000);
@@ -156,7 +156,7 @@ class Users extends MY_Controller
 	}
     public function send_sms_login_again(){
 	    $a=(!empty($_POST['token']) ? trim(filter_input(INPUT_POST, 'token', FILTER_SANITIZE_STRING)) : null);
-	    $b=(!empty($_POST['data']['phone'])?$_POST['data']['phone']:null);
+	    $b=(!empty($_POST['data']['phone']) && $this->validate_mobile_number($_POST['data']['phone'])?$_POST['data']['phone']:null);
         if(!is_null($a) && !is_null($b) && $this->Include_model->chapcha($a) && 
         ($c=$this->Users_model->select_info_where_phone($b))!==false && !empty($c) && !empty($c['0']) && !empty($c['0']['id']) && intval($c['0']['id'])>0){
     	    $_SESSION['sms_login_code']=rand(100000,1000000);
@@ -190,6 +190,12 @@ class Users extends MY_Controller
 	        die('0');
 	    
     }
+	private function validate_mobile_number($mobile) {
+		$mobile = trim($mobile);	
+		if (preg_match('/^09\d{9}$/', $mobile))
+			return true;
+		return false;
+	}
 }
     // $sms=$this->Include_model->send_sms($text,["9336160295","09336160295","+989336160295"]);
     // $email=$this->Include_model->send_email('29danialfrd69@gmail.com','',$text);

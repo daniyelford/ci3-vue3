@@ -33,7 +33,7 @@ class Includes extends MY_Controller
 	                $this->Product_model->add_product_change_value(['product_id'=>intval($d),'old_value'=>(!empty($g['0']['price'])?$g['0']['price']:0),'new_value'=>$price]);
 	            }
 	        }
-	}
+	} 
 	private function get_price_url($url){
 	    $req=json_decode($this->Include_model->resive_data_only($url));
 	    if(is_object($req)){
@@ -83,8 +83,10 @@ class Includes extends MY_Controller
 	private function set_products_informations($id,$arr){
 	    if(!empty($id) && intval($id)>0 && !empty($arr) && is_array($arr))
     	    foreach($arr as $key=>$value){
-    	        $a=$this->set_products_key($id,$key);
-    	        if(!empty($a)&&intval($a)>0) $this->set_product_value($id,$a,$value);
+				if(!empty($key) && !empty($value)){
+					$a=$this->set_products_key($id,$key);
+					if(!empty($a)&&intval($a)>0) $this->set_product_value($id,$a,$value);
+				}
     	    }
 	}
 	private function set_products_key($id,$str){
