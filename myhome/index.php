@@ -313,7 +313,7 @@ switch (ENVIRONMENT)
  * And away we go...
  */
 
-require_once __DIR__ . '/application/config/constants.php';
+require_once APPPATH. 'config/constants.php';
 $conn = new mysqli(HOST, USERNAME, PASSWORD);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
@@ -324,7 +324,7 @@ if (!$conn->select_db(DBNAME)){
 }
 $result = $conn->query("SHOW TABLES");
 if ($result->num_rows < 50){
-	$sql_file_path = __DIR__ . '/application/sql/init.sql';
+	$sql_file_path = APPPATH.'sql/init.sql';
     if (file_exists($sql_file_path)) {
         $sql_content = file_get_contents($sql_file_path);
 		$conn->query($sql_content);
