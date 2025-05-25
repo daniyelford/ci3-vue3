@@ -1,0 +1,40 @@
+@media screen and (max-width: 767px){
+    /*div#content {*/
+    /*    width: 100%;*/
+    /*    bottom: 38%;*/
+    /*    top: 0px;*/
+    /*} */
+    #map.map-page {
+    /*    width: auto;*/
+    /*    left: 50px;*/
+    /*    top: 62%;*/
+    /*    bottom: 5px;*/
+        right: 7px;
+    }
+    /*.res-l-10px{*/
+    /*    left:10px !important;*/
+    /*}*/
+    /*.all-product-in-category {*/
+    /*    bottom: -85px;;*/
+    /*    left: 0;*/
+    /*    width: 100%;*/
+    /*    z-index: 9999999;*/
+    /*}*/
+    /*.chat , .tel , .video{*/
+    /*    right: 0;*/
+    /*}*/
+    /*.tel .tel{*/
+    /*    right: 0;*/
+    /*}*/
+    /*.company-description{*/
+    /*    right: 0;*/
+    /*    height: 86px;*/
+    /*}*/
+    /*.chart{*/
+    /*    left: 50px;*/
+    /*    right: 0;*/
+    /*    max-height: 40%;*/
+    /*    bottom: 0;*/
+    /*    min-height: 150px;*/
+    /*}*/
+} 

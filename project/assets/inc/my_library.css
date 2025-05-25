@@ -1,0 +1,399 @@
+.v-hidden{
+    visibility:hidden;
+}
+.v-show{
+    visibility: visible;
+}
+
+
+.overflow-hidden{
+    overflow: hidden;
+}
+.overflow-x{
+    overflow-x: auto;
+}
+.overflow-y{
+    overflow-y: auto;
+}
+
+
+.v-align{
+    vertical-align: middle;
+}
+
+
+.d-none {
+    display: none !important;
+}
+.d-block{
+    display: block;
+}
+.d-inline-block{
+    display: inline-block;
+}
+
+
+.f-left{
+    float:left;
+}
+.f-right{
+    float:right;
+}
+
+
+.p-absolut{
+    position:absolute;
+}
+.p-fixed{
+    position:fixed;
+}
+.p-relative{
+    position:relative;
+}
+.p-sticky{
+    position: sticky;
+}
+
+
+.t--50px{
+    top:-50px;
+}
+.t--30px{
+    top:-30px;
+}
+.t--10px{
+    top:-10px;
+}
+.t--4px {
+    top: -4px;
+}
+.t-0{
+    top:0;
+}
+.t-2px{
+    top: 2px;
+}
+.t-4px{
+    top: 4px;
+}
+.t-10px{
+    top: 10px;
+}
+.t-15px{
+    top: 15px;
+}
+.t-18px{
+    top: 18px;
+}
+.t-55px{
+    top: 55px;
+}
+.l-0{
+    left: 0;
+}
+.l-10px{
+    left: 10px;
+}
+.l-50d{
+    left: 50%;
+}
+.l-60d{
+    left: 60%;
+}
+.r-0{
+    right:0;
+}
+.r-7px{
+    right: 7px;
+}
+.r-10px{
+    right: 10px;
+}
+.r-40px{
+    right: 40px;
+}
+.r-80px {
+    right: 80px;
+}
+.b-120px{
+    bottom:120px;
+}
+.b-165px{
+    bottom:165px;
+}
+.b-180px{
+    bottom:180px;
+}
+.b-200px{
+    bottom:200px;
+}
+.b-210px{
+    bottom:210px;
+}
+.b-220px{
+    bottom:220px;
+}
+
+
+.w-0{
+    width:0;
+}
+.w-30px {
+    width: 30px;
+}
+.w-40px{
+    width:40px;
+}
+.w-50px{
+    width:50px;
+}
+.w-55px{
+    width:55px;
+}
+.w-60px{
+    width:60px;
+}
+.w-70px{
+    width:70px;
+}
+.w-80px{
+    width:80px;
+}
+.w-90px{
+    width:90px;
+}
+.w-100px{
+    width:100px;
+}
+.w-110px {
+    width: 110px;
+}
+.w-250px {
+    width: 250px;
+}
+.w-10d{
+    width:10%;
+}
+.w-20d{
+    width:20%;
+}
+.w-30d{
+    width:30%;
+}
+.w-40d{
+    width:40%;
+}
+.w-50d{
+    width:50%;
+}
+.w-60d{
+    width:60%;
+}
+.w-70d{
+    width:70%;
+}
+.w-80d{
+    width:80%;
+}
+.w-90d{
+    width:90%;
+}
+.w-95d{
+    width:95%;
+}
+.w-100d{
+    width:100%;
+}
+
+.h-30px {
+    height: 30px;
+}
+.h-40px{
+    height:40px;
+}
+.h-50px{
+    height:50px;
+}
+.h-55px{
+    height:55px;
+}
+.h-60px{
+    height:60px;
+}
+.h-70px{
+    height:70px;
+}
+.h-80px{
+    height:80px;
+}
+.h-90px{
+    height:90px;
+}
+.h-100px{
+    height:100px;
+}
+.h-110px{
+    height:110px;
+}
+.h-120px{
+    height:120px;
+}
+.h-350px {
+    height: 350px;
+}
+.h-100d{
+    height:100%;
+}
+
+
+.p-0{
+    padding:0;
+}
+.py-5px{
+    padding-top:5px;
+    padding-bottom:5px;
+}
+.pt-5px{
+    padding-top:5px;
+}
+.pb-5px{
+    padding-bottom:5px;
+}
+.px-10px{
+    padding-left:10px;
+    padding-right:10px;
+}
+.px-15px{
+    padding-left:15px;
+    padding-right:15px;
+}
+.px-20px{
+    padding-left:20px;
+    padding-right:20px;
+}
+.px-25px{
+    padding-left:25px;
+    padding-right:25px;
+}
+.pl-10px{
+    padding-left:10px;
+}
+.pr-10px{
+    padding-right:10px;
+}
+
+
+.mt-10px{
+    margin-top:10px;
+}
+.mt-30px{
+    margin-top:30px;
+}
+.mt-50px{
+    margin-top:50px;
+}
+.mx-2d{
+    margin-left: 2%;
+    margin-right: 2%;    
+}
+.mx-auto{
+    margin-left: auto;
+    margin-right: auto;
+}
+.mx-5px{
+    margin-left: 5px;
+    margin-right: 5px;    
+}
+.mx-10px{
+    margin-left:10px;
+    margin-right:10px;
+}
+.my-5px{
+    margin-top:5px;
+    margin-bottom:5px;
+}
+.my-10px{
+    margin-top:10px;
+    margin-bottom:10px;
+}
+.ml-10px{
+    margin-left:10px;
+}
+.mr-10px{
+    margin-right:10px;
+}
+
+
+.color-light{
+    color:white;
+}
+.color-dark{
+    color:black;
+}
+
+
+.bg-light{
+    background-color:white;
+}
+.bg-grey{
+    background-color:grey;
+}
+.bg-green{
+    background-color:green;
+}
+.bg-dark{
+    background-color:black;
+}
+.bg-blue-op{
+    background: #3f4a54ad;
+}
+
+
+.border-none{
+    outline: none;
+    border:none;
+}
+.rounded-10px{
+    border-radius:10px;
+}
+.rounded-50px{
+    border-radius: 50px;
+}
+
+
+.shadow-light{
+    box-shadow:0px 4px 10px lightgrey;
+}
+
+
+.text-center{
+    text-align:center;
+}
+.text-start{
+    text-align:start;
+}
+
+
+.l-h-35px{
+    line-height: 35px;
+}
+.l-h-37px{
+    line-height: 37px;
+}
+
+.z-index-9{
+    z-index:9;
+}
+
+.font-11px{
+    font-size: 11px;
+}
+.inputs {
+    border-radius: 5px;
+    outline: none;
+    border: none;
+    box-shadow: 3px 4px 20px #00e6fd;
+    min-height: 33px;
+}
+
+
