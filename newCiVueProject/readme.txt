@@ -171,6 +171,7 @@ vue create .
 {vue 3}
 vue add router
 {yes,yes}
+npm install
 npm run build
 
 داخل پوشه 
@@ -185,10 +186,4 @@ htaccess
   RewriteRule ^ - [L]
   RewriteRule ^ index.html [L]
 </IfModule>
-
-??
-npm install vue-router
-npm install vue-router@3
-npm install axios
-npm run serve
 
