@@ -38,11 +38,7 @@ $conn->close();
 front
 محتویات پوشه
 back/application/views
-را ریخته و با ترمینال وارد فایل 
-front
-شده و مینویسیم
-npm init -y
-و در فایل
+را ریخته و در فایل
 back/application/config/config.php
 تغییرات می دهیم
 
@@ -165,3 +161,34 @@ init.sql
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^(.*)$ index.php/$1 [L]
 </IfModule>
+
+با ترمینال وارد فایل 
+front
+شده و مینویسیم
+npm init -y
+npm install -g @vue/cli
+vue create .
+{vue 3}
+vue add router
+{yes,yes}
+npm run build
+
+داخل پوشه 
+front
+فایل
+htaccess
+را می سازیم و در داخلش اضافه می کنیم
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+??
+npm install vue-router
+npm install vue-router@3
+npm install axios
+npm run serve
+
