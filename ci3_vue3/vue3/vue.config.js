@@ -1,7 +1,6 @@
 const { defineConfig } = require('@vue/cli-service')
-const path = require('path')
-const basePath = path.basename(path.dirname(__dirname))
+const { BASE_PATH } = require('./src/config')
 module.exports = defineConfig({
-  publicPath: `/codeigniter/${basePath}/`,
+  publicPath: BASE_PATH,
   transpileDependencies: true
 })

@@ -132,15 +132,15 @@ class Page extends MY_Controller
 		parent::__construct();
 	}
 	private $pages=[
-		'category'=>'',
-		'user_setting'=>'',
-		'search'=>'',
-		'map'=>'',
-		'company'=>'',
-		'chat'=>'',
-		'resume'=>'',
-		'wallet'=>'',
-		'basket'=>'',
+		'category',
+		'user_setting',
+		'search',
+		'map',
+		'company',
+		'chat',
+		'resume',
+		'wallet',
+		'basket',
 	];
 	private $id=0;
 	private $company=[];
@@ -248,8 +248,8 @@ class Page extends MY_Controller
 			if($this->urls['0']=='logout'){
 				$this->logout();
 				return true;
-			}elseif(in_array(array_keys($this->pages),$this->urls['0'])){
-				$this->handler = new $this->pages[$this->urls['0']]($this);
+			}elseif(in_array($this->urls['0'],$this->pages)){
+				$this->handler = new $this->urls['0']($this);
 				$this->handler->handler($this->urls);
 				$this->header_array=array_merge($this->header_array,$this->handler->header_data);
 				$this->body_array=array_merge($this->body_array,$this->handler->body_data);
