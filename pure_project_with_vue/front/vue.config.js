@@ -1,5 +1,5 @@
 const { defineConfig } = require('@vue/cli-service')
 module.exports = defineConfig({
-  publicPath: '/codeigniter/newCiVueProject/front/dist/',
+  publicPath: '/codeigniter/pure_project_with_vue/assets/',
   transpileDependencies: true
 })

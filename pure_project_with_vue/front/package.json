@@ -4,13 +4,15 @@
   "private": true,
   "description": "",
   "author": "",
+  "main": "index.js",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "postbuild": "npm run copy:dist",
+    "copy:dist": "xcopy /E /I /Y dist ..\\assets\\",
     "lint": "vue-cli-service lint",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "main": "index.js",
   "dependencies": {
     "core-js": "^3.8.3",
     "vue": "^3.2.13",
@@ -45,9 +47,5 @@
     "last 2 versions",
     "not dead",
     "not ie 11"
-  ],
-  "_id": "front@1.0.0",
-  "keywords": [],
-  "license": "ISC",
-  "readme": "ERROR: No README data found!"
+  ]
 }
