@@ -5,10 +5,10 @@ class Api_handler{
 
     public function __construct(){
 		$this->CI =& get_instance();
-        $this->CI->load->library('Tooles/Upload_handler');
+        $this->CI->load->library('Tools/Upload_handler');
 	}
     public function handler($data){
-        $upload=new Tooles_Upload_handler();
+        $upload=new Upload_handler();
         if(!empty($data))
             if(!empty($data['action']))
                 switch ($data['action']) {
@@ -32,6 +32,16 @@ class Api_handler{
                         $upload->upload_many_videos($data['data'],$url);
                         break;
 
+                    case 'upload_single_pdf':
+                        $url = (!empty($data['url']) ? $data['url'] : '');
+                        $upload->upload_single_pdf($data['data'], $url);
+                        break;
+
+                    case 'upload_many_pdfs':
+                        $url = (!empty($data['url']) ? $data['url'] : '');
+                        $upload->upload_many_pdfs($data['data'], $url);
+                        break;
+
                     default:
                         echo json_encode($data);
                         break;
@@ -40,6 +50,5 @@ class Api_handler{
                 echo json_encode($data);
         else
 			echo json_encode(['status' => 'error', 'message' => 'توکن نامعتبر است']);
-            
     }
 }
