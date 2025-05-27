@@ -9,7 +9,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build && npm run rename:index && npm run copy:dist",
     "rename:index": "powershell Rename-Item -Path dist/index.html -NewName vue.php",
-    "copy:dist": "xcopy /E /I /Y dist\\* ..\\",
+    "copy:dist": "xcopy /E /I /Y dist\\js ..\\js && xcopy /E /I /Y dist\\css ..\\css && xcopy /E /I /Y dist\\assets ..\\assets",
     "lint": "vue-cli-service lint",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
