@@ -1,0 +1,41 @@
+<?php
+defined('BASEPATH') OR exit('No direct script access allowed');
+
+class Migration_Create_user_mobile_table extends CI_Migration {
+    public function __construct() {
+        parent::__construct();
+        $this->load->dbforge();
+    }
+
+    public function up() {
+        $this->dbforge->add_field([
+            'id' => [
+                'type' => 'INT',
+                'unsigned' => TRUE,
+                'auto_increment' => TRUE,
+            ],
+            'user_id' => [
+                'type' => 'INT',
+                'unsigned' => TRUE,
+                'null' => FALSE,
+            ],
+            'phone' => [
+                'type' => 'VARCHAR',
+                'constraint' => 15,
+                'null' => FALSE,
+            ],
+            'nation_code_image_id' => [
+                'type' => 'INT',
+                'unsigned' => TRUE,
+                'null' => TRUE,
+            ],
+        ]);
+        $this->dbforge->add_key('id', TRUE);
+        $this->dbforge->create_table('user_mobile');
+        $this->db->query('ALTER TABLE user_mobile ADD CONSTRAINT fk_user_mobile_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE');
+    }
+
+    public function down() {
+        $this->dbforge->drop_table('user_mobile');
+    }
+}
