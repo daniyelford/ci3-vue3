@@ -97,7 +97,7 @@ switch (ENVIRONMENT)
  * This variable must contain the name of your "system" directory.
  * Set the path if it is not in the same directory as this file.
  */
-	$system_path = 'app/system';
+	$system_path = 'ci3/system';
 
 /*
  *---------------------------------------------------------------
@@ -114,7 +114,7 @@ switch (ENVIRONMENT)
  *
  * NO TRAILING SLASH!
  */
-	$application_folder = 'app/application';
+	$application_folder = 'ci3/application';
 
 /*
  *---------------------------------------------------------------
@@ -129,7 +129,7 @@ switch (ENVIRONMENT)
  *
  * NO TRAILING SLASH!
  */
-	$view_folder = 'pages';
+	$view_folder = 'vue3';
 
 
 /*
@@ -312,25 +312,29 @@ switch (ENVIRONMENT)
  *
  * And away we go...
  */
-
 require_once APPPATH. 'config/constants.php';
 $conn = new mysqli(HOST, USERNAME, PASSWORD);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
-if (!$conn->select_db(DBNAME)){
-    $conn->query("CREATE DATABASE IF NOT EXISTS ".DBNAME);
-	$conn->select_db(DBNAME);
+$dbExists = false;
+$result = $conn->query("SHOW DATABASES LIKE '".DBNAME."'");
+if ($result && $result->num_rows > 0) {
+    $dbExists = true;
 }
+if (!$dbExists) {
+	$conn->query("CREATE DATABASE IF NOT EXISTS ".DBNAME);
+}
+$conn->select_db(DBNAME);
 $result = $conn->query("SHOW TABLES");
 if ($result->num_rows < 50){
 	$sql_file_path = APPPATH.'sql/init.sql';
     if (file_exists($sql_file_path)) {
         $sql_content = file_get_contents($sql_file_path);
-		$conn->query($sql_content);
+		if(!empty($sql_content)) 
+			$conn->query($sql_content);
 	}
 }
 	
 $conn->close();
-
 require_once BASEPATH.'core/CodeIgniter.php';
