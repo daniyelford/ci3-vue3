@@ -21,7 +21,7 @@ export async function sendApi(data = {}) {
                 'Authorization': `Bearer ${token}`,
                 'X-API-KEY': API_SECRET_KEY
             },
-            body: JSON.stringify({ data })
+            body: data
         });
         const result = await response.json();
         if (!response.ok) throw result;

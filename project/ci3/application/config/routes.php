@@ -50,7 +50,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |		my-controller/my-method	-> my_controller/my_method
 */
 $route['default_controller'] = 'vue';
-$route['api'] = 'vue/api';
-$route['create_token'] = 'vue/create_token';
+$route['api'] = 'api/api';
+$route['create_token'] = 'api/create_token';
 $route['404_override'] = 'vue/index';
 $route['translate_uri_dashes'] = FALSE;

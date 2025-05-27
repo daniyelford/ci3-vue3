@@ -326,15 +326,17 @@ if (!$dbExists) {
 	$conn->query("CREATE DATABASE IF NOT EXISTS ".DBNAME);
 }
 $conn->select_db(DBNAME);
-$result = $conn->query("SHOW TABLES");
-if ($result->num_rows < 50){
-	$sql_file_path = APPPATH.'sql/init.sql';
-    if (file_exists($sql_file_path)) {
-        $sql_content = file_get_contents($sql_file_path);
-		if(!empty($sql_content)) 
-			$conn->query($sql_content);
-	}
-}
-	
 $conn->close();
 require_once BASEPATH.'core/CodeIgniter.php';
+$CI =& get_instance();
+$CI->load->database();
+$CI->load->library('migration');
+$migratedFlag = APPPATH . 'migrations/.migrated';
+if (!is_file($migratedFlag)) {
+    if ($CI->migration->current() === FALSE) {
+        log_message('error', 'Migration Error: ' . $CI->migration->error_string());
+        show_error('خطا در اجرای مایگریشن: ' . $CI->migration->error_string());
+    } else {
+        file_put_contents($migratedFlag, date('Y-m-d H:i:s'));
+    }
+}

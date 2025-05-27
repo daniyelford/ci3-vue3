@@ -26,7 +26,7 @@ export default {
   methods: {
     async testApi() {
       try {
-        const res = await sendApi({ name: 'Ali', message: 'salam' });
+        const res = await sendApi(JSON.stringify({ name: 'Ali', message: 'salam' }));
         this.result = JSON.stringify(res, null, 2);
       } catch (err) {
         this.result = JSON.stringify(err, null, 2);
