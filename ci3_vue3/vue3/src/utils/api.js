@@ -1,9 +1,12 @@
-import { BASE_URL } from '@/config';
+import { BASE_URL,API_SECRET_KEY } from '@/config';
 export async function sendApi(data = {}) {
     try {
         const tokenRes = await fetch(`${BASE_URL}/create_token`, {
             method: 'GET',
-            credentials: 'include'
+            credentials: 'include',
+            headers: {
+                'X-API-KEY': API_SECRET_KEY
+            }
         });
         const tokenJson = await tokenRes.json();
         if (!tokenJson.token) {
@@ -15,7 +18,8 @@ export async function sendApi(data = {}) {
             credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${token}`,
+                'X-API-KEY': API_SECRET_KEY
             },
             body: JSON.stringify({ data })
         });
