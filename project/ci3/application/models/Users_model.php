@@ -47,4 +47,7 @@ class Users_model extends CI_Model
     public function add_mobile_return_id($arr){
         return (!empty($arr) && is_array($arr)?$this->add_to_table_return_id($this->mobile,$arr):false);
     }
+    public function edit_mobile_weher_id($arr,$id){
+        return (!empty($id) && intval($id)>0 && !empty($arr) && is_array($arr) && $this->edit_table($this->mobile,$arr,['id'=>intval($id)]));
+    }
 }

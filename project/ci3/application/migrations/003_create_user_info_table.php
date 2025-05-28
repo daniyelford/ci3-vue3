@@ -34,6 +34,10 @@ class Migration_Create_user_info_table extends CI_Migration {
                 'constraint' => 40,
                 'null' => TRUE,
             ],
+            'birthday' => [
+                'type' => 'DATETIME',
+                'null' => TRUE,
+            ],
             'created_at' => [
                 'type' => 'DATETIME',
                 'null' => TRUE,

@@ -9,17 +9,23 @@ class Login_handler
 	}
     public function register($arr){
         $security= new Security_handler();
-        if(!empty($arr) && !empty($arr['mobile_id']) && 
+        if(!empty($arr) && $this->CI->session->has_userdata('mobile_id') && 
+        !empty($this->CI->session->userdata('mobile_id')) &&
         $security->string_secutory_week_check($arr['family']) &&
         $security->string_secutory_week_check($arr['name']) && 
-        intval($arr['mobile_id']) > 0 && !empty($arr['name']) &&
-        !empty($arr['family'])
-        ){
+        intval($this->CI->session->userdata('mobile_id')) > 0 && 
+        !empty($arr['name']) && !empty($arr['family'])){
             $id=$this->CI->Users_model->add_return_id(['name'=>$arr['name'],'family'=>$arr['family']]);
-            $this->CI->session->set_userdata('id',$id);
-            $account_id=$this->CI->Users_model->add_account_return_id(['user_mobile_id'=>$arr['mobile_id']]);
+            if(!(!empty($id) && intval($id)>0))
+                die(json_encode(['status' => 'error', 'message' => 'database error']));
+            $this->CI->session->set_userdata('id',intval($id));
+            if(!$this->CI->Users_model->edit_mobile_weher_id(['user_id'=>intval($id)],intval($this->CI->session->userdata('mobile_id'))))
+                die(json_encode(['status' => 'error', 'message' => 'database error']));
+            $account_id=$this->CI->Users_model->add_account_return_id(['user_mobile_id'=>intval($this->CI->session->userdata('mobile_id'))]);
+            if (!(!empty($account_id) && intval($account_id)>0))
+                die(json_encode(['status' => 'error', 'message' => 'database error']));
             $this->CI->session->set_userdata('account_id',$account_id);
-            echo json_encode(['status' => 'success','account_id'=>$account_id,'id' => $id]);
+            echo json_encode(['status' => 'success']);
         }else{
             echo json_encode(['status' => 'error', 'message' => 'نام و نام خانوادگی نامعتبر است']);
         }
@@ -48,16 +54,16 @@ class Login_handler
                     }
                 }
                 $this->CI->session->set_userdata('account_id',$account_id);
-    			$result=['status' => 'success','mobile_id'=>$mobile_id,'account_id'=>$account_id,'id' => intval(end($a)['user_id'])];
+    			$result=['status' => 'success','url'=>'dashboard'];
             }else{
-    			$result=['status' => 'success','mobile_id'=>$mobile_id,'register'=>true];
+    			$result=['status' => 'success','url'=>'register'];
             }
         }else{
             $mobile_id=$this->CI->Users_model->add_mobile_return_id(['phone'=>$str]);
     		if(!(!empty($mobile_id) && intval($mobile_id)>0)){
                 die(json_encode(['status'=>'error','message'=>'add to db has error mobile']));
             }
-            $result=['status' => 'success','mobile_id'=>$mobile_id,'register'=>true];
+            $result=['status' => 'success','url'=>'register'];
         }
         $this->CI->session->set_userdata('mobile_id',$mobile_id);
     	echo json_encode($result);
@@ -74,10 +80,7 @@ class Login_handler
         if(!empty($data) && $security->validate_mobile_number($data)){
             $this->CI->session->set_userdata('login_code',['code'=>rand(100000,1000000),'phone'=>$data]);
             if($this->send_sms_action($this->CI->session->userdata('login_code')['code'],$data))
-                echo json_encode([
-                    'status' => 'success',
-                    'code'=>$this->CI->session->userdata('login_code')['code']
-                ]);
+                echo json_encode(['status' => 'success']);
             else
                 echo json_encode(['status' => 'error','message'=>'پیامک ارسال نشد']);
         }else{

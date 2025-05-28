@@ -25,26 +25,17 @@ const message = ref('')
 const router = useRouter()
 
 const submitRegister = async () => {
-  const mobile_id = sessionStorage.getItem('mobile_id')
-  if (!mobile_id) {
-    message.value = 'خطا: شناسه موبایل پیدا نشد.'
-    return
-  }
-
   try {
     const response = await sendApi(
       JSON.stringify({
         action: 'register_user',
         data: {
-          mobile_id,
           name: name.value,
           family: family.value,
         },
       })
     )
-    if (response.status === 'success' && response.account_id && response.id) {
-        sessionStorage.setItem('account_id', response.account_id)
-        sessionStorage.setItem('user_id', response.id)
+    if (response.status === 'success') {
         router.push({ name: 'dashboard' })
     } else {
         message.value = 'مشخصات ناقص است. لطفاً دوباره تلاش کنید.'

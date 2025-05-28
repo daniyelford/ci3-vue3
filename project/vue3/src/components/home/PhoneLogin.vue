@@ -7,7 +7,7 @@
         id="phone"
         v-model="phone"
         type="text"
-        placeholder="مثلاً 09123456789"
+        placeholder="09123456789"
         required
       />
       <button type="submit">ارسال</button>
@@ -106,20 +106,14 @@ const submitCode = async () => {
         },
       })
     )
-    if (response.status === 'success' && response.mobile_id) {
-      sessionStorage.setItem('mobile_id', response.mobile_id)
-      message.value = 'ورود با موفقیت انجام شد!'
-      setTimeout(() => {
-        if (response.account_id && response.id) {
-          sessionStorage.setItem('account_id', response.account_id)
-          sessionStorage.setItem('user_id', response.id)
+    if (response.status === 'success') {
+        if (response.url === 'dashboard') {
           router.push({ name: 'dashboard' })
-        } else if (response.register === true) {
-          router.push({ name: 'register' }) // صفحه ثبت نام
+        } else if (response.url === 'register') {
+          router.push({ name: 'register' })
         } else {
           message.value = 'مشخصات ناقص است. لطفاً دوباره تلاش کنید.'
         }
-      }, 1000)
     } else {
       message.value = 'کد وارد شده اشتباه است.'
     }

@@ -16,6 +16,10 @@ class Api_handler{
         if(!empty($data))
             if(!empty($data['action']))
                 switch ($data['action']) {
+                    case 'check_auth':
+                        if($security->check_user_login())
+                            echo json_encode(['status'=>'success']);
+                        break;
                     case 'upload_single_image':
                         if(!empty($data['data']) && $security->check_user_login()) $upload->upload_single_image($data['data'],(!empty($data['url'])?$security->string_security_check($data['url']):''),(!empty($data['toAction']) ? $security->string_security_check($data['toAction']) : ''));
                         break;
