@@ -29,6 +29,11 @@ class Migration_Create_user_info_table extends CI_Migration {
                 'unsigned' => TRUE,
                 'null' => TRUE,
             ],
+            'father_name' => [
+                'type' => 'VARCHAR',
+                'constraint' => 40,
+                'null' => TRUE,
+            ],
             'created_at' => [
                 'type' => 'DATETIME',
                 'null' => TRUE,

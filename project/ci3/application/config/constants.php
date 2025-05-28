@@ -88,3 +88,6 @@ define('HOST','localhost');
 define('USERNAME','root');
 define('PASSWORD','');
 define('DBNAME','total');
+// sms.ir
+define('SMSIRTEMPID','');
+define('SMSIRKEY','');

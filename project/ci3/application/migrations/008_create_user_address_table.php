@@ -28,6 +28,21 @@ class Migration_Create_user_address_table extends CI_Migration {
                 'constraint' => 20,
                 'null' => TRUE,
             ],
+            'city' => [
+                'type' => 'VARCHAR',
+                'constraint' => 20,
+                'null' => TRUE,
+            ],
+            'province' => [
+                'type' => 'VARCHAR',
+                'constraint' => 20,
+                'null' => TRUE,
+            ],
+            'country' => [
+                'type' => 'VARCHAR',
+                'constraint' => 20,
+                'null' => TRUE,
+            ],
             'lat' => [
                 'type' => 'DECIMAL',
                 'constraint' => '10,7',

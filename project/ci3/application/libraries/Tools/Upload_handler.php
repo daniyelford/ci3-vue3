@@ -4,6 +4,7 @@ class Upload_handler
     private $CI;
     public function __construct(){
 		$this->CI =& get_instance();
+        $this->CI->load->model('Media_model');
 	}
     public function upload_single_image($image,$url,$to_action){
         $a=$this->upload_image_handler($image,$url,$to_action);
@@ -49,16 +50,14 @@ class Upload_handler
                 mkdir($dirPath, 0755, true);
             }
             file_put_contents($fullPath, $data);
-            $dataInsert = [
+            $id =$this->CI->Media_model->add_return_id([
                 'filename'     => $filename,
                 'url'          => base_url('storage/images/' . $url . $filename),
                 'type'         => 'image',
                 'user_id'      => $this->CI->session->userdata('id'),
                 'upload_place' => $to_action,
                 'created_at'   => date('Y-m-d H:i:s')
-            ];
-            $this->CI->db->insert('media', $dataInsert);
-            $id = $this->CI->db->insert_id();
+            ]);
             $result = [
                 'id'   => $id,
                 'url'  => base_url('storage/images/' . $url . $filename),
@@ -111,16 +110,14 @@ class Upload_handler
                 mkdir($dirPath, 0755, true);
             }
             file_put_contents($fullPath, $data);
-            $dataInsert = [
+            $id =$this->CI->Media_model->add_return_id([
                 'filename'     => $filename,
                 'url'          => base_url('storage/videos/' . $url . $filename),
                 'type'         => 'video',
                 'user_id'      => $this->CI->session->userdata('id'),
                 'upload_place' => $to_action,
                 'created_at'   => date('Y-m-d H:i:s')
-            ];
-            $this->CI->db->insert('media', $dataInsert);
-            $id = $this->CI->db->insert_id();
+            ]);
             $result = [
                 'id'  => $id,
                 'url' => base_url('storage/videos/' . $url . $filename),
@@ -175,16 +172,14 @@ class Upload_handler
                 mkdir($dirPath, 0755, true);
             }
             file_put_contents($fullPath, $data);
-            $dataInsert = [
+            $id =$this->CI->Media_model->add_return_id([
                 'filename'     => $filename,
                 'url'          => base_url('storage/pdfs/' . $url . $filename),
                 'type'         => 'pdf',
                 'upload_place' => $to_action,
                 'user_id'      => $this->CI->session->userdata('id'),
                 'created_at'   => date('Y-m-d H:i:s')
-            ];
-            $this->CI->db->insert('media', $dataInsert);
-            $id = $this->CI->db->insert_id();
+            ]);
             $result = [
                 'id'  => $id,
                 'url' => base_url('storage/pdfs/' . $url . $filename),

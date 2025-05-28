@@ -6,41 +6,51 @@ class Api_handler{
     public function __construct(){
 		$this->CI =& get_instance();
         $this->CI->load->library('Tools/Upload_handler');
+        $this->CI->load->library('Tools/Security_handler');
+        $this->CI->load->library('Tools/Login_handler');
 	}
-    private function check_user_login(){
-        if (!$this->CI->session->has_userdata('id') || empty($this->CI->session->userdata('id'))){
-			http_response_code(403);
-			die(json_encode(['status' => 'error', 'message' => 'دسترسی غیر مجاز']));
-		}
-        return true;
-    }
-    private function string_security_check($str){
-        $str = preg_replace('/[^a-zA-Z0-9\/]/', '', $str);
-        $str = trim($str);
-        return $str;
-    }
     public function handler($data){
         $upload=new Upload_handler();
+        $security= new Security_handler();
+        $login=new Login_handler();
         if(!empty($data))
             if(!empty($data['action']))
                 switch ($data['action']) {
                     case 'upload_single_image':
-                        if($this->check_user_login()) $upload->upload_single_image($data['data'],(!empty($data['url'])?$this->string_security_check($data['url']):''),(!empty($data['toAction']) ? $this->string_security_check($data['toAction']) : ''));
+                        if(!empty($data['data']) && $security->check_user_login()) $upload->upload_single_image($data['data'],(!empty($data['url'])?$security->string_security_check($data['url']):''),(!empty($data['toAction']) ? $security->string_security_check($data['toAction']) : ''));
                         break;
                     case 'upload_many_images':
-                        if($this->check_user_login()) $upload->upload_many_images($data['data'],(!empty($data['url'])?$this->string_security_check($data['url']):''),(!empty($data['toAction']) ? $this->string_security_check($data['toAction']) : ''));
+                        if(!empty($data['data']) && $security->check_user_login()) $upload->upload_many_images($data['data'],(!empty($data['url'])?$security->string_security_check($data['url']):''),(!empty($data['toAction']) ? $security->string_security_check($data['toAction']) : ''));
                         break;
                     case 'upload_single_video':
-                        if($this->check_user_login()) $upload->upload_single_video($data['data'],(!empty($data['url'])?$this->string_security_check($data['url']):''),(!empty($data['toAction']) ? $this->string_security_check($data['toAction']) : ''));
+                        if(!empty($data['data']) && $security->check_user_login()) $upload->upload_single_video($data['data'],(!empty($data['url'])?$security->string_security_check($data['url']):''),(!empty($data['toAction']) ? $security->string_security_check($data['toAction']) : ''));
                         break;
                     case 'upload_many_videos':
-                        if($this->check_user_login()) $upload->upload_many_videos($data['data'],(!empty($data['url'])?$this->string_security_check($data['url']):''),(!empty($data['toAction']) ? $this->string_security_check($data['toAction']) : ''));
+                        if(!empty($data['data']) && $security->check_user_login()) $upload->upload_many_videos($data['data'],(!empty($data['url'])?$security->string_security_check($data['url']):''),(!empty($data['toAction']) ? $security->string_security_check($data['toAction']) : ''));
                         break;
                     case 'upload_single_pdf':
-                        if($this->check_user_login()) $upload->upload_single_pdf($data['data'],(!empty($data['url'])?$this->string_security_check($data['url']):''),(!empty($data['toAction']) ? $this->string_security_check($data['toAction']) : ''));
+                        if(!empty($data['data']) && $security->check_user_login()) $upload->upload_single_pdf($data['data'],(!empty($data['url'])?$security->string_security_check($data['url']):''),(!empty($data['toAction']) ? $security->string_security_check($data['toAction']) : ''));
                         break;
                     case 'upload_many_pdfs':
-                        if($this->check_user_login()) $upload->upload_many_pdfs($data['data'],(!empty($data['url'])?$this->string_security_check($data['url']):''),(!empty($data['toAction']) ? $this->string_security_check($data['toAction']) : ''));
+                        if(!empty($data['data']) && $security->check_user_login()) $upload->upload_many_pdfs($data['data'],(!empty($data['url'])?$security->string_security_check($data['url']):''),(!empty($data['toAction']) ? $security->string_security_check($data['toAction']) : ''));
+                        break;
+                    case 'send_phone_login':
+                        if(!empty($data['data']))
+                            $login->send_sms_login($data['data']);
+                        else
+                            echo json_encode(['status' => 'error', 'message' => 'شماره نامعتبر است']);
+                        break;
+                    case 'verify_sms_code':
+                        if(!empty($data['data']))
+                            $login->sms_login_code_check($data['data']);
+                        else
+                            echo json_encode(['status' => 'error', 'message' => 'شماره نامعتبر است']);
+                        break;
+                    case 'register_user':
+                        if(!empty($data['data']))
+                            $login->register($data['data']);
+                        else
+                            echo json_encode(['status' => 'error', 'message' => 'نام و نام خانوادگی نامعتبر است']);
                         break;
                     default:
                         echo json_encode($data);

@@ -22,7 +22,7 @@ class Migration_Create_user_account_table extends CI_Migration {
             'gmail' => [
                 'type' => 'VARCHAR',
                 'constraint' => 150,
-                'null' => FALSE,
+                'null' => TRUE,
             ],
             'gmail_code' => [   // اصلاح نام فیلد از gamil_code به gmail_code
                 'type' => 'VARCHAR',
