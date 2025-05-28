@@ -26,79 +26,75 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { sendApi } from '@/utils/api';
-
-const selectedFilesBase64 = ref([]);
-const uploadedImages = ref([]);
-
-const readProgress = ref(0);
-const reading = ref(false);
-
-function readFileAsBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = (error) => reject(error);
-
-    reader.readAsDataURL(file);
-  });
-}
-async function toBase64WithProgress(files) {
-  const base64s = [];
-  reading.value = true;
-  readProgress.value = 0;
-
-  try {
-    const total = files.length;
-    for (let i = 0; i < total; i++) {
-      const base64 = await readFileAsBase64(files[i]);
-      base64s.push(base64);
-      readProgress.value = ((i + 1) / total) * 100;
+  import { ref,defineProps } from 'vue';
+  import { sendApi } from '@/utils/api';
+  const props = defineProps({
+    toAction: String,
+    url: String
+  })
+  const selectedFilesBase64 = ref([]);
+  const uploadedImages = ref([]);
+  const readProgress = ref(0);
+  const reading = ref(false);
+  function readFileAsBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+      reader.readAsDataURL(file);
+    });
+  }
+  async function toBase64WithProgress(files) {
+    const base64s = [];
+    reading.value = true;
+    readProgress.value = 0;
+    try {
+      const total = files.length;
+      for (let i = 0; i < total; i++) {
+        const base64 = await readFileAsBase64(files[i]);
+        base64s.push(base64);
+        readProgress.value = ((i + 1) / total) * 100;
+      }
+      reading.value = false;
+      return base64s;
+    } catch (error) {
+      reading.value = false;
+      throw error;
     }
-    reading.value = false;
-    return base64s;
-  } catch (error) {
-    reading.value = false;
-    throw error;
   }
-}
-const onFileChange = async (e) => {
-  const files = e.target.files;
-  if (!files || files.length === 0) return;
-
-  selectedFilesBase64.value = [];
-  uploadedImages.value = [];
-
-  try {
-    selectedFilesBase64.value = await toBase64WithProgress(files);
-    await uploadAll();
-  } catch (error) {
-    console.error('خطا در خواندن فایل‌ها:', error);
-    alert('خطا در خواندن فایل‌های انتخاب شده.');
-  }
-};
-const uploadAll = async () => {
-  try {
-    const response = await sendApi(
-      JSON.stringify({
-        action: 'upload_many_images',
-        url: '',
-        data: selectedFilesBase64.value
-      })
-    );
-
-    if (response.status === 'success' && Array.isArray(response.images)) {
-      uploadedImages.value = response.images;
-    } else {
-      alert(response.message || 'آپلود موفق نبود');
+  const onFileChange = async (e) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    selectedFilesBase64.value = [];
+    uploadedImages.value = [];
+    try {
+      selectedFilesBase64.value = await toBase64WithProgress(files);
+      await uploadAll();
+    } catch (error) {
+      console.error('خطا در خواندن فایل‌ها:', error);
+      alert('خطا در خواندن فایل‌های انتخاب شده.');
     }
-  } catch (err) {
-    console.error('خطا در ارسال به سرور:', err);
-    alert('مشکلی در آپلود پیش آمد');
-  }
-};
+  };
+  const uploadAll = async () => {
+    try {
+      const response = await sendApi(
+        JSON.stringify({
+          action: 'upload_many_images',
+          url: props.url,
+          data: selectedFilesBase64.value,
+          toAction:props.toAction
+        })
+      );
+      if (response.status === 'success' && Array.isArray(response.images)) {
+        uploadedImages.value = response.images;
+      } else {
+        alert(response.message || 'آپلود موفق نبود');
+      }
+    } catch (err) {
+      console.error('خطا در ارسال به سرور:', err);
+      alert('مشکلی در آپلود پیش آمد');
+    }
+  };
 </script>
 
 <style scoped>

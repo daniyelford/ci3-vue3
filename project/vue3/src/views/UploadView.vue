@@ -1,11 +1,11 @@
 <template>
   <div class="upload">
-    <UploadSingleImage />
-    <UploadManyImages />
-    <UploadSingleVideo />
-    <UploadManyVideos />
-    <UploadSinglePdf />
-    <UploadManyPdfs />
+    <UploadSingleImage toAction="" url="" />
+    <UploadManyImages toAction="" url="" />
+    <UploadSingleVideo toAction="" url="" />
+    <UploadManyVideos toAction="" url="" />
+    <UploadSinglePdf toAction="" url="" />
+    <UploadManyPdfs toAction="" url="" />
   </div>
 </template>
 

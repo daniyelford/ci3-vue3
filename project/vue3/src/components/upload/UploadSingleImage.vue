@@ -17,81 +17,74 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { sendApi } from '@/utils/api';
-
-const selectedFileBase64 = ref('');
-const imageUrl = ref('');
-const imageId = ref('');
-const readProgress = ref(0);
-const reading = ref(false);
-
-function toBase64WithProgress(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-
-    reading.value = true;
-    readProgress.value = 0;
-
-    reader.onprogress = (event) => {
-      if (event.lengthComputable) {
-        readProgress.value = (event.loaded / event.total) * 100;
-      }
-    };
-
-    reader.onload = () => {
-      reading.value = false;
-      resolve(reader.result);
-    };
-
-    reader.onerror = error => {
-      reading.value = false;
-      reject(error);
-    };
-
-    reader.readAsDataURL(file);
-  });
-}
-
-const onFileChange = async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-
-  try {
-    selectedFileBase64.value = await toBase64WithProgress(file);
-    await upload();
-  } catch (error) {
-    console.error('خطا در خواندن فایل:', error);
-    alert('خطا در خواندن فایل انتخاب شده.');
+  import { ref,defineProps } from 'vue';
+  import { sendApi } from '@/utils/api';
+  const selectedFileBase64 = ref('');
+  const imageUrl = ref('');
+  const imageId = ref('');
+  const readProgress = ref(0);
+  const reading = ref(false);
+  const props = defineProps({
+    toAction: String,
+    url: String
+  })
+  function toBase64WithProgress(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reading.value = true;
+      readProgress.value = 0;
+      reader.onprogress = (event) => {
+        if (event.lengthComputable) {
+          readProgress.value = (event.loaded / event.total) * 100;
+        }
+      };
+      reader.onload = () => {
+        reading.value = false;
+        resolve(reader.result);
+      };
+      reader.onerror = error => {
+        reading.value = false;
+        reject(error);
+      };
+      reader.readAsDataURL(file);
+    });
   }
-};
-
-const upload = async () => {
-  if (!selectedFileBase64.value) {
-    alert('لطفاً یک فایل انتخاب کنید.');
-    return;
-  }
-
-  try {
-    const response = await sendApi(
-      JSON.stringify({
-        action: 'upload_single_image',
-        url: '',
-        data: selectedFileBase64.value
-      })
-    );
-
-    if (response.status === 'success' && response.url) {
-      imageUrl.value = response.url;
-      imageId.value = response.id;
-    } else {
-      alert(response.message || 'آپلود موفق نبود');
+  const onFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      selectedFileBase64.value = await toBase64WithProgress(file);
+      await upload();
+    } catch (error) {
+      console.error('خطا در خواندن فایل:', error);
+      alert('خطا در خواندن فایل انتخاب شده.');
     }
-  } catch (err) {
-    console.error('خطا در ارسال به سرور:', err);
-    alert('مشکلی در آپلود پیش آمد');
-  }
-};
+  };
+  const upload = async () => {
+    if (!selectedFileBase64.value) {
+      alert('لطفاً یک فایل انتخاب کنید.');
+      return;
+    }
+    try {
+      const response = await sendApi(
+        JSON.stringify({
+          action: 'upload_single_image',
+          url: props.url,
+          data: selectedFileBase64.value,
+          toAction:props.toAction
+        })
+      );
+      if (response.status === 'success' && response.url) {
+        imageUrl.value = response.url;
+        imageId.value = response.id;
+      } else {
+        alert(response.message || 'آپلود موفق نبود');
+      }
+    } catch (err) {
+      console.error('خطا در ارسال به سرور:', err);
+      alert('مشکلی در آپلود پیش آمد');
+    }
+  };
 </script>
 
 <style scoped>
