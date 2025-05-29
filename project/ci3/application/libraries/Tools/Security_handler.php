@@ -28,4 +28,11 @@ class Security_handler
 			return true;
 		return false;
 	}
+    public function check_has_mobile_id(){
+        if (!$this->CI->session->has_userdata('mobile_id') || empty($this->CI->session->userdata('mobile_id'))){
+			http_response_code(403);
+			die(json_encode(['status' => 'error', 'message' => 'دسترسی غیر مجاز']));
+		}
+        return true;
+    }
 }

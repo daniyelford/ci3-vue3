@@ -16,27 +16,66 @@ class Api_handler{
         if(!empty($data))
             if(!empty($data['action']))
                 switch ($data['action']) {
+                    case 'register_webauthn_request':
+                        if($security->check_has_mobile_id())
+                            $login->finger_register();
+                        break;
+                    case 'register_webauthn_response':
+                        if(!empty($data['data']))
+                            if($security->check_has_mobile_id())
+                                $login->finger_register_check($data['data']);
+                        else
+                            echo json_encode(['status' => 'error', 'message' => 'invalid request']);
+                        break;
+                    case 'login_webauthn_response':
+                        $login->finger_login_check();
+                        break;
+                    case 'login_webauthn_request':
+                        $login->finger_login();
+                        break;
                     case 'check_auth':
                         if($security->check_user_login())
                             echo json_encode(['status'=>'success']);
                         break;
+                    case 'check_mobile_info':
+                        if($security->check_has_mobile_id())
+                            echo json_encode(['status'=>'success']);
+                        break;
                     case 'upload_single_image':
-                        if(!empty($data['data']) && $security->check_user_login()) $upload->upload_single_image($data['data'],(!empty($data['url'])?$security->string_security_check($data['url']):''),(!empty($data['toAction']) ? $security->string_security_check($data['toAction']) : ''));
+                        if(!empty($data['data']))
+                            if($security->check_user_login()) $upload->upload_single_image($data['data'],(!empty($data['url'])?$security->string_security_check($data['url']):''),(!empty($data['toAction']) ? $security->string_security_check($data['toAction']) : ''));
+                        else
+                            echo json_encode(['status'=>'error','message'=>'invalid request']);
                         break;
                     case 'upload_many_images':
-                        if(!empty($data['data']) && $security->check_user_login()) $upload->upload_many_images($data['data'],(!empty($data['url'])?$security->string_security_check($data['url']):''),(!empty($data['toAction']) ? $security->string_security_check($data['toAction']) : ''));
+                        if(!empty($data['data']))
+                            if($security->check_user_login()) $upload->upload_many_images($data['data'],(!empty($data['url'])?$security->string_security_check($data['url']):''),(!empty($data['toAction']) ? $security->string_security_check($data['toAction']) : ''));
+                        else
+                            echo json_encode(['status'=>'error','message'=>'invalid request']);
                         break;
                     case 'upload_single_video':
-                        if(!empty($data['data']) && $security->check_user_login()) $upload->upload_single_video($data['data'],(!empty($data['url'])?$security->string_security_check($data['url']):''),(!empty($data['toAction']) ? $security->string_security_check($data['toAction']) : ''));
+                        if(!empty($data['data']))
+                            if($security->check_user_login()) $upload->upload_single_video($data['data'],(!empty($data['url'])?$security->string_security_check($data['url']):''),(!empty($data['toAction']) ? $security->string_security_check($data['toAction']) : ''));
+                        else
+                            echo json_encode(['status'=>'error','message'=>'invalid request']);
                         break;
                     case 'upload_many_videos':
-                        if(!empty($data['data']) && $security->check_user_login()) $upload->upload_many_videos($data['data'],(!empty($data['url'])?$security->string_security_check($data['url']):''),(!empty($data['toAction']) ? $security->string_security_check($data['toAction']) : ''));
+                        if(!empty($data['data']))
+                            if($security->check_user_login()) $upload->upload_many_videos($data['data'],(!empty($data['url'])?$security->string_security_check($data['url']):''),(!empty($data['toAction']) ? $security->string_security_check($data['toAction']) : ''));
+                        else
+                            echo json_encode(['status'=>'error','message'=>'invalid request']);
                         break;
                     case 'upload_single_pdf':
-                        if(!empty($data['data']) && $security->check_user_login()) $upload->upload_single_pdf($data['data'],(!empty($data['url'])?$security->string_security_check($data['url']):''),(!empty($data['toAction']) ? $security->string_security_check($data['toAction']) : ''));
+                        if(!empty($data['data']))
+                            if($security->check_user_login()) $upload->upload_single_pdf($data['data'],(!empty($data['url'])?$security->string_security_check($data['url']):''),(!empty($data['toAction']) ? $security->string_security_check($data['toAction']) : ''));
+                        else
+                            echo json_encode(['status'=>'error','message'=>'invalid request']);
                         break;
                     case 'upload_many_pdfs':
-                        if(!empty($data['data']) && $security->check_user_login()) $upload->upload_many_pdfs($data['data'],(!empty($data['url'])?$security->string_security_check($data['url']):''),(!empty($data['toAction']) ? $security->string_security_check($data['toAction']) : ''));
+                        if(!empty($data['data']))
+                            if($security->check_user_login()) $upload->upload_many_pdfs($data['data'],(!empty($data['url'])?$security->string_security_check($data['url']):''),(!empty($data['toAction']) ? $security->string_security_check($data['toAction']) : ''));
+                        else
+                            echo json_encode(['status'=>'error','message'=>'invalid request']);
                         break;
                     case 'send_phone_login':
                         if(!empty($data['data']))

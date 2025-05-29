@@ -238,7 +238,7 @@ class vfsStream
                 $matches = null;
                 preg_match('/^\[(.*)\]$/', $name, $matches);
                 if ($matches !== array()) {
-                    self::newBlock($matches['1'])->withContent($data)->at($baseDir);
+                    self::newBlock($matches[1])->withContent($data)->at($baseDir);
                 } else {
                     self::newFile($name)->withContent($data)->at($baseDir);
                 }

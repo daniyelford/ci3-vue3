@@ -3,7 +3,7 @@
         'name' => 'codeigniter/framework',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '1bbe40851b19c148b3bd682dc29ad98b26b2c43a',
+        'reference' => '8555b4213406f286d5679cc2228d356caf99c68d',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'codeigniter/framework' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '1bbe40851b19c148b3bd682dc29ad98b26b2c43a',
+            'reference' => '8555b4213406f286d5679cc2228d356caf99c68d',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -27,6 +27,15 @@
             'install_path' => __DIR__ . '/../doctrine/instantiator',
             'aliases' => array(),
             'dev_requirement' => true,
+        ),
+        'lbuchs/webauthn' => array(
+            'pretty_version' => 'v1.1.3',
+            'version' => '1.1.3.0',
+            'reference' => '4780c7b017ccc74a023c6ae05b5847e478f5b97d',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../lbuchs/webauthn',
+            'aliases' => array(),
+            'dev_requirement' => false,
         ),
         'mikey179/vfsstream' => array(
             'pretty_version' => 'v1.6.12',

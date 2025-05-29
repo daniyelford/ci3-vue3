@@ -31,7 +31,8 @@ const routes = [
   {
     path: '/register',
     name: 'register',
-    component: RegisterView
+    component: RegisterView,
+    meta:{checkHasMobileId:true}
   },
   {
     path: '/dashboard',
@@ -61,7 +62,21 @@ router.beforeEach(async (to, from, next) => {
       console.error('Auth check failed:', e)
       next('/login')
     }
-  } else {
+  } else if(to.meta.checkHasMobileId) {
+    try {
+      const res = await sendApi(JSON.stringify({
+        action: 'check_mobile_info'
+      }));
+      if (res.status==='success') {
+        next()
+      } else {
+        next('/login')
+      }
+    } catch (e) {
+      console.error('Auth check failed:', e)
+      next('/login')
+    }
+  }else{
     next()
   }
 })
