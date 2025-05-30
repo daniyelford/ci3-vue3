@@ -1,5 +1,14 @@
 <template>
-  <div class="about">
-    <h1>This is an dashboard page</h1>
+  <div class="dashboard">
+    <FingerPrintRegister/>
   </div>
 </template>
+<script>
+import FingerPrintRegister from '@/components/home/FingerPrintRegister.vue';
+export default {
+  name: 'DashboardView',
+  components: {
+    FingerPrintRegister
+  }
+}
+</script>

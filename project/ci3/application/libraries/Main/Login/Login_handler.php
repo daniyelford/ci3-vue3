@@ -1,8 +1,8 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-
 class Login_handler
 {
     private $CI;
+    private $send_sms_code_in_login=true;
     public function __construct(){
 		$this->CI =& get_instance();
         $this->CI->load->model('Users_model');
@@ -16,10 +16,10 @@ class Login_handler
             !empty(end($a)['id']) && 
             intval(end($a)['id']) > 0){
                 $b=$this->CI->Users_model->credential_where_user_mobile_id(intval(end($a)['id']));
-                if(!empty($b) && !empty(end($b))){
+                if(!empty($b) && !empty(end($b)) && !empty(end($b)['credential_id'])){
                     $webauthnlib=new Finger_print();
                     $webauthn = $webauthnlib->getInstance();
-                    $options = $webauthn->getGetArgs(end($b));
+                    $options = $webauthn->getGetArgs([base64_decode(end($b)['credential_id'],true)],20,true,true,true,true,true);
                     $this->CI->session->set_userdata('finger_login_challenge',$options->publicKey->challenge);
                     echo json_encode($options);
                 }else{
@@ -33,36 +33,26 @@ class Login_handler
         }
     }
     public function finger_login_check($data) {
-        $credentialId = $data['credentialId']??'';
-        $clientDataJSON = $data['clientDataJSON']??'';
-        $authenticatorData = $data['authenticatorData']??'';
-        $signature = $data['signature']??'';
-        $userHandle = $data['userHandle']??'';
-        $challenge = $this->CI->session->userdata('finger_login_challenge');
-        if (!$challenge) {
+        if(!(!empty($data) && !empty($data['id']))){
             echo json_encode(['status' => 'error', 'message' => 'Challenge not found']);
             return;
         }
-        $credential = $this->CI->Users_model->credential_where_credential_id($credentialId);
-        if (!$credential) {
+        $clientDataJSON = $data['response']['clientDataJSON']??'';
+        $authenticatorData = $data['response']['authenticatorData']??'';
+        $signature = $data['response']['signature']??'';
+        if (!$this->CI->session->has_userdata('finger_login_challenge') || empty($this->CI->session->userdata('finger_login_challenge'))) {
+            echo json_encode(['status' => 'error', 'message' => 'Challenge not found']);
+            return;
+        }
+        $webauthnlib = new Finger_print();
+        $credential = $this->CI->Users_model->credential_where_credential_id($webauthnlib->base64url_to_base64($data['id']));
+        if (!(!empty($credential) && !empty(end($credential)))) {
             echo json_encode(['status' => 'error', 'message' => 'Credential not found']);
             return;
         }
         try {
-            $webauthnlib = new Finger_print();
-            $data = $webauthnlib->validateLogin(
-                $clientDataJSON,
-                $authenticatorData,
-                $signature,
-                $credentialId,
-                base64_decode($credential->public_key,true),
-                $credential->counter,
-                $challenge
-            );
-            $this->CI->Users_model->edit_credential_where_credential_id($data,$credentialId);
+            $data = $webauthnlib->validateLogin($webauthnlib->decodeBase64Url($clientDataJSON),$webauthnlib->decodeBase64Url($authenticatorData),$webauthnlib->decodeBase64Url($signature),base64_decode(end($credential)['public_key'],true),$this->CI->session->userdata('finger_login_challenge'),end($credential)['counter']);
             $this->check_user($this->CI->session->userdata('phone_number'));
-            // $this->CI->session->set_userdata('user_mobile_id', $credential->user_mobile_id);
-            echo json_encode(['status' => 'success']);
         } catch (Exception $e) {
             echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
         }
@@ -91,26 +81,12 @@ class Login_handler
                 if (!isset($clientDataArr['type']) || $clientDataArr['type'] !== 'webauthn.create') {
                     throw new Exception('Invalid client data type');
                 }
+                $check=$this->CI->Users_model->credential_where_user_mobile_id($this->CI->session->userdata('mobile_id'));
                 $webauthnlib = new Finger_print();
-                $data = $webauthnlib->validateRegistration(
-                    base64_decode(strtr($arr['response']['clientDataJSON'], '-_', '+/'),true),
-                    base64_decode(strtr($arr['response']['attestationObject'], '-_', '+/'),true),
-                    base64_decode(strtr($this->CI->session->userdata('finger_register_challenge'), '-_', '+/'),true)
-                );
-                $credential = [
-                    'user_mobile_id'       => $this->CI->session->userdata('mobile_id'),
-                    'credential_id'        => base64_encode($data->credentialId),
-                    'public_key'           => base64_encode($data->credentialPublicKey),
-                    'counter'              => $data->signatureCounter ?? 0,
-                    'aaguid'               => $data->AAGUID ?? null,
-                    'user_verified'        => $data->userVerified ? 1 : 0,
-                    'user_present'         => $data->userPresent ? 1 : 0,
-                    'attestation_format'   => $data->attestationFormat ?? null,
-                    'certificate'          => $data->certificate ?? null,
-                    'certificate_issuer'   => $data->certificateIssuer ?? null,
-                    'certificate_subject'  => $data->certificateSubject ?? null,
-                ];
-                $this->CI->Users_model->add_credential($credential);
+                if(!empty($check) && !empty(end($check)) && !empty(end($check)['id']) && intval(end($check)['id'])>0)
+                    $this->CI->Users_model->edit_credential_where_id($webauthnlib->set_credential($arr['response'],$this->CI->session->userdata('finger_register_challenge'),$this->CI->session->userdata('mobile_id')),intval(end($check)['id']));
+                else
+                    $this->CI->Users_model->add_credential($webauthnlib->set_credential($arr['response'],$this->CI->session->userdata('finger_register_challenge'),$this->CI->session->userdata('mobile_id')));
                 echo json_encode(['status' => 'success']);
             } catch (Exception $e) {
                 echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
@@ -192,7 +168,7 @@ class Login_handler
         if(!empty($data) && $security->validate_mobile_number($data) && $this->CI->session->has_userdata('phone_number') && !empty($this->CI->session->userdata('phone_number')) && $data===$this->CI->session->userdata('phone_number')){
             $this->CI->session->set_userdata('login_code',['code'=>rand(100000,1000000),'phone'=>$data]);
             if($this->send_sms_action($this->CI->session->userdata('login_code')['code'],$data))
-                echo json_encode(['status' => 'success','code'=>$this->CI->session->userdata('login_code')['code']]);
+                echo ($this->send_sms_code_in_login?json_encode(['status' => 'success','code'=>$this->CI->session->userdata('login_code')['code']]):json_encode(['status' => 'success']));
             else
                 echo json_encode(['status' => 'error','message'=>'پیامک ارسال نشد']);
         }else{

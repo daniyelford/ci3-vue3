@@ -12,47 +12,38 @@
     import router from '@/router'
     const isSupported = ref(false)
     onMounted(() => {
-        isSupported.value =
-        window.PublicKeyCredential &&
-        typeof window.PublicKeyCredential === 'function'
+        isSupported.value = window.PublicKeyCredential && typeof window.PublicKeyCredential === 'function'
     })
     async function loginWithWebAuthn() {
         try {
             const res = await sendApi(JSON.stringify({
                 action: 'login_webauthn_request'
             }))
-            if (!res || !res.publicKey){
-                if(res.status==='error')
-                    alert(res.message);
-                else
+            if (!res || !res.publicKey) {
+                if (res.status === 'error') {
+                    alert(res.message)
+                } else {
                     throw new Error('مشکلی در دریافت challenge رخ داد.')
-            } 
+                }
+                return
+            }
             const options = preformatGetReq(res.publicKey)
-            console.log(options);
-            
             const assertion = await navigator.credentials.get({
                 publicKey: options
             })
-            console.log(assertion);
-            
             const dataToSend = JSON.stringify({
                 action: 'login_webauthn_response',
-                id: assertion.id,
-                rawId: arrayBufferToBase64(assertion.rawId),
-                type: assertion.type,
-                response: {
-                    clientDataJSON: arrayBufferToBase64(assertion.response.clientDataJSON),
-                    authenticatorData: arrayBufferToBase64(assertion.response.authenticatorData),
-                    signature: arrayBufferToBase64(assertion.response.signature),
-                    userHandle: assertion.response.userHandle
-                    ? arrayBufferToBase64(assertion.response.userHandle)
-                    : null,
-                },
+                data:assertion
             })
-            console.log(dataToSend);
             const verify = await sendApi(dataToSend)
-            if (verify && verify.success) {
-                router.push({name:'dashboard'})
+            if (verify.status==='success') {
+                if (verify.url === 'dashboard') {
+                    router.push({ name: 'dashboard' })
+                } else if (verify.url === 'register') {
+                    router.push({ name: 'register' })
+                } else {
+                    this.message = 'مشخصات ناقص است. لطفاً دوباره تلاش کنید.'
+                }
             } else {
                 alert('احراز هویت ناموفق بود.')
             }
@@ -61,16 +52,20 @@
             alert('خطا در ورود با اثر انگشت')
         }
     }
-    function arrayBufferToBase64(buffer) {
-        return btoa(String.fromCharCode(...new Uint8Array(buffer)))
+    function decodeMimeBase64(mimeString) {
+        const match = mimeString.match(/=\?BINARY\?B\?(.*)\?=/i)
+        if (match && match[1]) {
+        return Uint8Array.from(atob(match[1]), c => c.charCodeAt(0)).buffer
+        }
+        return Uint8Array.from(atob(mimeString), c => c.charCodeAt(0)).buffer
     }
     function preformatGetReq(options) {
-        const opts = {...options}
-        opts.challenge = Uint8Array.from(atob(opts.challenge), c => c.charCodeAt(0)).buffer
+        const opts = { ...options }
+        opts.challenge = decodeMimeBase64(opts.challenge)
         if (opts.allowCredentials && Array.isArray(opts.allowCredentials)) {
             opts.allowCredentials = opts.allowCredentials.map(cred => ({
             ...cred,
-            id: Uint8Array.from(atob(cred.id), c => c.charCodeAt(0)).buffer
+            id: decodeMimeBase64(cred.id)
             }))
         }
         return opts

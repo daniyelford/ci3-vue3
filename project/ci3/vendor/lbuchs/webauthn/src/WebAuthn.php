@@ -157,7 +157,6 @@ class WebAuthn {
         // user
         $args->publicKey->user = new \stdClass();
         $args->publicKey->user->id = new ByteBuffer($userId); // binary
-        $args->publicKey->user->id=base64_encode($args->publicKey->user->id);
         $args->publicKey->user->name = $userName;
         $args->publicKey->user->displayName = $userDisplayName;
 
@@ -246,7 +245,6 @@ class WebAuthn {
             foreach ($credentialIds as $id) {
                 $tmp = new \stdClass();
                 $tmp->id = $id instanceof ByteBuffer ? $id : new ByteBuffer($id);  // binary
-                $tmp->id =base64_encode($tmp->id);
                 $tmp->transports = array();
 
                 if ($allowUsb) {
@@ -606,6 +604,6 @@ class WebAuthn {
         if (!$this->_challenge) {
             $this->_challenge = ByteBuffer::randomBuffer($length);
         }
-        return base64_encode($this->_challenge);
+        return $this->_challenge;
     }
 }

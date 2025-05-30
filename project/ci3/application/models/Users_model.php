@@ -43,7 +43,7 @@ class Users_model extends CI_Model
 	    return (!empty($id) && intval($id)?$this->select_where_array_table($this->credential,['user_mobile_id'=>intval($id)]):false);
 	}
     public function credential_where_credential_id($id){
-	    return (!empty($id) && intval($id)?$this->select_where_array_table($this->credential,['credential_id'=>intval($id)]):false);
+	    return (!empty($id) && is_string($id)?$this->select_where_array_table($this->credential,['credential_id'=>$id]):false);
 	}
     public function add_return_id($arr){
         return (!empty($arr) && is_array($arr)?$this->add_to_table_return_id($this->tbl,$arr):false);
@@ -60,7 +60,7 @@ class Users_model extends CI_Model
     public function edit_mobile_weher_id($arr,$id){
         return (!empty($id) && intval($id)>0 && !empty($arr) && is_array($arr) && $this->edit_table($this->mobile,$arr,['id'=>intval($id)]));
     }
-    public function edit_credential_where_credential_id($arr,$id){
-        return (!empty($id) && intval($id)>0 && !empty($arr) && is_array($arr) && $this->edit_table($this->credential,$arr,['credential_id'=>intval($id)]));
+    public function edit_credential_where_id($arr,$id){
+        return (!empty($id) && intval($id)>0 && !empty($arr) && is_array($arr) && $this->edit_table($this->credential,$arr,['id'=>intval($id)]));
     }
 }
