@@ -26,13 +26,14 @@ const routes = [
   {
     path: '/login',
     name: 'login',
-    component: LoginView
+    component: LoginView,
+    meta:{onlyAuth:true}
   },
   {
     path: '/register',
     name: 'register',
     component: RegisterView,
-    meta:{checkHasMobileId:true}
+    meta:{checkHasMobileId:true,onlyAuth:true}
   },
   {
     path: '/dashboard',
@@ -48,37 +49,26 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
-  if (to.meta.requiresAuth) {
-    try {
-      const res = await sendApi(JSON.stringify({
-        action: 'check_auth'
-      }));
-      if (res.status==='success') {
-        next()
-      } else {
-        next('/login')
-      }
-    } catch (e) {
-      console.error('Auth check failed:', e)
-      next('/login')
+  try {
+    const meta = to.meta;
+    if (meta.requiresAuth) {
+      const res = await sendApi(JSON.stringify({ action: 'check_auth' }));
+      if (res.status !== 'success') return next('/login');
     }
-  } else if(to.meta.checkHasMobileId) {
-    try {
-      const res = await sendApi(JSON.stringify({
-        action: 'check_mobile_info'
-      }));
-      if (res.status==='success') {
-        next()
-      } else {
-        next('/login')
-      }
-    } catch (e) {
-      console.error('Auth check failed:', e)
-      next('/login')
+    if (meta.checkHasMobileId) {
+      const res = await sendApi(JSON.stringify({ action: 'check_mobile_info' }));
+      if (res.status !== 'success') return next('/login');
     }
-  }else{
-    next()
+    if (meta.onlyAuth) {
+      const res = await sendApi(JSON.stringify({ action: 'check_auth' }));
+      if (res.status === 'success') return next('/dashboard');
+    }
+    next();
+  } catch (e) {
+    console.error('Router Guard Error:', e);
+    next('/login');
   }
-})
+});
+
 
 export default router

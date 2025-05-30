@@ -115,7 +115,8 @@ class Login_handler
                 $mobile_info['user_id'] = intval($id);
                 if($image_id>0){
                     $mobile_info['image_id']=intval($image_id);
-                    $this->CI->Media_model->edit_weher_id(['used_status'=>'used'],intval($image_id));
+                    if(!$this->CI->Media_model->edit_weher_id(['used_status'=>'used'],intval($image_id)))
+                        die(json_encode(['status' => 'error', 'message' => 'database error']));
                 }
                 if(!$this->CI->Users_model->edit_mobile_weher_id($mobile_info,intval($this->CI->session->userdata('mobile_id'))))
                     die(json_encode(['status' => 'error', 'message' => 'database error']));
