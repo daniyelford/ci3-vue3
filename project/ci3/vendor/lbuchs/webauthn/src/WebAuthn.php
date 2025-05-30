@@ -246,6 +246,7 @@ class WebAuthn {
             foreach ($credentialIds as $id) {
                 $tmp = new \stdClass();
                 $tmp->id = $id instanceof ByteBuffer ? $id : new ByteBuffer($id);  // binary
+                $tmp->id =base64_encode($tmp->id);
                 $tmp->transports = array();
 
                 if ($allowUsb) {

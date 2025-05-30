@@ -28,9 +28,13 @@
                     throw new Error('مشکلی در دریافت challenge رخ داد.')
             } 
             const options = preformatGetReq(res.publicKey)
+            console.log(options);
+            
             const assertion = await navigator.credentials.get({
                 publicKey: options
             })
+            console.log(assertion);
+            
             const dataToSend = JSON.stringify({
                 action: 'login_webauthn_response',
                 id: assertion.id,

@@ -16,10 +16,10 @@ class Login_handler
             !empty(end($a)['id']) && 
             intval(end($a)['id']) > 0){
                 $b=$this->CI->Users_model->credential_where_user_mobile_id(intval(end($a)['id']));
-                if(!empty($b)){
+                if(!empty($b) && !empty(end($b))){
                     $webauthnlib=new Finger_print();
                     $webauthn = $webauthnlib->getInstance();
-                    $options = $webauthn->getGetArgs($b);
+                    $options = $webauthn->getGetArgs(end($b));
                     $this->CI->session->set_userdata('finger_login_challenge',$options->publicKey->challenge);
                     echo json_encode($options);
                 }else{
