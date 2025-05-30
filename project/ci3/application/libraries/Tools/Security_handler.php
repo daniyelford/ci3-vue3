@@ -9,14 +9,12 @@ class Security_handler
         if (!($this->CI->session->has_userdata('id') && !empty($this->CI->session->userdata('id'))) && 
         !($this->CI->session->has_userdata('mobile_id') && !empty($this->CI->session->userdata('mobile_id'))) &&
         !($this->CI->session->has_userdata('account_id') && !empty($this->CI->session->userdata('account_id')))){
-			http_response_code(403);
 			die(json_encode(['status' => 'error', 'message' => 'دسترسی غیر مجاز']));
 		}
         return true;
     }
     public function check_user_login(){
         if (!$this->CI->session->has_userdata('id') || empty($this->CI->session->userdata('id'))){
-			http_response_code(403);
 			die(json_encode(['status' => 'error', 'message' => 'دسترسی غیر مجاز']));
 		}
         return true;
@@ -39,7 +37,6 @@ class Security_handler
 	}
     public function check_has_mobile_id(){
         if (!$this->CI->session->has_userdata('mobile_id') || empty($this->CI->session->userdata('mobile_id'))){
-			http_response_code(403);
 			die(json_encode(['status' => 'error', 'message' => 'دسترسی غیر مجاز']));
 		}
         return true;

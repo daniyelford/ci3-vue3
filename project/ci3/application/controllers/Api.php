@@ -13,7 +13,6 @@ class Api extends CI_Controller {
 		$headers = apache_request_headers();
 		$apiKey = $headers['X-API-KEY'] ?? '';
 		if (!$this->session->has_userdata('api_key_back') || !$this->session->has_userdata('api_key') || empty($this->session->userdata('api_key')) || empty($this->session->userdata('api_key_back')) || $this->session->userdata('api_key') !== $apiKey) {
-			http_response_code(403);
 			echo json_encode(['error' => 'دسترسی غیرمجاز']);
 			return;
 		}
@@ -23,7 +22,6 @@ class Api extends CI_Controller {
 	}
 	public function api() {
 		if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-			http_response_code(405);
 			echo json_encode(['status' => 'error', 'message' => 'روش نادرست']);
 			return;
 		}
@@ -32,7 +30,6 @@ class Api extends CI_Controller {
 		$token = str_replace('Bearer ', '', $headers['Authorization'] ?? '');
 		$providedKey = $headers['X-API-KEY'] ?? '';
 		if (!$this->session->has_userdata('api_key') || !$this->session->has_userdata('api_key_back') || !$this->session->has_userdata('token') || empty($this->session->userdata('api_key')) || empty($this->session->userdata('api_key_back')) || empty($this->session->userdata('token')) || $this->session->userdata('token') !== $token || $this->session->userdata('api_key') !== $providedKey) {
-			http_response_code(401);
 			echo json_encode(['status' => 'error', 'message' => 'توکن نامعتبر است']);
 			return;
 		}
