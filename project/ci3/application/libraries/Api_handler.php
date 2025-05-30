@@ -7,7 +7,7 @@ class Api_handler{
 		$this->CI =& get_instance();
         $this->CI->load->library('Tools/Upload_handler');
         $this->CI->load->library('Tools/Security_handler');
-        $this->CI->load->library('Tools/Login_handler');
+        $this->CI->load->library('Main/Login/Login_handler');
 	}
     public function handler($data){
         $upload=new Upload_handler();
@@ -28,7 +28,10 @@ class Api_handler{
                             echo json_encode(['status' => 'error', 'message' => 'invalid request']);
                         break;
                     case 'login_webauthn_response':
-                        $login->finger_login_check();
+                        if(!empty($data['data']))
+                            $login->finger_login_check($data['data']);
+                        else
+                            echo json_encode(['status' => 'error', 'message' => 'invalid request']);
                         break;
                     case 'login_webauthn_request':
                         $login->finger_login();
@@ -40,6 +43,16 @@ class Api_handler{
                     case 'check_mobile_info':
                         if($security->check_has_mobile_id())
                             echo json_encode(['status'=>'success']);
+                        break;
+                    case 'save_phone':
+                        if(!empty($data['data']))
+                            $login->set_mobile_number($data['data']);
+                        else
+                            echo json_encode(['status'=>'error','message'=>'invalid phone number']);
+                        break;
+                    case 'delete_phone':
+                        $this->CI->session->unset_userdata('phone_number');
+                        echo json_encode(['status'=>'success']);
                         break;
                     case 'upload_single_image':
                         if(!empty($data['data']))

@@ -1,47 +1,5 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-use lbuchs\WebAuthn\WebAuthn;
-use LBuchs\WebAuthn\Binary\ByteBuffer;
-class finger_Print{
-    private $webauthn;
 
-    public function __construct(){
-        $CI =& get_instance();
-        $config = $CI->config->item('webauthn');
-        $rpName = $config['rp_name'];
-        $rpID = $config['rp_id'];
-        $origin = $config['origin'];
-        $requireResidentKey = false;
-        $attestation = $config['attestation'];
-        $this->webauthn = new WebAuthn($rpName, $rpID, $origin, $requireResidentKey, null, $attestation);
-    }
-
-    public function getInstance(){
-        return $this->webauthn;
-    }
-
-    public function generateRegistrationOptions($userID, $userName){
-        return $this->webauthn->getCreateArgs($userID, $userName, $userName);
-    }
-
-    public function validateRegistration($clientDataJSON, $attestationObject, $challenge, $requireResidentKey = false){
-        return $this->webauthn->processCreate($clientDataJSON, $attestationObject, $challenge, $requireResidentKey);
-    }
-
-    public function generateLoginOptions($credentials){
-        return $this->webauthn->getGetArgs($credentials);
-    }
-
-    public function validateLogin($clientDataJSON, $authenticatorData, $signature, $credentialPublicKey, $challenge, $userHandle){
-        return $this->webauthn->processGet(
-            $clientDataJSON,
-            $authenticatorData,
-            $signature,
-            $credentialPublicKey,
-            $challenge,
-            $userHandle
-        );
-    }
-}
 class Login_handler
 {
     private $CI;
@@ -49,9 +7,68 @@ class Login_handler
 		$this->CI =& get_instance();
         $this->CI->load->model('Users_model');
         $this->CI->load->library('Tools/Security_handler');
+        $this->CI->load->library('Main/Login/Finger_print');
 	}
+    public function finger_login(){
+        if($this->CI->session->has_userdata('phone_number') && !empty($this->CI->session->userdata('phone_number'))){
+            $a=$this->CI->Users_model->select_mobile($this->CI->session->userdata('phone_number'));
+            if(!empty($a) && !empty(end($a)) && 
+            !empty(end($a)['id']) && 
+            intval(end($a)['id']) > 0){
+                $b=$this->CI->Users_model->credential_where_user_mobile_id(intval(end($a)['id']));
+                if(!empty($b)){
+                    $webauthnlib=new Finger_print();
+                    $webauthn = $webauthnlib->getInstance();
+                    $options = $webauthn->getGetArgs($b);
+                    $this->CI->session->set_userdata('finger_login_challenge',$options->publicKey->challenge);
+                    echo json_encode($options);
+                }else{
+                    echo json_encode(['status'=>'error','message'=>'اثر انگشت قبلا ثبت نشده است']);                    
+                }
+            }else{
+                echo json_encode(['status'=>'error','message'=>'با این شماره ثبت نام انجام نشده است']);                
+            }
+        }else{
+            echo json_encode(['status'=>'error','message'=>'invalid request']);            
+        }
+    }
+    public function finger_login_check($data) {
+        $credentialId = $data['credentialId']??'';
+        $clientDataJSON = $data['clientDataJSON']??'';
+        $authenticatorData = $data['authenticatorData']??'';
+        $signature = $data['signature']??'';
+        $userHandle = $data['userHandle']??'';
+        $challenge = $this->CI->session->userdata('finger_login_challenge');
+        if (!$challenge) {
+            echo json_encode(['status' => 'error', 'message' => 'Challenge not found']);
+            return;
+        }
+        $credential = $this->CI->Users_model->credential_where_credential_id($credentialId);
+        if (!$credential) {
+            echo json_encode(['status' => 'error', 'message' => 'Credential not found']);
+            return;
+        }
+        try {
+            $webauthnlib = new Finger_print();
+            $data = $webauthnlib->validateLogin(
+                $clientDataJSON,
+                $authenticatorData,
+                $signature,
+                $credentialId,
+                base64_decode($credential->public_key,true),
+                $credential->counter,
+                $challenge
+            );
+            $this->CI->Users_model->edit_credential_where_credential_id($data,$credentialId);
+            $this->check_user($this->CI->session->userdata('phone_number'));
+            // $this->CI->session->set_userdata('user_mobile_id', $credential->user_mobile_id);
+            echo json_encode(['status' => 'success']);
+        } catch (Exception $e) {
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+    }
     public function finger_register() {
-        $webauthnlib = new finger_Print();
+        $webauthnlib = new Finger_print();
         $options = $webauthnlib->generateRegistrationOptions($this->CI->session->userdata('mobile_id'),'user' . $this->CI->session->userdata('mobile_id'));
         $this->CI->session->set_userdata('finger_register_challenge', $options->publicKey->challenge);
         echo json_encode($options);
@@ -74,11 +91,11 @@ class Login_handler
                 if (!isset($clientDataArr['type']) || $clientDataArr['type'] !== 'webauthn.create') {
                     throw new Exception('Invalid client data type');
                 }
-                $webauthnlib = new finger_Print();
+                $webauthnlib = new Finger_print();
                 $data = $webauthnlib->validateRegistration(
-                    base64_decode(strtr($arr['response']['clientDataJSON'], '-_', '+/')),
-                    base64_decode(strtr($arr['response']['attestationObject'], '-_', '+/')),
-                    base64_decode(strtr($this->CI->session->userdata('finger_register_challenge'), '-_', '+/'))
+                    base64_decode(strtr($arr['response']['clientDataJSON'], '-_', '+/'),true),
+                    base64_decode(strtr($arr['response']['attestationObject'], '-_', '+/'),true),
+                    base64_decode(strtr($this->CI->session->userdata('finger_register_challenge'), '-_', '+/'),true)
                 );
                 $credential = [
                     'user_mobile_id'       => $this->CI->session->userdata('mobile_id'),
@@ -100,52 +117,6 @@ class Login_handler
             }
         } else {
             echo json_encode(['status' => 'error', 'message' => 'invalid request lib']);
-        }
-    }
-    public function finger_login(){
-        $webauthnlib=new finger_Print();
-        $webauthn = $webauthnlib->getInstance();
-        $options = $webauthn->getGetArgs();
-        $this->CI->session->set_userdata('challenge',$options->publicKey->challenge);
-        echo json_encode($options);
-    }
-    public function finger_login_check() {
-        $credentialId = $this->CI->input->post('credentialId');
-        $clientDataJSON = $this->CI->input->post('clientDataJSON');
-        $authenticatorData = $this->CI->input->post('authenticatorData');
-        $signature = $this->CI->input->post('signature');
-        $userHandle = $this->CI->input->post('userHandle');
-        $challenge = $this->CI->session->userdata('finger_login_challenge');
-        if (!$challenge) {
-            echo json_encode(['status' => 'error', 'message' => 'Challenge not found']);
-            return;
-        }
-        $credential = $this->CI->Users_model->credential_where_credential_id($credentialId);
-        if (!$credential) {
-            echo json_encode(['status' => 'error', 'message' => 'Credential not found']);
-            return;
-        }
-        try {
-            $webauthnlib = new finger_Print();
-            $data = $webauthnlib->validateLogin(
-                $clientDataJSON,
-                $authenticatorData,
-                $signature,
-                $credentialId,
-                base64_decode($credential->public_key),
-                $credential->counter,
-                $challenge
-            );
-
-            // به‌روزرسانی counter در دیتابیس
-            $this->CI->Users_model->edit_credential_where_credential_id($data,$credentialId);
-
-            // ورود موفق، حالا می‌تونیم کاربر رو لاگین کنیم (مثلاً ذخیره‌ی user_mobile_id در سشن)
-            $this->CI->session->set_userdata('user_mobile_id', $credential->user_mobile_id);
-
-            echo json_encode(['status' => 'success']);
-        } catch (Exception $e) {
-            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
         }
     }
     public function register($arr){
@@ -218,7 +189,7 @@ class Login_handler
     }
     public function send_sms_login($data){
         $security= new Security_handler();
-        if(!empty($data) && $security->validate_mobile_number($data)){
+        if(!empty($data) && $security->validate_mobile_number($data) && $this->CI->session->has_userdata('phone_number') && !empty($this->CI->session->userdata('phone_number')) && $data===$this->CI->session->userdata('phone_number')){
             $this->CI->session->set_userdata('login_code',['code'=>rand(100000,1000000),'phone'=>$data]);
             if($this->send_sms_action($this->CI->session->userdata('login_code')['code'],$data))
                 echo json_encode(['status' => 'success','code'=>$this->CI->session->userdata('login_code')['code']]);
@@ -263,5 +234,14 @@ class Login_handler
             if(!empty($response) && !empty($response['status']) && intval($response['status'])===1) return true;
         }
         return false;
+    }
+    public function set_mobile_number($str){
+        $security= new Security_handler();
+        if(!empty($str) && $security->validate_mobile_number($str)){
+            $this->CI->session->set_userdata('phone_number',$str);
+            echo json_encode(['status' => 'success']);
+        }else{
+            echo json_encode(['status' => 'error','message'=>'شماره همراه معتبر نیست']);
+        }
     }
 }

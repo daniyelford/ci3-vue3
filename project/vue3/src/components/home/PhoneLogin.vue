@@ -1,20 +1,22 @@
 <template>
   <div>
-    <!-- مرحله اول: ارسال شماره موبایل -->
     <form v-if="step === 1" @submit.prevent="submitPhone">
       <label for="phone">شماره تلفن:</label>
       <input
         id="phone"
         v-model="phone"
-        type="text"
+        type="tel"
+        maxlength="11"
+        pattern="[0-9]*"
         placeholder="09123456789"
         required
       />
-      <button type="submit">ارسال</button>
+      <button v-if="showSend" :disabled="submitDisabled" type="submit">
+        ارسال
+        <span v-if="submitDisabled">({{ submitCountdown }} ثانیه)</span>
+      </button>
       <p v-if="message">{{ message }}</p>
     </form>
-
-    <!-- مرحله دوم: وارد کردن کد پیامکی -->
     <form v-else-if="step === 2" @submit.prevent="submitCode">
       <label for="code">کد پیامک شده:</label>
       <input
@@ -25,13 +27,9 @@
         required
       />
       <button type="submit">تأیید کد</button>
-
-      <!-- دکمه ویرایش شماره -->
       <button type="button" @click="editPhone" style="margin-top: 10px;">
         ویرایش شماره
       </button>
-
-      <!-- دکمه ارسال مجدد کد -->
       <button
         type="button"
         @click="resendCode"
@@ -41,131 +39,199 @@
         ارسال مجدد کد
         <span v-if="resendDisabled">({{ countdown }} ثانیه)</span>
       </button>
-
       <p v-if="message">{{ message }}</p>
     </form>
   </div>
 </template>
-
-<script setup>
-import { sendApi } from '@/utils/api'
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-const router = useRouter()
-const phone = ref('')
-const code = ref('')
-const message = ref('')
-const step = ref(1)
-
-const resendDisabled = ref(true)
-const countdown = ref(120)
-let countdownInterval = null
-
-const startCountdown = () => {
-  resendDisabled.value = true
-  countdown.value = 120
-  clearInterval(countdownInterval)
-  countdownInterval = setInterval(() => {
-    countdown.value--
-    if (countdown.value <= 0) {
-      resendDisabled.value = false
-      clearInterval(countdownInterval)
-    }
-  }, 1000)
-}
-
-const submitPhone = async () => {
-  try {
-    const response = await sendApi(
-      JSON.stringify({
-        action: 'send_phone_login',
-        data: phone.value,
-      })
-    )
-    if (response.status === 'success') {
-      message.value = 'شماره با موفقیت ارسال شد. لطفاً کد پیامکی را وارد کنید.'
-      step.value = 2
-      startCountdown()
-    } else {
-      message.value =response.message || 'ارسال موفق نبود'
-    }
-  } catch (error) {
-    message.value = 'خطا در ارسال شماره.'
-    console.error(error)
-  }
-}
-
-const submitCode = async () => {
-  try {
-    const response = await sendApi(
-      JSON.stringify({
-        action: 'verify_sms_code',
-        data: {
-          phone: phone.value,
-          code: code.value,
+<script>
+  import { sendApi } from '@/utils/api'
+  export default {
+    name: 'PhoneLogin',
+    data() {
+      return {
+        phone: '',
+        code: '',
+        message: '',
+        step: 1,
+        sentOnce: false,
+        showSend: false,
+        resendDisabled: true,
+        countdown: 120,
+        countdownInterval: null,
+        submitDisabled: false,
+        submitCountdown: 60,
+        submitInterval: null,
+      }
+    },
+    watch: {
+      phone: {
+        immediate: false,
+        handler: async function (newVal) {
+          const isValid = /^09\d{9}$/.test(newVal)
+          if (isValid && !this.sentOnce) {
+            try {
+              const response = await sendApi(
+                JSON.stringify({
+                  action: 'save_phone',
+                  data: newVal,
+                })
+              )
+              if (response.status === 'success') {
+                this.$emit('validPhone', isValid)
+                this.sentOnce = true
+                this.showSend = true
+              }
+            } catch (e) {
+              console.error('خطا در ارسال شماره:', e)
+            }
+          }else if (!isValid && this.sentOnce) {
+            try {
+              const responseDel = await sendApi(
+                JSON.stringify({
+                  action: 'delete_phone',
+                })
+              )
+              if (responseDel.status === 'success') {
+                this.sentOnce = false
+                this.showSend = false
+                this.$emit('validPhone', false)  
+              }
+            } catch (e) {
+              console.error('خطا در حذف شماره:', e)
+            }
+          }
         },
-      })
-    )
-    if (response.status === 'success') {
-        if (response.url === 'dashboard') {
-          router.push({ name: 'dashboard' })
-        } else if (response.url === 'register') {
-          router.push({ name: 'register' })
-        } else {
-          message.value = 'مشخصات ناقص است. لطفاً دوباره تلاش کنید.'
+      },
+    },
+    methods: {
+      startCountdown() {
+        this.resendDisabled = true
+        this.countdown = 120
+        if (this.countdownInterval) {
+          clearInterval(this.countdownInterval)
         }
-    } else {
-      message.value = 'کد وارد شده اشتباه است.'
-    }
-  } catch (error) {
-    message.value = 'خطا در تأیید کد.'
-    console.error(error)
+        this.countdownInterval = setInterval(() => {
+          this.countdown--
+          if (this.countdown <= 0) {
+            this.resendDisabled = false
+            clearInterval(this.countdownInterval)
+          }
+        }, 1000)
+      },
+      startSubmitLock() {
+        this.submitDisabled = true
+        this.submitCountdown = 60
+        if (this.submitInterval) {
+          clearInterval(this.submitInterval)
+        }
+        this.submitInterval = setInterval(() => {
+          this.submitCountdown--
+          if (this.submitCountdown <= 0) {
+            this.submitDisabled = false
+            clearInterval(this.submitInterval)
+          }
+        }, 1000)
+      },
+      async submitPhone() {
+        if (this.submitDisabled) return
+        try {
+          const response = await sendApi(
+            JSON.stringify({
+              action: 'send_phone_login',
+              data: this.phone,
+            })
+          )
+          if (response.status === 'success') {
+            this.message = 'شماره با موفقیت ارسال شد. لطفاً کد پیامکی را وارد کنید.'
+            this.step = 2
+            this.startCountdown()
+          } else {
+            this.message = response.message || 'ارسال موفق نبود'
+          }
+        } catch (error) {
+          this.message = 'خطا در ارسال شماره.'
+          console.error(error)
+        }
+      },
+      async submitCode() {
+        try {
+          const response = await sendApi(
+            JSON.stringify({
+              action: 'verify_sms_code',
+              data: {
+                phone: this.phone,
+                code: this.code,
+              },
+            })
+          )
+          if (response.status === 'success') {
+            if (response.url === 'dashboard') {
+              this.$router.push({ name: 'dashboard' })
+            } else if (response.url === 'register') {
+              this.$router.push({ name: 'register' })
+            } else {
+              this.message = 'مشخصات ناقص است. لطفاً دوباره تلاش کنید.'
+            }
+          } else {
+            this.message = 'کد وارد شده اشتباه است.'
+          }
+        } catch (error) {
+          this.message = 'خطا در تأیید کد.'
+          console.error(error)
+        }
+      },
+      editPhone() {
+        this.step = 1
+        this.message = ''
+        this.code = ''
+        this.sentOnce = false
+        if (this.countdownInterval) {
+          clearInterval(this.countdownInterval)
+        }
+        this.startSubmitLock()
+      },
+      async resendCode() {
+        if (this.resendDisabled) return
+        try {
+          const response = await sendApi(
+            JSON.stringify({
+              action: 'send_phone_login',
+              data: this.phone,
+            })
+          )
+          if (response.status === 'success') {
+            this.message = 'کد مجدداً ارسال شد.'
+            this.startCountdown()
+          } else {
+            this.message = response.message || 'ارسال مجدد موفق نبود'
+          }
+        } catch (error) {
+          this.message = 'خطا در ارسال مجدد کد.'
+          console.error(error)
+        }
+      },
+    },
+    beforeUnmount() {
+      if (this.countdownInterval) clearInterval(this.countdownInterval)
+      if (this.submitInterval) clearInterval(this.submitInterval)
+    },
   }
-}
-
-const editPhone = () => {
-  step.value = 1
-  message.value = ''
-  code.value = ''
-  clearInterval(countdownInterval)
-}
-
-const resendCode = async () => {
-  if (resendDisabled.value) return
-  try {
-    const response = await sendApi(
-      JSON.stringify({
-        action: 'send_phone_login',
-        data: phone.value,
-      })
-    )
-    if (response.status === 'success') {
-      message.value = 'کد مجدداً ارسال شد.'
-      startCountdown()
-    } else {
-      message.value =response.message || 'ارسال مجدد موفق نبود'
-    }
-  } catch (error) {
-    message.value = 'خطا در ارسال مجدد کد.'
-    console.error(error)
-  }
-}
 </script>
 
 <style scoped>
-form {
-  max-width: 300px;
-  margin: auto;
-}
-label,
-input,
-button {
-  display: block;
-  width: 100%;
-  margin-bottom: 10px;
-}
-button[disabled] {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
+  form {
+    max-width: 300px;
+    margin: auto;
+  }
+  label,
+  input,
+  button {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  button[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 </style>

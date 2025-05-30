@@ -21,7 +21,12 @@
             const res = await sendApi(JSON.stringify({
                 action: 'login_webauthn_request'
             }))
-            if (!res || !res.publicKey) throw new Error('مشکلی در دریافت challenge رخ داد.')
+            if (!res || !res.publicKey){
+                if(res.status==='error')
+                    alert(res.message);
+                else
+                    throw new Error('مشکلی در دریافت challenge رخ داد.')
+            } 
             const options = preformatGetReq(res.publicKey)
             const assertion = await navigator.credentials.get({
                 publicKey: options
