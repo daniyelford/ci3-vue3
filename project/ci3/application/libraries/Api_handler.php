@@ -16,6 +16,9 @@ class Api_handler{
         if(!empty($data))
             if(!empty($data['action']))
                 switch ($data['action']) {
+                    case 'check_mobile_has_finger_print':
+                        $login->check_mobile_has_finger_print();
+                        break;
                     case 'register_webauthn_request':
                         if($security->check_has_mobile_id())
                             $login->finger_register();

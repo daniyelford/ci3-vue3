@@ -33,7 +33,10 @@ class Users_model extends CI_Model
         return (!empty($tbl) && is_string($tbl) && !empty($arr) && is_array($arr) && $this->db->delete($tbl, $arr));
     }
     // costum 
-	public function select_mobile($str){
+	public function select_where_id($id){
+	    return (!empty($id) && intval($id)?$this->select_where_array_table($this->tbl,['id'=>intval($id)]):false);
+	}
+    public function select_mobile($str){
         return (!empty($str) && is_string($str)?$this->select_where_array_table($this->mobile,['phone'=>$str]):false);
 	}
     public function select_account_where_mobile_id($id){

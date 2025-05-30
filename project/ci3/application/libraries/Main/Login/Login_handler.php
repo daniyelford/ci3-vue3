@@ -104,16 +104,23 @@ class Login_handler
         intval($this->CI->session->userdata('mobile_id')) > 0 && 
         !empty($arr['name']) && !empty($arr['family'])){
             $id=$this->CI->Users_model->add_return_id(['name'=>$arr['name'],'family'=>$arr['family']]);
-            if(!(!empty($id) && intval($id)>0))
-                die(json_encode(['status' => 'error', 'message' => 'database error']));
-            $this->CI->session->set_userdata('id',intval($id));
-            if(!$this->CI->Users_model->edit_mobile_weher_id(['user_id'=>intval($id)],intval($this->CI->session->userdata('mobile_id'))))
-                die(json_encode(['status' => 'error', 'message' => 'database error']));
-            $account_id=$this->CI->Users_model->add_account_return_id(['user_mobile_id'=>intval($this->CI->session->userdata('mobile_id'))]);
-            if (!(!empty($account_id) && intval($account_id)>0))
-                die(json_encode(['status' => 'error', 'message' => 'database error']));
-            $this->CI->session->set_userdata('account_id',$account_id);
-            echo json_encode(['status' => 'success']);
+            $user_info=$this->CI->Users_model->select_where_id(intval($id));
+            if(!empty($user_info) && !empty(end($user_info))){
+                $this->CI->session->set_userdata('user_info',end($user_info));    
+                if(!(!empty($id) && intval($id)>0))
+                    die(json_encode(['status' => 'error', 'message' => 'database error']));
+                $this->CI->session->set_userdata('id',intval($id));
+                if(!$this->CI->Users_model->edit_mobile_weher_id(['user_id'=>intval($id)],intval($this->CI->session->userdata('mobile_id'))))
+                    die(json_encode(['status' => 'error', 'message' => 'database error']));
+                $account_id=$this->CI->Users_model->add_account_return_id(['user_mobile_id'=>intval($this->CI->session->userdata('mobile_id'))]);
+                if (!(!empty($account_id) && intval($account_id)>0))
+                    die(json_encode(['status' => 'error', 'message' => 'database error']));
+                $this->CI->session->set_userdata('account_id',$account_id);
+    
+                echo json_encode(['status' => 'success']);
+            }else{
+                echo json_encode(['status' => 'error', 'message' =>'user info has error']);
+            }
         }else{
             echo json_encode(['status' => 'error', 'message' => 'نام و نام خانوادگی نامعتبر است']);
         }
@@ -128,21 +135,27 @@ class Login_handler
             $mobile_id=intval(end($a)['id']);
             if(!empty(end($a)['user_id']) &&
             intval(end($a)['user_id']) > 0){
-                $this->CI->session->set_userdata('id',intval(end($a)['user_id']));
-                $b=$this->CI->Users_model->select_account_where_mobile_id(intval(end($a)['id']));
-                $account_id=0;
-                if(!empty($b) && !empty(end($b)) && 
-                !empty(end($b)['id']) && 
-                intval(end($b)['id']) > 0){
-                    $account_id=intval(end($b)['id']);
-                }else{
-                    $account_id=$this->CI->Users_model->add_account_return_id(['user_mobile_id'=>intval(end($a)['id'])]);
-                    if(!(!empty($account_id) && intval($account_id)>0)){
-                        die(json_encode(['status'=>'error','message'=>'add to db has error account']));
+                $user_info=$this->CI->Users_model->select_where_id(intval(end($a)['user_id']));
+                if(!empty($user_info) && !empty(end($user_info))){
+                    $this->CI->session->set_userdata('user_info',end($user_info));    
+                    $this->CI->session->set_userdata('id',intval(end($a)['user_id']));
+                    $b=$this->CI->Users_model->select_account_where_mobile_id(intval(end($a)['id']));
+                    $account_id=0;
+                    if(!empty($b) && !empty(end($b)) && 
+                    !empty(end($b)['id']) && 
+                    intval(end($b)['id']) > 0){
+                        $account_id=intval(end($b)['id']);
+                    }else{
+                        $account_id=$this->CI->Users_model->add_account_return_id(['user_mobile_id'=>intval(end($a)['id'])]);
+                        if(!(!empty($account_id) && intval($account_id)>0)){
+                            die(json_encode(['status'=>'error','message'=>'add to db has error account']));
+                        }
                     }
+                    $this->CI->session->set_userdata('account_id',$account_id);
+                    $result=['status' => 'success','url'=>'dashboard'];
+                }else{
+                    die(json_encode(['status'=>'error','message'=>'user info has error']));
                 }
-                $this->CI->session->set_userdata('account_id',$account_id);
-    			$result=['status' => 'success','url'=>'dashboard'];
             }else{
     			$result=['status' => 'success','url'=>'register'];
             }
@@ -219,5 +232,18 @@ class Login_handler
         }else{
             echo json_encode(['status' => 'error','message'=>'شماره همراه معتبر نیست']);
         }
+    }
+    public function check_mobile_has_finger_print(){
+        if($this->CI->session->has_userdata('phone_number') && !empty($this->CI->session->userdata('phone_number'))){
+            $a=$this->CI->Users_model->select_mobile($this->CI->session->userdata('phone_number'));
+            if(!empty($a) && !empty(end($a)) && 
+            !empty(end($a)['id']) && 
+            intval(end($a)['id']) > 0){
+                $b=$this->CI->Users_model->credential_where_user_mobile_id(intval(end($a)['id']));
+                if(!empty($b) && !empty(end($b)))
+                    die(json_encode(['status'=>'success']));
+            }
+        }
+        echo json_encode(['status'=>'error']);
     }
 }
