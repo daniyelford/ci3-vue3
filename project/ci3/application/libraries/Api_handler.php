@@ -16,6 +16,10 @@ class Api_handler{
         if(!empty($data))
             if(!empty($data['action']))
                 switch ($data['action']) {
+                    case 'logout':
+                        $this->CI->session->sess_destroy();
+                        echo json_encode(['status'=>'success']);
+                        break;
                     case 'check_mobile_has_finger_print':
                         $login->check_mobile_has_finger_print();
                         break;
