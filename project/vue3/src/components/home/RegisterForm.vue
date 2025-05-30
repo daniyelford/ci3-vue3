@@ -15,10 +15,12 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref,defineProps } from 'vue'
 import { useRouter } from 'vue-router'
 import { sendApi } from '@/utils/api'
-
+const props = defineProps({
+  imageId: Number
+});
 const name = ref('')
 const family = ref('')
 const message = ref('')
@@ -32,6 +34,7 @@ const submitRegister = async () => {
         data: {
           name: name.value,
           family: family.value,
+          image_id: props.imageId
         },
       })
     )

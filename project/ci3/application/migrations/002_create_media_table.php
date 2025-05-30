@@ -28,9 +28,8 @@ class Migration_Create_media_table extends CI_Migration {
                 'constraint' => 255,
                 'null' => TRUE,
             ],
-            'user_id' => [
-                'type' => 'INT',
-                'unsigned' => TRUE,
+            'user_sign' => [
+                'type' => 'LONGTEXT',
                 'null' => TRUE,
             ],
             'used_status' => [
@@ -51,7 +50,6 @@ class Migration_Create_media_table extends CI_Migration {
         $this->dbforge->add_key('id', TRUE);
         $this->dbforge->create_table('media');
         $this->db->query("ALTER TABLE media MODIFY created_at DATETIME DEFAULT CURRENT_TIMESTAMP");
-        $this->db->query("ALTER TABLE media ADD CONSTRAINT fk_media_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL ON UPDATE CASCADE");
     }
 
     public function down() {

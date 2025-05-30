@@ -59,37 +59,37 @@ class Api_handler{
                         break;
                     case 'upload_single_image':
                         if(!empty($data['data']))
-                            if($security->check_user_login()) $upload->upload_single_image($data['data'],(!empty($data['url'])?$security->string_security_check($data['url']):''),(!empty($data['toAction']) ? $security->string_security_check($data['toAction']) : ''));
+                            if($security->check_user_sing()) $upload->upload_single_image($data['data'],(!empty($data['url'])?$security->string_security_check($data['url']):''),(!empty($data['toAction']) ? $security->string_security_check($data['toAction']) : ''));
                         else
                             echo json_encode(['status'=>'error','message'=>'invalid request']);
                         break;
                     case 'upload_many_images':
                         if(!empty($data['data']))
-                            if($security->check_user_login()) $upload->upload_many_images($data['data'],(!empty($data['url'])?$security->string_security_check($data['url']):''),(!empty($data['toAction']) ? $security->string_security_check($data['toAction']) : ''));
+                            if($security->check_user_sing()) $upload->upload_many_images($data['data'],(!empty($data['url'])?$security->string_security_check($data['url']):''),(!empty($data['toAction']) ? $security->string_security_check($data['toAction']) : ''));
                         else
                             echo json_encode(['status'=>'error','message'=>'invalid request']);
                         break;
                     case 'upload_single_video':
                         if(!empty($data['data']))
-                            if($security->check_user_login()) $upload->upload_single_video($data['data'],(!empty($data['url'])?$security->string_security_check($data['url']):''),(!empty($data['toAction']) ? $security->string_security_check($data['toAction']) : ''));
+                            if($security->check_user_sing()) $upload->upload_single_video($data['data'],(!empty($data['url'])?$security->string_security_check($data['url']):''),(!empty($data['toAction']) ? $security->string_security_check($data['toAction']) : ''));
                         else
                             echo json_encode(['status'=>'error','message'=>'invalid request']);
                         break;
                     case 'upload_many_videos':
                         if(!empty($data['data']))
-                            if($security->check_user_login()) $upload->upload_many_videos($data['data'],(!empty($data['url'])?$security->string_security_check($data['url']):''),(!empty($data['toAction']) ? $security->string_security_check($data['toAction']) : ''));
+                            if($security->check_user_sing()) $upload->upload_many_videos($data['data'],(!empty($data['url'])?$security->string_security_check($data['url']):''),(!empty($data['toAction']) ? $security->string_security_check($data['toAction']) : ''));
                         else
                             echo json_encode(['status'=>'error','message'=>'invalid request']);
                         break;
                     case 'upload_single_pdf':
                         if(!empty($data['data']))
-                            if($security->check_user_login()) $upload->upload_single_pdf($data['data'],(!empty($data['url'])?$security->string_security_check($data['url']):''),(!empty($data['toAction']) ? $security->string_security_check($data['toAction']) : ''));
+                            if($security->check_user_sing()) $upload->upload_single_pdf($data['data'],(!empty($data['url'])?$security->string_security_check($data['url']):''),(!empty($data['toAction']) ? $security->string_security_check($data['toAction']) : ''));
                         else
                             echo json_encode(['status'=>'error','message'=>'invalid request']);
                         break;
                     case 'upload_many_pdfs':
                         if(!empty($data['data']))
-                            if($security->check_user_login()) $upload->upload_many_pdfs($data['data'],(!empty($data['url'])?$security->string_security_check($data['url']):''),(!empty($data['toAction']) ? $security->string_security_check($data['toAction']) : ''));
+                            if($security->check_user_sing()) $upload->upload_many_pdfs($data['data'],(!empty($data['url'])?$security->string_security_check($data['url']):''),(!empty($data['toAction']) ? $security->string_security_check($data['toAction']) : ''));
                         else
                             echo json_encode(['status'=>'error','message'=>'invalid request']);
                         break;

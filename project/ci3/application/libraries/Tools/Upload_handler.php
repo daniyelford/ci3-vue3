@@ -1,11 +1,30 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 class Upload_handler
 {
+    // url must be have / in the end
     private $CI;
     public function __construct(){
 		$this->CI =& get_instance();
         $this->CI->load->model('Media_model');
 	}
+    private function add_retern_id($type,$filename,$url,$to_action){
+        $sing='';
+        if ($this->CI->session->has_userdata('id') && !empty($this->CI->session->userdata('id'))){
+            $sing=json_encode(['id'=>$this->CI->session->userdata('id')]);
+        }elseif($this->CI->session->has_userdata('account_id') && !empty($this->CI->session->userdata('account_id'))){
+            $sing=json_encode(['account_id'=>$this->CI->session->userdata('account_id')]);
+        }elseif($this->CI->session->has_userdata('mobile_id') && !empty($this->CI->session->userdata('mobile_id'))){
+            $sing=json_encode(['mobile_id'=>$this->CI->session->userdata('mobile_id')]);
+        }
+        return $this->CI->Media_model->add_return_id([
+            'filename'     => $filename,
+            'url'          => base_url('storage/'.$type.'s/'.$url),
+            'type'         => $type,
+            'user_sign'      => $sing,
+            'upload_place' => $to_action,
+            'created_at'   => date('Y-m-d H:i:s')
+        ]);
+    }
     public function upload_single_image($image,$url,$to_action){
         $a=$this->upload_image_handler($image,$url,$to_action);
         if(!empty($a)){
@@ -50,14 +69,7 @@ class Upload_handler
                 mkdir($dirPath, 0755, true);
             }
             file_put_contents($fullPath, $data);
-            $id =$this->CI->Media_model->add_return_id([
-                'filename'     => $filename,
-                'url'          => base_url('storage/images/' . $url . $filename),
-                'type'         => 'image',
-                'user_id'      => $this->CI->session->userdata('id'),
-                'upload_place' => $to_action,
-                'created_at'   => date('Y-m-d H:i:s')
-            ]);
+            $id=$this->add_retern_id('image',$filename,$url. $filename,$to_action);
             $result = [
                 'id'   => $id,
                 'url'  => base_url('storage/images/' . $url . $filename),
@@ -65,7 +77,6 @@ class Upload_handler
         }
         return $result;
     }
-
     public function upload_single_video($video,$url,$to_action){
         $a=$this->upload_video_handler($video,$url,$to_action);
         if(!empty($a)){
@@ -110,14 +121,7 @@ class Upload_handler
                 mkdir($dirPath, 0755, true);
             }
             file_put_contents($fullPath, $data);
-            $id =$this->CI->Media_model->add_return_id([
-                'filename'     => $filename,
-                'url'          => base_url('storage/videos/' . $url . $filename),
-                'type'         => 'video',
-                'user_id'      => $this->CI->session->userdata('id'),
-                'upload_place' => $to_action,
-                'created_at'   => date('Y-m-d H:i:s')
-            ]);
+            $id=$this->add_retern_id('video',$filename,$url. $filename,$to_action);
             $result = [
                 'id'  => $id,
                 'url' => base_url('storage/videos/' . $url . $filename),
@@ -125,7 +129,6 @@ class Upload_handler
         }
         return $result;
     }
-
     public function upload_single_pdf($pdf,$url,$to_action) {
         $a = $this->upload_pdf_handler($pdf,$url,$to_action);
         if (!empty($a)) {
@@ -172,14 +175,7 @@ class Upload_handler
                 mkdir($dirPath, 0755, true);
             }
             file_put_contents($fullPath, $data);
-            $id =$this->CI->Media_model->add_return_id([
-                'filename'     => $filename,
-                'url'          => base_url('storage/pdfs/' . $url . $filename),
-                'type'         => 'pdf',
-                'upload_place' => $to_action,
-                'user_id'      => $this->CI->session->userdata('id'),
-                'created_at'   => date('Y-m-d H:i:s')
-            ]);
+            $id=$this->add_retern_id('pdf',$filename,$url. $filename,$to_action);
             $result = [
                 'id'  => $id,
                 'url' => base_url('storage/pdfs/' . $url . $filename),

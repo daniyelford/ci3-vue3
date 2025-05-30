@@ -17,11 +17,12 @@
 </template>
 
 <script setup>
-  import { ref,defineProps } from 'vue';
+  import { ref,defineProps,defineEmits } from 'vue';
   import { sendApi } from '@/utils/api';
+  const emit = defineEmits(['uploaded']);
   const selectedFileBase64 = ref('');
   const imageUrl = ref('');
-  const imageId = ref('');
+  // const imageId = ref('');
   const readProgress = ref(0);
   const reading = ref(false);
   const props = defineProps({
@@ -76,7 +77,8 @@
       );
       if (response.status === 'success' && response.url) {
         imageUrl.value = response.url;
-        imageId.value = response.id;
+        // imageId.value = response.id;
+        emit('uploaded', response.id);
       } else {
         alert(response.message || 'آپلود موفق نبود');
       }

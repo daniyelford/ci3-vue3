@@ -25,11 +25,17 @@ class Media_model extends CI_Model
         return (!empty($tbl) && is_string($tbl) && !empty($arr) && is_array($arr) && $this->db->delete($tbl, $arr));
     }
     // costum
+    public function select_where_id($id){
+	    return (!empty($id) && intval($id)?$this->select_where_array_table($this->tbl,['id'=>intval($id)]):false);
+	}
     public function add($arr){
         return (!empty($arr) && is_array($arr) && $this->add_to_table($this->tbl,$arr));
     }
     public function add_return_id($arr){
         return (!empty($arr) && is_array($arr)?$this->add_to_table_return_id($this->tbl,$arr):false);
+    }
+    public function edit_weher_id($arr,$id){
+        return (!empty($id) && intval($id)>0 && !empty($arr) && is_array($arr) && $this->edit_table($this->tbl,$arr,['id'=>intval($id)]));
     }
 	public function remove_file($str){
 	    return (!empty($str) && is_string($str) && unlink($str));

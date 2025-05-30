@@ -96,6 +96,7 @@ class Login_handler
         }
     }
     public function register($arr){
+        $mobile_info=[];
         $security= new Security_handler();
         if(!empty($arr) && $this->CI->session->has_userdata('mobile_id') && 
         !empty($this->CI->session->userdata('mobile_id')) &&
@@ -110,7 +111,13 @@ class Login_handler
                 if(!(!empty($id) && intval($id)>0))
                     die(json_encode(['status' => 'error', 'message' => 'database error']));
                 $this->CI->session->set_userdata('id',intval($id));
-                if(!$this->CI->Users_model->edit_mobile_weher_id(['user_id'=>intval($id)],intval($this->CI->session->userdata('mobile_id'))))
+                $image_id=(!empty($arr['image_id']) && intval($arr['image_id'])>0?$arr['image_id']:0);
+                $mobile_info['user_id'] = intval($id);
+                if($image_id>0){
+                    $mobile_info['image_id']=intval($image_id);
+                    $this->CI->Media_model->edit_weher_id(['used_status'=>'used'],intval($image_id));
+                }
+                if(!$this->CI->Users_model->edit_mobile_weher_id($mobile_info,intval($this->CI->session->userdata('mobile_id'))))
                     die(json_encode(['status' => 'error', 'message' => 'database error']));
                 $account_id=$this->CI->Users_model->add_account_return_id(['user_mobile_id'=>intval($this->CI->session->userdata('mobile_id'))]);
                 if (!(!empty($account_id) && intval($account_id)>0))

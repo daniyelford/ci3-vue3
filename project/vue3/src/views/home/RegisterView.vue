@@ -1,7 +1,7 @@
 <template>
   <div class="home">
-    <UploadSingleImage toAction="" url="" />
-    <RegisterForm/>
+    <UploadSingleImage toAction="user_mobile" url="register/" @uploaded="handleImageUpload" />
+    <RegisterForm :image-id="imageId" />
   </div>
 </template>
 
@@ -13,6 +13,16 @@ export default {
   components: {
     RegisterForm,
     UploadSingleImage
+  },
+  data() {
+    return {
+      imageId: null
+    };
+  },
+  methods: {
+    handleImageUpload(id) {
+      this.imageId = id;
+    }
   }
 }
 </script>
