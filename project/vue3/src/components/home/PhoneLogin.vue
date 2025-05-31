@@ -190,6 +190,8 @@ export default {
           localStorage.removeItem('submit_locked_at')
           localStorage.removeItem('submit_countdown')
           if (response.url === 'dashboard') {
+            localStorage.setItem('isLogin', true);
+            window.dispatchEvent(new Event("storage"));
             this.$router.push({ name: 'dashboard' })
           } else if (response.url === 'register') {
             this.$router.push({ name: 'register' })

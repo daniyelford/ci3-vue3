@@ -39,6 +39,8 @@ const submitRegister = async () => {
       })
     )
     if (response.status === 'success') {
+        localStorage.setItem('isLogin', true)
+        window.dispatchEvent(new Event("storage"));
         router.push({ name: 'dashboard' })
     } else {
         message.value = 'مشخصات ناقص است. لطفاً دوباره تلاش کنید.'
