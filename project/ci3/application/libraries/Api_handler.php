@@ -22,10 +22,7 @@ class Api_handler{
                         if(!empty($data['data']))
                             if($security->check_user_login()){
                                 $table->data=[];
-                                $table->table='';
-                                $table->return_json=true;
-                                $table->return_table=false;
-                                $table->pagination=false;
+                                $table->db_table='';
                                 $table->handler();
                             }
                         else
