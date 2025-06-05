@@ -11,3 +11,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |	https://codeigniter.com/userguide3/general/hooks.html
 |
 */
+$hook['post_controller_constructor'][] = array(
+    'class'    => '',
+    'function' => 'enable_profiler_hook',
+    'filename' => 'profiler_hook.php',
+    'filepath' => 'hooks'
+);
