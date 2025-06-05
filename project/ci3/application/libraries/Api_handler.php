@@ -7,15 +7,30 @@ class Api_handler{
 		$this->CI =& get_instance();
         $this->CI->load->library('Tools/Upload_handler');
         $this->CI->load->library('Tools/Security_handler');
+        $this->CI->load->library('Tools/Table_data_handler');
         $this->CI->load->library('Main/Login/Login_handler');
 	}
     public function handler($data){
         $upload=new Upload_handler();
         $security= new Security_handler();
         $login=new Login_handler();
+        $table=new Table_data_handler();
         if(!empty($data))
             if(!empty($data['action']))
                 switch ($data['action']) {
+                    case 'show_data':
+                        if(!empty($data['data']))
+                            if($security->check_user_login()){
+                                $table->data=[];
+                                $table->table='';
+                                $table->return_json=true;
+                                $table->return_table=false;
+                                $table->pagination=false;
+                                $table->handler();
+                            }
+                        else
+                            echo json_encode(['status' => 'error', 'message' => 'invalid request']);
+                        break;
                     case 'logout':
                         $this->CI->session->sess_destroy();
                         echo json_encode(['status'=>'success']);
