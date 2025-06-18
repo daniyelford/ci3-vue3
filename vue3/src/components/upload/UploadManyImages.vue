@@ -78,12 +78,15 @@
   const uploadAll = async () => {
     try {
       const response = await sendApi(
-        JSON.stringify({
+        {
           action: 'upload_many_images',
-          url: props.url,
-          data: selectedFilesBase64.value,
-          toAction:props.toAction
-        })
+          data: {
+            url: props.url,
+            data:selectedFilesBase64.value,
+            toAction:props.toAction,
+          },
+          control:'upload'
+        }
       );
       if (response.status === 'success' && Array.isArray(response.images)) {
         uploadedImages.value = response.images;

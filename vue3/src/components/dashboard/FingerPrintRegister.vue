@@ -1,10 +1,5 @@
 <template>
-  <div v-if="isSupported">
-    <button @click="registerWithWebAuthn">ثبت اثر انگشت</button>
-  </div>
-  <div v-else>
-    مرورگر شما WebAuthn را پشتیبانی نمی‌کند.
-  </div>
+  <button v-if="isSupported" @click="registerWithWebAuthn">ثبت اثر انگشت</button>
 </template>
 
 <script setup>
@@ -16,18 +11,20 @@
   })
   async function registerWithWebAuthn() {
     try {
-      const res = await sendApi(JSON.stringify({
-        action: 'register_webauthn_request'
-      }))
+      const res = await sendApi({
+        action: 'register_webauthn_request',
+        control:'login'
+      })
       if (!res || !res.publicKey) throw new Error('مشکلی در دریافت challenge ثبت رخ داد.')
       const options = preformatMakeCredReq(res.publicKey)
       const credential = await navigator.credentials.create({
         publicKey: options
       })
-      const result = await sendApi(JSON.stringify({
+      const result = await sendApi({
         action: 'register_webauthn_response',
-        data:credential
-      }))
+        data:credential,
+        control:'login'
+      })
       if (result && result.status === 'success') {
         alert('ثبت اثر انگشت موفقیت‌آمیز بود.')
       } else {

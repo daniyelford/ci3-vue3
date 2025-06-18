@@ -19,6 +19,16 @@ class Migration_Create_user_account_table extends CI_Migration {
                 'unsigned' => TRUE,
                 'null' => FALSE,
             ],
+            'category_id' => [
+                'type' => 'INT',
+                'unsigned' => TRUE,
+                'null' => TRUE,
+            ],
+            'rule' => [
+                'type' => 'VARCHAR',
+                'constraint' => 150,
+                'null' => TRUE,
+            ],
             'gmail' => [
                 'type' => 'VARCHAR',
                 'constraint' => 150,
@@ -39,6 +49,7 @@ class Migration_Create_user_account_table extends CI_Migration {
         $this->dbforge->add_key('id', TRUE);
         $this->dbforge->create_table('user_account');
         $this->db->query('ALTER TABLE user_account ADD CONSTRAINT fk_user_account_user_mobile FOREIGN KEY (user_mobile_id) REFERENCES user_mobile(id) ON DELETE CASCADE ON UPDATE CASCADE');
+        $this->db->query('ALTER TABLE user_account ADD CONSTRAINT fk_user_account_category FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL ON UPDATE CASCADE');
     }
 
     public function down() {

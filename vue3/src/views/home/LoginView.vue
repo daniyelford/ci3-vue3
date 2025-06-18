@@ -7,7 +7,10 @@ const showFingerPrint = ref(false)
 async function handleValidPhone(isValid) {
   if (isValid) {
     try {
-      const response = await sendApi(JSON.stringify({action:'check_mobile_has_finger_print'}))
+      const response = await sendApi({ 
+        action:'check_mobile_has_finger_print',
+        control:'login' 
+      })
       if (response && response.status === 'success') {
         showFingerPrint.value = true
       } else {
@@ -29,3 +32,19 @@ async function handleValidPhone(isValid) {
       <FingerPrintLogin v-if="showFingerPrint" />
   </div>
 </template>
+<style scoped>
+  .home{
+    display: flex;
+    flex-direction: row-reverse;
+    flex-wrap: nowrap;
+    direction: rtl;
+    justify-content: space-evenly;
+    align-items: center;
+    margin-top: 50px;
+  }
+  @media screen and (max-width:600px){
+    .home{
+      flex-direction: column;
+    }
+  }
+</style>

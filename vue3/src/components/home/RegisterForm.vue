@@ -29,14 +29,15 @@ const router = useRouter()
 const submitRegister = async () => {
   try {
     const response = await sendApi(
-      JSON.stringify({
+      {
         action: 'register_user',
         data: {
           name: name.value,
           family: family.value,
           image_id: props.imageId
         },
-      })
+        control:'login'
+      }
     )
     if (response.status === 'success') {
         localStorage.setItem('isLogin', true)

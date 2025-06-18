@@ -1,7 +1,7 @@
 <template>
   <div>
     <form v-if="step === 1" @submit.prevent="submitPhone">
-      <label for="phone">شماره تلفن:</label>
+      <label for="phone">شماره تلفن</label>
       <input
         id="phone"
         v-model="phone"
@@ -19,7 +19,7 @@
     </form>
 
     <form v-else-if="step === 2" @submit.prevent="submitCode">
-      <label for="code">کد پیامک شده:</label>
+      <label for="code">کد پیامک شده</label>
       <input
         id="code"
         v-model="code"
@@ -95,13 +95,18 @@ export default {
       }
     }
   },
+  // only check phone and time for send
   watch: {
     phone: {
       handler: async function (newVal) {
         const isValid = /^09\d{9}$/.test(newVal)
         if (isValid && !this.sentOnce) {
           try {
-            const response = await sendApi(JSON.stringify({ action: 'save_phone', data: newVal }))
+            const response = await sendApi({ 
+              action: 'save_phone',
+              data: newVal,
+              control:'login'
+            })
             if (response.status === 'success') {
               this.sentOnce = true
               this.showSend = true
@@ -112,7 +117,10 @@ export default {
           }
         } else if (!isValid && this.sentOnce) {
           try {
-            const responseDel = await sendApi(JSON.stringify({ action: 'delete_phone' }))
+            const responseDel = await sendApi({ 
+              control:'security',
+              action: 'delete_phone'
+            })
             if (responseDel.status === 'success') {
               this.sentOnce = false
               this.showSend = false
@@ -125,7 +133,9 @@ export default {
       },
     },
   },
+
   methods: {
+    
     startCountdown(seconds = 120) {
       this.resendDisabled = true
       this.countdown = seconds
@@ -158,7 +168,11 @@ export default {
     async submitPhone() {
       if (this.submitDisabled) return
       try {
-        const response = await sendApi(JSON.stringify({ action: 'send_phone_login', data: this.phone }))
+        const response = await sendApi({ 
+          action: 'send_phone_login',
+          data: this.phone,
+          control:'login'
+         })
         if (response.status === 'success') {
           this.message = 'شماره با موفقیت ارسال شد. لطفاً کد پیامکی را وارد کنید.'
           this.step = 2
@@ -179,10 +193,11 @@ export default {
     async submitCode() {
       try {
         const response = await sendApi(
-          JSON.stringify({
+          {
             action: 'verify_sms_code',
             data: { phone: this.phone, code: this.code },
-          })
+            control:'login'
+          }
         )
         if (response.status === 'success') {
           sessionStorage.removeItem('phone')
@@ -222,7 +237,11 @@ export default {
     async resendCode() {
       if (this.resendDisabled) return
       try {
-        const response = await sendApi(JSON.stringify({ action: 'send_phone_login', data: this.phone }))
+        const response = await sendApi({ 
+          action: 'send_phone_login',
+          data: this.phone,
+          control:'login'
+        })
         if (response.status === 'success') {
           this.message = 'کد مجدداً ارسال شد.'
           this.startCountdown()
@@ -244,19 +263,35 @@ export default {
 </script>
 
 <style scoped>
-form {
-  max-width: 300px;
-  margin: auto;
-}
-label,
-input,
-button {
-  display: block;
-  width: 100%;
-  margin-bottom: 10px;
-}
-button[disabled] {
-  opacity: 0.6;
-  cursor: not-allowed;
+  form {
+    max-width: 300px;
+    margin: auto;
+  }
+  label,
+  input,
+  button {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  button{
+    background-color: green;
+    color: white;
+    padding: 7px;
+    border-radius: 10px;
+    border: none;
+  }
+  button[disabled] {
+    opacity: 0.6;
+    background-color: rgb(143, 141, 141);
+    cursor: not-allowed;
+  }
+  input {
+    box-sizing: border-box;
+    padding: 7px;
+    border: none;
+    outline: none;
+    border-radius: 10px;
+    background-color: #edefff;
 }
 </style>

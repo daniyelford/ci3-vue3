@@ -14,7 +14,7 @@
 
 <script setup>
   import { ref,defineProps } from 'vue'
-  import { sendApi } from '@/utils/api' // متد ارسال API که خودت ساختی
+  import { sendApi } from '@/utils/api'
   const props = defineProps({
     toAction: String,
     url: String
@@ -42,12 +42,15 @@
       const base64Data = reader.result
       try {
         const response = await sendApi(
-          JSON.stringify({
+          {
             action: 'upload_single_video',
-            data: base64Data,
-            url:props.url,
-            toAction:props.toAction
-          })
+            data:{
+              data: base64Data,
+              url:props.url,
+              toAction:props.toAction,
+            },
+            control:'upload'
+          }
         )
         if (response.status === 'success' && response.url) {
           videoUrl.value = response.url

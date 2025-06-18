@@ -5,19 +5,33 @@ class Security_handler
     public function __construct(){
 		$this->CI =& get_instance();
 	}
+    public function delete_phone(){
+        $this->CI->session->unset_userdata('phone_number');
+        return ['status'=>'success'];
+    }
+    public function logout(){
+        $this->CI->session->sess_destroy();
+        return ['status'=>'success'];
+    }
+    public function check_mobile_info(){
+        if (!$this->CI->session->has_userdata('mobile_id') || empty($this->CI->session->userdata('mobile_id'))){
+			return ['status' => 'error', 'message' => 'دسترسی غیر مجاز'];
+		}
+        return null;
+    }
+    public function check_auth(){
+        if (!$this->CI->session->has_userdata('id') || empty($this->CI->session->userdata('id'))){
+			return ['status' => 'error', 'message' => 'دسترسی غیر مجاز'];
+		}
+        return ['status'=>'success'];
+    }
     public function check_user_sing(){
         if (!($this->CI->session->has_userdata('id') && !empty($this->CI->session->userdata('id'))) && 
         !($this->CI->session->has_userdata('mobile_id') && !empty($this->CI->session->userdata('mobile_id'))) &&
         !($this->CI->session->has_userdata('account_id') && !empty($this->CI->session->userdata('account_id')))){
-			die(json_encode(['status' => 'error', 'message' => 'دسترسی غیر مجاز']));
+			return ['status' => 'error', 'message' => 'دسترسی غیر مجاز'];
 		}
-        return true;
-    }
-    public function check_user_login(){
-        if (!$this->CI->session->has_userdata('id') || empty($this->CI->session->userdata('id'))){
-			die(json_encode(['status' => 'error', 'message' => 'دسترسی غیر مجاز']));
-		}
-        return true;
+        return null;
     }
     public function string_security_check($str){
         $str = preg_replace('/[^a-zA-Z0-9\/]/', '', $str);
@@ -35,10 +49,6 @@ class Security_handler
 			return true;
 		return false;
 	}
-    public function check_has_mobile_id(){
-        if (!$this->CI->session->has_userdata('mobile_id') || empty($this->CI->session->userdata('mobile_id'))){
-			die(json_encode(['status' => 'error', 'message' => 'دسترسی غیر مجاز']));
-		}
-        return true;
-    }
+
+
 }

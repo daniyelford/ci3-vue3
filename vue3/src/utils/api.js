@@ -28,7 +28,7 @@ export async function sendApi(data = {}) {
         'Authorization': `Bearer ${token}`,
         'X-API-KEY': API_SECRET_KEY
       },
-      body: data
+      body: JSON.stringify(data)
     });
     const result = await response.json();
     if (result.code === 401 || result.message === 'توکن نامعتبر است') {

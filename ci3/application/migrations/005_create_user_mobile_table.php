@@ -17,7 +17,7 @@ class Migration_Create_user_mobile_table extends CI_Migration {
             'user_id' => [
                 'type' => 'INT',
                 'unsigned' => TRUE,
-                'null' => TRUE,
+                'null' => FALSE,
             ],
             'phone' => [
                 'type' => 'VARCHAR',

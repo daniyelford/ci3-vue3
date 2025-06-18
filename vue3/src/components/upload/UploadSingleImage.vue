@@ -68,12 +68,15 @@
     }
     try {
       const response = await sendApi(
-        JSON.stringify({
+        {
           action: 'upload_single_image',
-          url: props.url,
-          data: selectedFileBase64.value,
-          toAction:props.toAction
-        })
+          data:{
+            url: props.url,
+            data: selectedFileBase64.value,
+            toAction:props.toAction,
+          }, 
+          control:'upload'
+        }
       );
       if (response.status === 'success' && response.url) {
         imageUrl.value = response.url;

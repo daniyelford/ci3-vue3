@@ -1,11 +1,8 @@
 <template>
-  <div v-if="isSupported">
-    <button @click="loginWithWebAuthn">
-      ورود با اثر انگشت
+    <button v-if="isSupported" @click="loginWithWebAuthn">
+        ورود با اثر انگشت
     </button>
-  </div>
 </template>
-
 <script setup>
     import { ref, onMounted } from 'vue'
     import { sendApi } from '@/utils/api'
@@ -16,9 +13,10 @@
     })
     async function loginWithWebAuthn() {
         try {
-            const res = await sendApi(JSON.stringify({
-                action: 'login_webauthn_request'
-            }))
+            const res = await sendApi({
+                action: 'login_webauthn_request',
+                control:'login'
+            })
             if (!res || !res.publicKey) {
                 if (res.status === 'error') {
                     alert(res.message)
@@ -31,11 +29,11 @@
             const assertion = await navigator.credentials.get({
                 publicKey: options
             })
-            const dataToSend = JSON.stringify({
+            const verify = await sendApi({
                 action: 'login_webauthn_response',
-                data:assertion
+                data:assertion,
+                control:'login'
             })
-            const verify = await sendApi(dataToSend)
             if (verify.status==='success') {
                 if (verify.url === 'dashboard') {
                     router.push({ name: 'dashboard' })

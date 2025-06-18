@@ -37,7 +37,6 @@
       }
       selectedFiles.value.push(file)
     }
-    // ریست کردن input برای اجازه انتخاب مجدد
     e.target.value = ''
     if (selectedFiles.value.length > 0) {
       await uploadFiles()
@@ -60,12 +59,15 @@
     }
     try {
       const response = await sendApi(
-        JSON.stringify({
+        {
           action: 'upload_many_pdfs',
-          data: fileDataArray,
-          url:mergeProps.url,
-          toAction:props.toAction
-        })
+          data: { 
+            data:fileDataArray,
+            url:mergeProps.url,
+            toAction:props.toAction
+          },
+          control:'upload'
+        }
       )
       if (response.status === 'success' && Array.isArray(response.pdfs)) {
         uploadedFiles.value = response.pdfs

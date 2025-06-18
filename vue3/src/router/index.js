@@ -1,6 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '@/views/home/HomeView.vue'
-import AboutView from '@/views/home/AboutView.vue'
 import UploadView from "@/views/home/UploadView.vue";
 import LoginView from '@/views/home/LoginView.vue';
 import DashboardView from '@/views/dashboard/DashboardView.vue';
@@ -9,22 +7,12 @@ import { sendApi } from '@/utils/api';
 
 const routes = [
   {
-    path: '/',
-    name: 'home',
-    component: HomeView
-  },
-  {
-    path: '/about',
-    name: 'about',
-    component: AboutView
-  },
-  {
     path: '/upload',
     name: 'upload',
     component: UploadView
   },
   {
-    path: '/login',
+    path: '/',
     name: 'login',
     component: LoginView,
     meta:{onlyAuth:true}
@@ -52,21 +40,30 @@ router.beforeEach(async (to, from, next) => {
   try {
     const meta = to.meta;
     if (meta.requiresAuth) {
-      const res = await sendApi(JSON.stringify({ action: 'check_auth' }));
-      if (res.status !== 'success') return next('/login');
+      const res = await sendApi({ 
+        action: 'check_auth' ,
+        control:'security'
+       });
+      if (res.status !== 'success') return next('/');
     }
     if (meta.checkHasMobileId) {
-      const res = await sendApi(JSON.stringify({ action: 'check_mobile_info' }));
-      if (res.status !== 'success') return next('/login');
+      const res = await sendApi({ 
+        action: 'check_mobile_info',
+        control:'security'
+      });
+      if (res.status !== 'success') return next('/');
     }
     if (meta.onlyAuth) {
-      const res = await sendApi(JSON.stringify({ action: 'check_auth' }));
+      const res = await sendApi({ 
+        action: 'check_auth',
+        control:'security'
+      });
       if (res.status === 'success') return next('/dashboard');
     }
     next();
   } catch (e) {
     console.error('Router Guard Error:', e);
-    next('/login');
+    next('/');
   }
 });
 
