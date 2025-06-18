@@ -57,7 +57,7 @@ class Migration_Create_news_table extends CI_Migration {
         $this->db->query("ALTER TABLE news MODIFY created_at DATETIME DEFAULT CURRENT_TIMESTAMP");
         $this->db->query("ALTER TABLE news MODIFY updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP");
         $this->db->query('ALTER TABLE news ADD CONSTRAINT fk_news_user_account FOREIGN KEY (user_account_id) REFERENCES user_account(id) ON DELETE CASCADE ON UPDATE CASCADE');
-        $this->db->query('ALTER TABLE news ADD CONSTRAINT fk_news_category FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL ON UPDATE CASCADE');
+        $this->db->query('ALTER TABLE news ADD CONSTRAINT fk_news_category FOREIGN KEY (category_id) REFERENCES category(id) ON DELETE SET NULL ON UPDATE CASCADE');
         $this->db->query("ALTER TABLE news ADD CONSTRAINT fk_news_media FOREIGN KEY (media_id) REFERENCES media(id) ON DELETE SET NULL ON UPDATE CASCADE");
     }
 

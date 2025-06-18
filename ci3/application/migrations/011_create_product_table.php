@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Migration_Create_products_table extends CI_Migration {
+class Migration_Create_product_table extends CI_Migration {
     public function __construct() {
         parent::__construct();
         $this->load->dbforge();
@@ -54,13 +54,13 @@ class Migration_Create_products_table extends CI_Migration {
             ],
         ]);
         $this->dbforge->add_key('id', TRUE);
-        $this->dbforge->create_table('products');
-        $this->db->query("ALTER TABLE products MODIFY created_at DATETIME DEFAULT CURRENT_TIMESTAMP");
-        $this->db->query("ALTER TABLE products MODIFY updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP");
-        $this->db->query('ALTER TABLE products ADD CONSTRAINT fk_products_category FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL ON UPDATE CASCADE');
+        $this->dbforge->create_table('product');
+        $this->db->query("ALTER TABLE product MODIFY created_at DATETIME DEFAULT CURRENT_TIMESTAMP");
+        $this->db->query("ALTER TABLE product MODIFY updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP");
+        $this->db->query('ALTER TABLE product ADD CONSTRAINT fk_product_category FOREIGN KEY (category_id) REFERENCES category(id) ON DELETE SET NULL ON UPDATE CASCADE');
     }
 
     public function down() {
-        $this->dbforge->drop_table('products');
+        $this->dbforge->drop_table('product');
     }
 }

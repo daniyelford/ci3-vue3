@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Migration_Create_categories_table extends CI_Migration {
+class Migration_Create_category_table extends CI_Migration {
     public function __construct() {
         parent::__construct();
         $this->load->dbforge();
@@ -34,12 +34,12 @@ class Migration_Create_categories_table extends CI_Migration {
             ],
         ]);
         $this->dbforge->add_key('id', TRUE);
-        $this->dbforge->create_table('categories');
-        $this->db->query("ALTER TABLE categories MODIFY created_at DATETIME DEFAULT CURRENT_TIMESTAMP");
-        $this->db->query("ALTER TABLE categories MODIFY updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP");
+        $this->dbforge->create_table('category');
+        $this->db->query("ALTER TABLE category MODIFY created_at DATETIME DEFAULT CURRENT_TIMESTAMP");
+        $this->db->query("ALTER TABLE category MODIFY updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP");
     }
 
     public function down() {
-        $this->dbforge->drop_table('categories');
+        $this->dbforge->drop_table('category');
     }
 }
