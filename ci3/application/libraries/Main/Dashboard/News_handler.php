@@ -37,14 +37,33 @@ class News_handler
     }
     private function search_array($data,$key,$value){
         $result=[];
-        if(!empty($data) && !empty($key) && !empty($value))
-            foreach ($data as $a) {
-                if(!empty($a) && !empty($a[$key]) && in_array($a[$key],$value)) $result[]=$a;
-            }
+        if(!empty($data) && !empty($key) && !empty($value)){
+            $result=$data[array_search($value, array_column($data, $key))];
+        }
         return $result;
     }
-    private function search($data,$id){
-        return (!empty($data) && !empty($id)?json_encode($this->search_array($data,'id',json_decode($id,true))):'');
+    private function search_id_return_value_in_key($data,$id,$key){
+        $a = (!empty($data) && !empty($id)?$this->search_array($data,'id',$id):'');
+        if(!empty($key) && !empty($a)){
+            if(is_string($key) && !empty($a[$key])) return $a[$key];
+            $res=[];
+            if(is_array($key))
+                foreach($key as $k){
+                    if(!empty($k) && !empty($a[$k]))
+                        $res[$k]=$a[$k];
+                }
+            if(!empty($res)) return $res;
+        }
+        return '';
+    }
+    private function medias_finder($data){
+        $media=[];
+        $media_ids=(!empty($data)?explode(',',$data):[]);
+        if(!empty($media_ids))
+            foreach ($media_ids as $media_id) {
+                if(!empty($media_id) && intval($media_id)>0) $media[]=$this->search_id_return_value_in_key($this->media,intval($media_id),['id','url','type']);
+            }
+        return array_reverse($media);
     }
     private function set_data(){
         foreach ($this->news as $a) {
@@ -54,9 +73,9 @@ class News_handler
                 $arr['created_at']=$a['created_at']??'';
                 $arr['type']=$a['type']??'';
                 $arr['description']=$a['description']??'';
-                $arr['category']=$this->search($this->category,$a['category_id']??'');
-                $arr['location']=$this->search($this->address,$a['user_address_id']??'');
-                $arr['media']=$this->search($this->media,$a['media_id']??'');
+                $arr['category']=$this->search_id_return_value_in_key($this->category,$a['category_id']??0,'title');
+                $arr['location']=$this->search_id_return_value_in_key($this->address,$a['user_address_id']??0,'city');
+                $arr['media']=$this->medias_finder($a['media_id']??'');
                 $this->result[]=$arr;
             }
         }

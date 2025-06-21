@@ -1,12 +1,14 @@
 <template>
     <button v-if="isSupported" @click="loginWithWebAuthn">
-        ورود با اثر انگشت
+        <img :src="fingerPrintIcon" alt="finger print login icon">
     </button>
 </template>
 <script setup>
     import { ref, onMounted } from 'vue'
     import { sendApi } from '@/utils/api'
     import router from '@/router'
+    import { BASE_URL } from '@/config';
+    const fingerPrintIcon=BASE_URL+'/assets/images/fin.png'
     const isSupported = ref(false)
     onMounted(() => {
         isSupported.value = window.PublicKeyCredential && typeof window.PublicKeyCredential === 'function'
@@ -69,3 +71,18 @@
         return opts
     }
 </script>
+<style scoped>
+    button{
+        border: none;
+        outline: none;
+        width: 35px;
+        height: 35px;
+        cursor: pointer;
+        padding: 0;
+        background: transparent;
+    }
+    img{
+        height: 100%;
+        width: 100%;
+    }
+</style>

@@ -6,7 +6,7 @@
     <NewsCards/>
   </div>
   <div class="nav-bottom">
-    <BottomNav :search="true" :list="true" :add="true"/>
+    <BottomNav :Wallet="true" :list="true" :add="true"/>
   </div>
 </template>
 <script setup>
@@ -17,9 +17,11 @@
 <style scoped>
   .nav-top,.nav-bottom,.content{
     position: fixed;
-    box-shadow: 0 0 10px grey;
+    box-shadow: 0 0 6px grey;
     left: 0;
     right: 0;
+    box-sizing: border-box;
+    border: 1px solid #9b7ca9c4;
   }
   .nav-top{
     height: 60px;
@@ -29,6 +31,9 @@
     top: 60px;
     bottom: 60px;
     height: auto;
+    padding: 10px;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
   .nav-bottom{
     height: 60px;

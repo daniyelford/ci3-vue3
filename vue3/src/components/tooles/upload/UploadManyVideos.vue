@@ -11,7 +11,7 @@
     <div v-if="uploadedVideos.length" class="preview">
       <p>ویدیوهای آپلود شده:</p>
       <div v-for="video in uploadedVideos" :key="video.id" class="video-wrapper">
-        <video :src="video.url" controls style="max-width: 400px; max-height: 300px; margin: 0.5rem;" />
+        <video :src="video.url" controls style="max-width: 400px; max-height: 300px; margin: 0.5rem;"></video>
       </div>
     </div>
   </div>

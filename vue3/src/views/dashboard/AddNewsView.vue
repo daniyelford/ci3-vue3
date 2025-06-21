@@ -1,12 +1,12 @@
 <template>
     <div class="nav-top">
-        <TopNav :is-wallet="false"/>
+        <TopNav/>
     </div>
     <div class="content">
         <AddNewsForm/>
     </div>
     <div class="nav-bottom">
-        <BottomNav :search="false" :add="false" :list="true"/>
+        <BottomNav :Wallet="true" :add="false" :list="true"/>
     </div>
 </template>
 <script setup>
@@ -17,9 +17,11 @@
 <style scoped>
     .nav-top,.nav-bottom,.content{
         position: fixed;
-        box-shadow: 0 0 10px grey;
+        box-shadow: 0 0 6px grey;
         left: 0;
         right: 0;
+        box-sizing: border-box;
+        border: 1px solid #9b7ca9c4;
     }
     .nav-top{
         height: 60px;
@@ -29,6 +31,9 @@
         top: 60px;
         bottom: 60px;
         height: auto;
+        padding: 10px;
+        overflow-y: auto;
+        overflow-x: hidden;
     }
     .nav-bottom{
         height: 60px;

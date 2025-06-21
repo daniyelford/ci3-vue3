@@ -4,38 +4,33 @@
     </div>
     <div class="card-inner" v-else-if="cards.length>0">
         <div v-for="card in cards" :key="card.id" class="card">
-            <div class="info">
-                <div class="card-header">
-                    <div class="location" v-if="card.location!==''">
-                        {{ card.location }}
-                    </div>
-                    <div class="card-category">
-                        {{ card.category }}
-                    </div>
+            <div class="card-header">
+                <div class="location" v-if="card.location!==''">
+                    {{ card.location }}
                 </div>
-                <div class="medias" v-if="card.media!==''">
-                    {{ card.media }}
+                <div class="type" v-if="card.type ==='force'">
+                    فوری
                 </div>
-                <div class="name">
-                    <p>{{ card.description }}</p>
+                <div class="card-category">
+                    {{ card.category }}
                 </div>
+            </div>
+            <div class="medias" v-if="card.medias.length>0">
+                <div class="media" v-for="media in card.medias" :key="media.id">
+                    <img v-if="media.url && media.type==='image'" :src="media.url" alt="news image">
+                    <video v-else-if="media.url && media.type==='video'" :src="media.url" controls></video>
+                </div>
+                {{ card.media }}
+            </div>
+            <div class="description" v-if="card.description!==''">
+                {{ card.description }}
             </div>
             <div class="time">
-                <span>
-                    زمان ثبت
-                </span>
-                <span>
-                    {{ moment(card.created_at).format('jYYYY/jMM/jDD') }}
-                </span>
+                {{ moment(card.created_at).format('jYYYY/jMM/jDD') }}
             </div>
-            <div class="type" v-if="card.type ==='force'">
-                فوری
-            </div>
-            <div class="choose">
-                <a @click="select(card.id)">
-                    انتخاب
-                </a>
-            </div>
+            <a class="choose" @click="select(card.id)">
+                انتخاب
+            </a>
         </div>
     </div>
     <div class="none-cart-error" v-else>
@@ -43,15 +38,26 @@
     </div>
 </template>
 <script setup>
-    import { onMounted ,ref } from 'vue'
+    import { ref,onMounted } from 'vue'
     import moment from 'moment-jalaali'
     import { sendApi } from '@/utils/api'
+    import { useNotification } from '@kyvg/vue3-notification';
+    const notif=useNotification() 
+    const showNotification = () => {
+        notif.notify({
+            title: 'خبر جدید',
+            text: 'اخبار روز محدوده ی خود را با ما دنبال کنید',
+            type: 'info'
+        });
+    };
+    showNotification();
     // const props = defineProps({
     //     filters: Object,
     // })
     const isLoaded = ref(false)
     const cards = ref([])
     onMounted(async () => {
+        
         const news = await sendApi({action: 'get_news',control:'news'});
         if(news.status==="success") {
             if(news.data.length>0){
@@ -62,7 +68,10 @@
                     description: cat.description,
                     created_at: cat.created_at,
                     type: cat.type,
-                    media: cat.media,
+                    medias: cat.media.map(media=>({
+                        type:media.type,
+                        url:media.url
+                    })),
                 }))
             }
             isLoaded.value=true
@@ -115,152 +124,63 @@
         flex-direction: row-reverse;
         flex-wrap: wrap;
         align-content: flex-start;
-        justify-content: flex-start;
+        justify-content: center;
         align-items: stretch;
     }
     .card{
-        width: 23%;
-        height: 210px;
-        margin: 0 1% 0 0;
+        width: 49%;
+        min-height: 300px;
+        margin: 0 0.5% 10px 0.5%;
         border-radius: 10px;
         box-shadow: 0 0 5px grey;
     }
-    .info{
-        margin-top: 7px;
+    .media{
+        height: 150px;
+        width: auto;
+        margin: auto;
     }
-    .img {
-        float: left;
-        width: 40px;
-        height: 40px;
-        margin: 0 5px 0 15px;
-    }
-    .img img{
+    .media img,.media video{
         width: 100%;
         height: 100%;
-        border-radius: 50px;
     }
-    .name{
-        text-align: start;
-        width: calc(100% - 60px);
-        display: inline-block;
-        padding: 5px;
-    }
-    .name p:first-child{
-        font-size: 10px;
-    }
-    .name p:last-child{
-        font-size: 12px;
-    }
-    .follwer{
-        width: 100%;
+    .card-header{
         display: flex;
-        margin-top: -3px;
-        margin-bottom: 7px;
-        height: 30px;
         flex-direction: row-reverse;
         flex-wrap: nowrap;
-        justify-content: center;
+        justify-content: space-between;
         align-items: stretch;
+        padding: 6px;
+    }
+    .description {
+        height: 50px;
+        padding: 5px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 95%;
         text-align: center;
+        white-space: nowrap;
     }
-    .count{
-        padding-right: 10px;
-    }
-    .inflowence{
+    .time{
+        font-size: 10px;
         padding-left: 10px;
     }
-    .count,.inflowence{
-        width: 50%;
-        display: inline-block;
-    }
-    .count p,.inflowence p{
-        margin-top: -12px;
-        font-size: 12px;
-    }
-    .count svg,.inflowence svg{
-        height: 20px;
-        width: 20px;
-        fill: grey;
-    }
-    .category,.admin-info,.price{
-        height: 25px;
+    .choose{
+        width: 95%;
+        height: 30px;
+        background: blue;
+        margin: 5px auto;
         text-align: center;
-        width: 85%;
-        margin: 2px auto;
-        border-radius: 6px;
-        background: lightgray;
-    }
-    .category svg,.admin-info svg,.price svg{
-        width: 15px;
-        float: left;
-        height: 15px;
-        margin: 5px;
-        fill: gray;
-    }
-    .order-name{
-        margin-top: 4px;
-        font-size: 12px;
-    }
-    .time {
-        width: 80%;
-        margin: 0 auto;
-    }
-    .time span {
-        font-size: 10px;
-    }
-    .time span:first-child{
-        float: right;
-        direction: rtl;
-    }
-    .time span:last-child{
-        float: left;
-    }
-    .choose {
-        width: 85%;
-        margin: 0 auto;
-    }
-    .choosen{
-        width: 100%;
-        display: inline-block;
-        background: grey;
-        color: white;
-        border-radius: 10px;
-        height: 22px;
-        text-align: center;
-        font-size: 12px;
-        padding-top: 3px;
-    }
-    .choose a{
-        width: 100%;
-        background: #00f;
-        color: #fff;
-        border-radius: 10px;
-        display: inline-block;
-        height: 22px;
-        text-align: center;
-        font-size: 12px;
-        cursor: pointer;
-    }
-    .loading{
-        width: 90%;
-        text-align: center;
-        background: rgb(166, 181, 228);
-        margin: 0 auto;
         border-radius: 10px;
         color: white;
-        font-size: 20px;
-        height: 150px;
-        padding-top: 55px;
+        display: block;
+        padding-top: 10px;
     }
-    .none-cart-error {
-        width: 90%;
-        text-align: center;
-        background: red;
-        margin: 0 auto;
-        border-radius: 10px;
-        color: white;
-        font-size: 20px;
-        height: 150px;
-        padding-top: 55px;
+    /* .media video{ */
+        /* max-width: 400px; max-height: 300px; margin: 0.5rem; */
+    /* } */
+    @media screen and (max-width:600px){
+        .card{
+            width: 99%;
+        }
     }
 </style>

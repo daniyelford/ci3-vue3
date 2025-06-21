@@ -91,3 +91,4 @@ define('DBNAME','total');
 // sms.ir
 define('SMSIRTEMPID','');
 define('SMSIRKEY','');
+define('WEATHER_API','');

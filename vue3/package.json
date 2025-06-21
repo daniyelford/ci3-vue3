@@ -14,8 +14,9 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "moment-jalaali": "^0.10.4",
+    "@kyvg/vue3-notification": "^3.4.1",
     "core-js": "^3.8.3",
+    "moment-jalaali": "^0.10.4",
     "vue": "^3.2.13",
     "vue-router": "^4.0.3"
   },

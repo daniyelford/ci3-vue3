@@ -19,9 +19,14 @@ class Migration_Create_user_address_table extends CI_Migration {
                 'unsigned' => TRUE,
                 'null' => TRUE,
             ],
+            'ip_address' => [
+                'type' => 'VARCHAR',
+                'constraint' => 20,
+                'null' => TRUE,
+            ],
             'address' => [
                 'type' => 'TEXT',
-                'null' => FALSE,
+                'null' => TRUE,
             ],
             'code_posti' => [
                 'type' => 'VARCHAR',
@@ -39,6 +44,11 @@ class Migration_Create_user_address_table extends CI_Migration {
                 'null' => TRUE,
             ],
             'country' => [
+                'type' => 'VARCHAR',
+                'constraint' => 20,
+                'null' => TRUE,
+            ],
+            'country_code' => [
                 'type' => 'VARCHAR',
                 'constraint' => 20,
                 'null' => TRUE,

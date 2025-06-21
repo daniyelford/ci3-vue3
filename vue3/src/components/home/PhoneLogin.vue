@@ -1,8 +1,6 @@
 <template>
-  <div>
     <PhoneForm v-if=" step === 1" @success="goStep2" @valid="validPhoneNumber"/>
     <SmsLoginForm v-else-if=" step === 2" :phone="phone" @back="step = 1"/>
-  </div>
 </template>
 <script setup>
   import { ref,watch,onMounted,defineEmits } from 'vue'
@@ -31,12 +29,3 @@
     emit('validPhone', val)
   }
 </script>
-
-<style scoped>
-  div{
-    border-radius: 10px;
-    background: #e0e4ed;
-    padding: 20px;
-    box-shadow: 0 0 10px grey;
-  }
-</style>

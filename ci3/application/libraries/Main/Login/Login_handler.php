@@ -2,63 +2,29 @@
 class Login_handler
 {
     // sessions['user_info','id','account_id','mobile_id','phone_number','finger_register_challenge','finger_login_challenge','login_code'=>['code','phone'],'category_id','rule']
-    // features functions { send_sms_action , check_user_address }
     private $CI;
     private $send_sms_code_in_login=true;
     private $send_sms_example=true;
     public function __construct(){
 		$this->CI =& get_instance();
         $this->CI->load->model('Users_model');
+        $this->CI->load->model('Tooles_model');
         $this->CI->load->library('Tools/Security_handler');
         $this->CI->load->library('Main/Login/Finger_print');
 	}
-    private function send_sms_action($str,$to){
-        if($this->send_sms_example) return true;
-        if(!empty($str) && (is_string($str)||is_numeric($str)) && !empty($to) && is_string($to)){
-            $curl = curl_init();
-            curl_setopt_array($curl, [
-                CURLOPT_URL => 'https://api.sms.ir/v1/send/verify',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS =>'{
-                    "mobile": "'.$to.'",
-                    "templateId": '.SMSIRTEMPID.',
-                    "parameters": [
-                        {
-                            "name": "CODE",
-                            "value": "'.$str.'"
-                        }
-                    ]
-                }',
-                CURLOPT_HTTPHEADER => [
-                    'Content-Type: application/json',
-                    'Accept: text/plain',
-                    'x-api-key: '.SMSIRKEY
-                ]
-            ]);
-            $response = curl_exec($curl);
-            curl_close($curl);
-            $response=json_decode($response,true);
-            if(!empty($response) && !empty($response['status']) && intval($response['status'])===1) return true;
-        }
-        return false;
-    }
     private function check_user_address($account_id){
+        // 'province',
+        // 'country_code'
         if(!empty($account_id)&&intval($account_id)>0){
+            $a=$this->CI->Tooles_model->ip_handler();
             $this->CI->Users_model->add_address([
                 'user_account_id'=>intval($account_id),
-                'address'=>'ip address',
+                'ip_address'=>$_SERVER['REMOTE_ADDR'],
+                'country'=>$a['country']??'',
+                'city'=>$a['country']??'',
+                'lat'=>$a['country']??'',
+                'long'=>$a['country']??''
             ]);
-                // 'city',
-                // 'province',
-                // 'country',
-                // 'lat',
-                // 'long'
         }
     }
     private function check_user_rule($account_id){
@@ -160,7 +126,8 @@ class Login_handler
         $security= new Security_handler();
         if(!empty($data) && $security->validate_mobile_number($data) && $this->CI->session->has_userdata('phone_number') && !empty($this->CI->session->userdata('phone_number')) && $data===$this->CI->session->userdata('phone_number')){
             $this->CI->session->set_userdata('login_code',['code'=>rand(100000,1000000),'phone'=>$data]);
-            if($this->send_sms_action($this->CI->session->userdata('login_code')['code'],$data))
+            $this->CI->Tooles_model->send_sms_example=$this->send_sms_example;
+            if($this->CI->Tooles_model->send_sms_action($this->CI->session->userdata('login_code')['code'],$data))
                 return ($this->send_sms_code_in_login?['status' => 'success','code'=>$this->CI->session->userdata('login_code')['code']]:['status' => 'success']);
             else
                 return ['status' => 'error','message'=>'پیامک ارسال نشد'];
