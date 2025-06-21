@@ -33,11 +33,20 @@ class Users_model extends CI_Model
         return (!empty($tbl) && is_string($tbl) && !empty($arr) && is_array($arr) && $this->db->delete($tbl, $arr));
     }
     // costum 
+    public function select_address_where_news(){
+	    return $this->select_where_array_table($this->address,['status'=>'news']);
+	}
 	public function select_where_id($id){
 	    return (!empty($id) && intval($id)?$this->select_where_array_table($this->tbl,['id'=>intval($id)]):false);
 	}
+    public function select_mobile_where_id($id){
+	    return (!empty($id) && intval($id)?$this->select_where_array_table($this->mobile,['id'=>intval($id)]):false);
+	}
     public function select_mobile($str){
         return (!empty($str) && is_string($str)?$this->select_where_array_table($this->mobile,['phone'=>$str]):false);
+	}
+    public function select_account_where_id($id){
+	    return (!empty($id) && intval($id)?$this->select_where_array_table($this->account,['id'=>intval($id)]):false);
 	}
     public function select_account_where_mobile_id($id){
 	    return (!empty($id) && intval($id)?$this->select_where_array_table($this->account,['user_mobile_id'=>intval($id)]):false);
@@ -50,6 +59,9 @@ class Users_model extends CI_Model
 	}
     public function add_return_id($arr){
         return (!empty($arr) && is_array($arr)?$this->add_to_table_return_id($this->tbl,$arr):false);
+    }
+    public function add_address($arr){
+        return (!empty($arr) && is_array($arr) && $this->add_to_table($this->address,$arr));
     }
     public function add_credential($arr){
         return (!empty($arr) && is_array($arr) && $this->add_to_table($this->credential,$arr));

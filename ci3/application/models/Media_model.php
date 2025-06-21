@@ -26,7 +26,10 @@ class Media_model extends CI_Model
     }
     // costum
     public function select_where_id($id){
-	    return (!empty($id) && intval($id)?$this->select_where_array_table($this->tbl,['id'=>intval($id)]):false);
+	    return (!empty($id) && intval($id)?$this->select_where_id_table($this->tbl,intval($id)):false);
+	}
+    public function select_where_news_used(){
+	    return $this->select_where_array_table($this->tbl,['upload_place'=>'news','used_status'=>'used']);
 	}
     public function add($arr){
         return (!empty($arr) && is_array($arr) && $this->add_to_table($this->tbl,$arr));

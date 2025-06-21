@@ -13,6 +13,11 @@ class Security_handler
         $this->CI->session->sess_destroy();
         return ['status'=>'success'];
     }
+    public function check_has_mobile(){
+        $a=$this->check_mobile_info();
+        if(is_null($a)) return ['status'=>'success'];
+        return $a;
+    }
     public function check_mobile_info(){
         if (!$this->CI->session->has_userdata('mobile_id') || empty($this->CI->session->userdata('mobile_id'))){
 			return ['status' => 'error', 'message' => 'دسترسی غیر مجاز'];

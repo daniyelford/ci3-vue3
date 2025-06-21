@@ -1,6 +1,8 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 class Login_handler
 {
+    // sessions['user_info','id','account_id','mobile_id','phone_number','finger_register_challenge','finger_login_challenge','login_code'=>['code','phone'],'category_id','rule']
+    // features functions { send_sms_action , check_user_address }
     private $CI;
     private $send_sms_code_in_login=true;
     private $send_sms_example=true;
@@ -46,6 +48,72 @@ class Login_handler
         }
         return false;
     }
+    private function check_user_address($account_id){
+        if(!empty($account_id)&&intval($account_id)>0){
+            $this->CI->Users_model->add_address([
+                'user_account_id'=>intval($account_id),
+                'address'=>'ip address',
+            ]);
+                // 'city',
+                // 'province',
+                // 'country',
+                // 'lat',
+                // 'long'
+        }
+    }
+    private function check_user_rule($account_id){
+        if(!empty($account_id)&&intval($account_id)>0){
+            $a=$this->CI->Users_model->select_account_where_id(intval($account_id));
+            if(!empty($a) && !empty(end($a))){
+                if(!empty(end($a)['category_id']) && intval(end($a)['category_id'])>0) $this->CI->session->set_userdata('category_id',intval(end($a)['category_id']));
+                if(!empty(end($a)['rule'])) $this->CI->session->set_userdata('rule',end($a)['rule']);
+            }
+        }
+    }
+    private function check_user($str){
+        $mobile_id=0;
+        $result=[];
+        $a=$this->CI->Users_model->select_mobile($str);
+        if(!empty($a) && !empty(end($a)) && 
+        !empty(end($a)['id']) && 
+        intval(end($a)['id']) > 0){
+            $mobile_id=intval(end($a)['id']);
+            if(!empty(end($a)['user_id']) &&
+            intval(end($a)['user_id']) > 0){
+                $user_info=$this->CI->Users_model->select_where_id(intval(end($a)['user_id']));
+                if(!empty($user_info) && !empty(end($user_info))){
+                    $this->CI->session->set_userdata('user_info',end($user_info));    
+                    $this->CI->session->set_userdata('id',intval(end($a)['user_id']));
+                    $b=$this->CI->Users_model->select_account_where_mobile_id(intval(end($a)['id']));
+                    $account_id=0;
+                    if(!empty($b) && !empty(end($b)) && 
+                    !empty(end($b)['id']) && 
+                    intval(end($b)['id']) > 0){
+                        $account_id=intval(end($b)['id']);
+                    }else{
+                        $account_id=$this->CI->Users_model->add_account_return_id(['user_mobile_id'=>intval(end($a)['id'])]);
+                        if(!(!empty($account_id) && intval($account_id)>0)) return ['status'=>'error','message'=>'add to db has error account'];
+                    }
+                    $this->CI->session->set_userdata('account_id',$account_id);
+                    $this->check_user_address($account_id);
+                    $this->check_user_rule($account_id);
+                    $result=['status' => 'success','url'=>'dashboard'];
+                }else{
+                    return ['status'=>'error','message'=>'user info has error'];
+                }
+            }else{
+    			$result=['status' => 'success','url'=>'register'];
+            }
+        }else{
+            $mobile_id=$this->CI->Users_model->add_mobile_return_id(['phone'=>$str]);
+    		if(!(!empty($mobile_id) && intval($mobile_id)>0)){
+                return ['status'=>'error','message'=>'add to db has error mobile'];
+            }
+            $result=['status' => 'success','url'=>'register'];
+        }
+        $this->CI->session->set_userdata('mobile_id',$mobile_id);
+    	return $result;
+    }
     public function register_user($arr){
         $mobile_info=[];
         $security= new Security_handler();
@@ -71,6 +139,8 @@ class Login_handler
                 $account_id=$this->CI->Users_model->add_account_return_id(['user_mobile_id'=>intval($this->CI->session->userdata('mobile_id'))]);
                 if (!(!empty($account_id) && intval($account_id)>0)) return ['status' => 'error', 'message' => 'database error'];
                 $this->CI->session->set_userdata('account_id',$account_id);
+                $this->check_user_address($account_id);
+                $this->check_user_rule($account_id);
                 return ['status' => 'success'];
             }else{
                 return ['status' => 'error', 'message' =>'user info has error'];
@@ -128,48 +198,6 @@ class Login_handler
         }else{
             return ['status'=>'error','message'=>'invalid request'];
         }
-    }
-    private function check_user($str){
-        $mobile_id=0;
-        $result=[];
-        $a=$this->CI->Users_model->select_mobile($str);
-        if(!empty($a) && !empty(end($a)) && 
-        !empty(end($a)['id']) && 
-        intval(end($a)['id']) > 0){
-            $mobile_id=intval(end($a)['id']);
-            if(!empty(end($a)['user_id']) &&
-            intval(end($a)['user_id']) > 0){
-                $user_info=$this->CI->Users_model->select_where_id(intval(end($a)['user_id']));
-                if(!empty($user_info) && !empty(end($user_info))){
-                    $this->CI->session->set_userdata('user_info',end($user_info));    
-                    $this->CI->session->set_userdata('id',intval(end($a)['user_id']));
-                    $b=$this->CI->Users_model->select_account_where_mobile_id(intval(end($a)['id']));
-                    $account_id=0;
-                    if(!empty($b) && !empty(end($b)) && 
-                    !empty(end($b)['id']) && 
-                    intval(end($b)['id']) > 0){
-                        $account_id=intval(end($b)['id']);
-                    }else{
-                        $account_id=$this->CI->Users_model->add_account_return_id(['user_mobile_id'=>intval(end($a)['id'])]);
-                        if(!(!empty($account_id) && intval($account_id)>0)) return ['status'=>'error','message'=>'add to db has error account'];
-                    }
-                    $this->CI->session->set_userdata('account_id',$account_id);
-                    $result=['status' => 'success','url'=>'dashboard'];
-                }else{
-                    return ['status'=>'error','message'=>'user info has error'];
-                }
-            }else{
-    			$result=['status' => 'success','url'=>'register'];
-            }
-        }else{
-            $mobile_id=$this->CI->Users_model->add_mobile_return_id(['phone'=>$str]);
-    		if(!(!empty($mobile_id) && intval($mobile_id)>0)){
-                return ['status'=>'error','message'=>'add to db has error mobile'];
-            }
-            $result=['status' => 'success','url'=>'register'];
-        }
-        $this->CI->session->set_userdata('mobile_id',$mobile_id);
-    	return $result;
     }
     public function login_webauthn_response($data) {
         if(!(!empty($data) && !empty($data['id']) && $this->CI->session->has_userdata('phone_number') && !empty($this->CI->session->userdata('phone_number')))) return ['status' => 'error', 'message' => 'Challenge not found'];

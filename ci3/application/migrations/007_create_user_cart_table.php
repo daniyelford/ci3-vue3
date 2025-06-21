@@ -17,7 +17,7 @@ class Migration_Create_user_cart_table extends CI_Migration {
             'user_id' => [
                 'type' => 'INT',
                 'unsigned' => TRUE,
-                'null' => FALSE,
+                'null' => TRUE,
             ],
             'shomare_shaba' => [
                 'type' => 'VARCHAR',
@@ -37,7 +37,7 @@ class Migration_Create_user_cart_table extends CI_Migration {
         ]);
         $this->dbforge->add_key('id', TRUE);
         $this->dbforge->create_table('user_cart');
-        $this->db->query('ALTER TABLE user_cart ADD CONSTRAINT fk_user_cart_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE');
+        $this->db->query('ALTER TABLE user_cart ADD CONSTRAINT fk_user_cart_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL ON UPDATE CASCADE');
     }
 
     public function down() {

@@ -17,7 +17,7 @@ class Migration_Create_user_address_table extends CI_Migration {
             'user_account_id' => [
                 'type' => 'INT',
                 'unsigned' => TRUE,
-                'null' => FALSE,
+                'null' => TRUE,
             ],
             'address' => [
                 'type' => 'TEXT',
@@ -53,10 +53,15 @@ class Migration_Create_user_address_table extends CI_Migration {
                 'constraint' => '10,7',
                 'null' => TRUE,
             ],
+            'status' => [
+                'type' => 'ENUM("login", "news")',
+                'default' => 'login',
+                'null' => FALSE,
+            ],
         ]);
         $this->dbforge->add_key('id', TRUE);
         $this->dbforge->create_table('user_address');
-        $this->db->query('ALTER TABLE user_address ADD CONSTRAINT fk_user_address_user_account FOREIGN KEY (user_account_id) REFERENCES user_account(id) ON DELETE CASCADE ON UPDATE CASCADE');
+        $this->db->query('ALTER TABLE user_address ADD CONSTRAINT fk_user_address_user_account FOREIGN KEY (user_account_id) REFERENCES user_account(id) ON DELETE SET NULL ON UPDATE CASCADE');
     }
 
     public function down() {

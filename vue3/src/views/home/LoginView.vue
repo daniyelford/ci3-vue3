@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import PhoneLogin from '@/components/home/PhoneLogin.vue'
 import FingerPrintLogin from '@/components/home/FingerPrintLogin.vue'
 import { sendApi } from '@/utils/api'
+import logo from '@/assets/logo.png'
 const showFingerPrint = ref(false)
 async function handleValidPhone(isValid) {
   if (isValid) {
@@ -27,7 +28,7 @@ async function handleValidPhone(isValid) {
 </script>
 <template>
     <div class="home">
-      <img alt="Vue logo" src="../../assets/logo.png" />
+      <img alt="logo" :src="logo" />
       <PhoneLogin @validPhone="handleValidPhone" />
       <FingerPrintLogin v-if="showFingerPrint" />
   </div>
@@ -41,6 +42,8 @@ async function handleValidPhone(isValid) {
     justify-content: space-evenly;
     align-items: center;
     margin-top: 50px;
+    width: 100%;
+    gap: 20px;
   }
   @media screen and (max-width:600px){
     .home{

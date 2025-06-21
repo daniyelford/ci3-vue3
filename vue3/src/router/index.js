@@ -3,6 +3,9 @@ import UploadView from "@/views/home/UploadView.vue";
 import LoginView from '@/views/home/LoginView.vue';
 import DashboardView from '@/views/dashboard/DashboardView.vue';
 import RegisterView from '@/views/home/RegisterView.vue';
+import WalletView from '@/views/dashboard/WalletView.vue';
+import ReportListView from '@/views/dashboard/ReportListView.vue';
+import AddNewsView from '@/views/dashboard/AddNewsView.vue';
 import { sendApi } from '@/utils/api';
 
 const routes = [
@@ -29,6 +32,24 @@ const routes = [
     component: DashboardView,
     meta: { requiresAuth: true }
   },
+  {
+    path: '/wallet',
+    name: 'wallet',
+    component: WalletView,
+    meta: { requiresAuth: true }
+  },
+    {
+    path: '/add-news',
+    name: 'add-news',
+    component: AddNewsView,
+    meta: { requiresAuth: true }
+  },
+    {
+    path: '/report-list',
+    name: 'report-list',
+    component: ReportListView,
+    meta: { requiresAuth: true }
+  },
 ]
 
 const router = createRouter({
@@ -48,7 +69,7 @@ router.beforeEach(async (to, from, next) => {
     }
     if (meta.checkHasMobileId) {
       const res = await sendApi({ 
-        action: 'check_mobile_info',
+        action: 'check_has_mobile',
         control:'security'
       });
       if (res.status !== 'success') return next('/');
