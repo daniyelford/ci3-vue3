@@ -28,7 +28,7 @@
             <div class="time">
                 {{ moment(card.created_at).format('jYYYY/jMM/jDD') }}
             </div>
-            <a class="choose" @click="select(card.id)">
+            <a class="choose" @click="addToList(card.id)">
                 انتخاب
             </a>
         </div>
@@ -104,17 +104,17 @@
     //     // }
     //     return result
     // })
-    // async function select(id){
-    //     // const response = await sendApi({action: "page_handler/telegram_cards", handler:'select_card', data: id});
-    //     // if(response.status ==='success'){
-    //     //     const selectedCard = cards.value.find(card => card.id === id)
-    //     //     if (selectedCard) {
-    //     //         selectedCard.selected = true
-    //     //     }
-    //     // }else{
-    //     //     alert('ارتباط با اینترنت قطع است');            
-    //     // }
-    // }
+    async function addToList(id){
+        const response = await sendApi({action: 'add_news_to_list',control:'news',data:id});
+        if(response.status ==='success'){
+        //     const selectedCard = cards.value.find(card => card.id === id)
+        //     if (selectedCard) {
+        //         selectedCard.selected = true
+        //     }
+        }else{
+            alert('ارتباط با اینترنت قطع است');            
+        }
+    }
 </script>
 <style scoped>
     .card-inner{

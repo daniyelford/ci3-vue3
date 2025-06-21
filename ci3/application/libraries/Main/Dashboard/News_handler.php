@@ -85,4 +85,7 @@ class News_handler
         $this->set_data();
         return ['status'=>'success','data'=>array_reverse($this->result)];
     }
+    public function add_news_to_list($id){
+        return ['status'=>'success','data'=>$id];
+    }
 }
