@@ -2,6 +2,24 @@
 class Security_handler
 {
     private $CI;
+    private $session_list=[
+        'user_info',
+        'id',
+        'account_id',
+        'mobile_id',
+        'phone_number',
+        'finger_register_challenge',
+        'finger_login_challenge',
+        'login_code'=>['code','phone'],
+        'category_id',
+        'rule'
+    ];
+    // private $session_keep_list=[
+    //     'api_key',
+    //     'api_key_back',
+    //     'token',
+    //     'token_created_at'
+    // ];
     public function __construct(){
 		$this->CI =& get_instance();
 	}
@@ -10,7 +28,13 @@ class Security_handler
         return ['status'=>'success'];
     }
     public function logout(){
-        $this->CI->session->sess_destroy();
+        foreach ($this->session_list as $key) {
+            $this->CI->session->unset_userdata($key);
+        }
+        // foreach ($_SESSION as $key) {
+        //     if (!in_array($key, $this->session_keep_list)) 
+        //         $this->CI->session->unset_userdata($key);
+        // }
         return ['status'=>'success'];
     }
     public function check_has_mobile(){

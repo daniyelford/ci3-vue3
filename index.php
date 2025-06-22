@@ -327,6 +327,9 @@ if (!$dbExists) {
 }
 $conn->select_db(DBNAME);
 $conn->close();
+ini_set('session.cookie_samesite', 'Strict');
+ini_set('session.cookie_httponly', 1);
+ini_set('session.cookie_secure', 1);
 require_once BASEPATH.'core/CodeIgniter.php';
 $CI =& get_instance();
 $CI->load->database();
