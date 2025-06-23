@@ -43,7 +43,7 @@ class Migration_Create_news_table extends CI_Migration {
                 'null' => FALSE,
             ],
             'status' => [
-                'type' => 'ENUM("checking", "done")',
+                'type' => 'ENUM("checking", "seen")',
                 'default' => 'checking',
                 'null' => FALSE,
             ],

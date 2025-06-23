@@ -35,7 +35,7 @@ class Migration_Create_report_list_table extends CI_Migration {
                 'null' => FALSE,
             ],
             'run_time' => [
-                'type' => 'TEXT',
+                'type' => 'DATE',
                 'null' => TRUE,
             ],
             'created_at' => [

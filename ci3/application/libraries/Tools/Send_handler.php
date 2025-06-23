@@ -1,10 +1,9 @@
-<?php
-
-class Tooles_model extends CI_Model
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+class Send_handler
 {
-    public function __construct()
-	{
-		parent::__construct();
+    private $CI;
+    public function __construct(){
+		$this->CI =& get_instance();
 	}
     public $send_sms_example=false;
     public function send_sms_action($str,$to){

@@ -14,12 +14,6 @@ class Security_handler
         'category_id',
         'rule'
     ];
-    // private $session_keep_list=[
-    //     'api_key',
-    //     'api_key_back',
-    //     'token',
-    //     'token_created_at'
-    // ];
     public function __construct(){
 		$this->CI =& get_instance();
 	}
@@ -31,10 +25,6 @@ class Security_handler
         foreach ($this->session_list as $key) {
             $this->CI->session->unset_userdata($key);
         }
-        // foreach ($_SESSION as $key) {
-        //     if (!in_array($key, $this->session_keep_list)) 
-        //         $this->CI->session->unset_userdata($key);
-        // }
         return ['status'=>'success'];
     }
     public function check_has_mobile(){

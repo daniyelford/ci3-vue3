@@ -1,22 +1,24 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 class Login_handler
 {
-    // sessions['user_info','id','account_id','mobile_id','phone_number','finger_register_challenge','finger_login_challenge','login_code'=>['code','phone'],'category_id','rule']
     private $CI;
     private $send_sms_code_in_login=true;
     private $send_sms_example=true;
+    private $send;
     public function __construct(){
 		$this->CI =& get_instance();
         $this->CI->load->model('Users_model');
-        $this->CI->load->model('Tooles_model');
+        $this->CI->load->library('Tools/Send_handler');
         $this->CI->load->library('Tools/Security_handler');
         $this->CI->load->library('Main/Login/Finger_print');
+        $this->send=new Send_handler();
+        $this->send->send_sms_example=$this->send_sms_example;
 	}
     private function check_user_address($account_id){
         // 'province',
         // 'country_code'
         if(!empty($account_id)&&intval($account_id)>0){
-            $a=$this->CI->Tooles_model->ip_handler();
+            $a=$this->send->ip_handler();
             $this->CI->Users_model->add_address([
                 'user_account_id'=>intval($account_id),
                 'ip_address'=>$_SERVER['REMOTE_ADDR'],
@@ -126,8 +128,7 @@ class Login_handler
         $security= new Security_handler();
         if(!empty($data) && $security->validate_mobile_number($data) && $this->CI->session->has_userdata('phone_number') && !empty($this->CI->session->userdata('phone_number')) && $data===$this->CI->session->userdata('phone_number')){
             $this->CI->session->set_userdata('login_code',['code'=>rand(100000,1000000),'phone'=>$data]);
-            $this->CI->Tooles_model->send_sms_example=$this->send_sms_example;
-            if($this->CI->Tooles_model->send_sms_action($this->CI->session->userdata('login_code')['code'],$data))
+            if($this->send->send_sms_action($this->CI->session->userdata('login_code')['code'],$data))
                 return ($this->send_sms_code_in_login?['status' => 'success','code'=>$this->CI->session->userdata('login_code')['code']]:['status' => 'success']);
             else
                 return ['status' => 'error','message'=>'پیامک ارسال نشد'];

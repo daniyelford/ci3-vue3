@@ -24,8 +24,8 @@
 </template>
 <script setup>
     import { defineProps } from 'vue';
-    import FingerPrintRegister from '@/components/dashboard/menus/topNavTooles/FingerPrintRegister.vue';
-    import LogOutUser from '@/components/dashboard/menus/topNavTooles/LogOutUser.vue';
+    import FingerPrintRegister from '@/components/tooles/nav/FingerPrintRegister.vue';
+    import LogOutUser from '@/components/tooles/nav/LogOutUser.vue';
     const props=defineProps({
         add:Boolean,
         list:Boolean,

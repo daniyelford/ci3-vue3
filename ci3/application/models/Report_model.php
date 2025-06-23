@@ -1,14 +1,13 @@
 <?php
 
-class News_model extends CI_Model
+class Report_model extends CI_Model
 {
+	private $tbl="report_list";
     public function __construct()
 	{
 		parent::__construct();
 	}
-	private $tbl="news";
-    // private $category='category';
-    private function select_where_array_table($tbl,$arr){
+	private function select_where_array_table($tbl,$arr){
 	    return (!empty($tbl) && is_string($tbl) && !empty($arr) && is_array($arr)?$this->db->get_where($tbl,$arr)->result_array():false);
 	}
 	private function select_where_id_table($tbl,$id){
@@ -26,16 +25,7 @@ class News_model extends CI_Model
     private function remove_where_array_in_table($tbl,$arr){
         return (!empty($tbl) && is_string($tbl) && !empty($arr) && is_array($arr) && $this->db->delete($tbl, $arr));
     }
-    public function select_news_where_id($id){
-	    return (!empty($id) && intval($id)?$this->select_where_id_table($this->tbl,intval($id)):false);
+	public function add_report(){
+        return (!empty($arr) && is_array($arr) && $this->add_to_table($this->tbl,$arr));
 	}
-    public function select_news_where_public_status_checking(){
-	    return $this->select_where_array_table($this->tbl,['status'=>'checking','privacy'=>'public']);
-	}
-    public function select_news_where_category_id_status_checking_private($id){
-	    return (!empty($id) && intval($id)?$this->select_where_array_table($this->tbl,['category_id'=>intval($id),'status'=>'checking','privacy'=>'private']):false);
-	}
-    public function seen_weher_id($id){
-        return (!empty($id) && intval($id)>0 && $this->edit_table($this->tbl,['status'=>'seen'],['id'=>intval($id)]));
-    }
 }

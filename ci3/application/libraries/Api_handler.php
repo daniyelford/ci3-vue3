@@ -2,7 +2,7 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 class Api_handler{
     private $CI;
-    private $handler;
+    private $handlers=[];
     public function __construct(){
 		$this->CI =& get_instance();
         $this->CI->load->library('Tools/Upload_handler');
@@ -11,49 +11,29 @@ class Api_handler{
         $this->CI->load->library('Main/Login/Login_handler');
         $this->CI->load->library('Main/Dashboard/User_handler');
         $this->CI->load->library('Main/Dashboard/News_handler');
+        $this->handlers = [
+            'upload'    => new Upload_handler(),
+            'security'  => new Security_handler(),
+            'table'     => new Table_data_handler(),
+            'login'     => new Login_handler(),
+            'user'      => new User_handler(),
+            'news'      => new News_handler(),
+        ];
 	}
     public function handler($data){
-        if(!empty($data)){
-            if(!empty($data['control']))
-                switch ($data['control']) {
-                    case 'login':
-                        $this->handler=new Login_handler();
-                        break;
-
-                    case 'security':
-                        $this->handler=new Security_handler();
-                        break;
-
-                    case 'upload':
-                        $this->handler=new Upload_handler();
-                        break;
-
-                    case 'user':
-                        $this->handler=new User_handler();
-                        break;
-
-                    case 'news':
-                        $this->handler=new News_handler();
-                        break;
-
-                    case 'table':
-                        $this->handler=new Table_data_handler();
-                        break;
-                    
-                    default:
-                        die(json_encode($data));
-                        break;
-                }
-                if(!empty($data['action'])){
-                    if(!empty($data['data']))
-                        $result=$this->handler->{$data['action']}($data['data']);
-                    else
-                        $result=$this->handler->{$data['action']}();
-                die(json_encode($result));
+        header('Content-Type: application/json');
+        if (!empty($data) && !empty($data['control']) && !empty($data['action'])) {
+            $control = strtolower(trim($data['control']));
+            $action = trim($data['action']);
+            if (!array_key_exists($control,$this->handlers) || !isset($this->handlers[$control])) exit(json_encode(['status' => 'error', 'message' => 'ماژول یافت نشد']));
+            $handler = $this->handlers[$control];
+            if (!method_exists($handler, $action)) exit(json_encode(['status' => 'error', 'message' => "متد «{$action}» در ماژول «{$control}» وجود ندارد"]));
+            try {
+                exit(json_encode(!empty($data['data'])? $handler->{$action}($data['data']): $handler->{$action}()));
+            } catch (Exception $e) {
+                exit(json_encode(['status' => 'error', 'message' => $e->getMessage()]));
             }
-            echo json_encode($data);
-        }else{
-			echo json_encode(['status' => 'error', 'message' => 'توکن نامعتبر است']);
         }
+        exit(json_encode(['status' => 'error', 'message' => 'کنترل یا اکشن خالی است']));
     }
 }

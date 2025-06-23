@@ -15,49 +15,48 @@
                     {{ card.category }}
                 </div>
             </div>
-            <div class="medias" v-if="card.medias.length>0">
-                <div class="media" v-for="media in card.medias" :key="media.id">
-                    <img v-if="media.url && media.type==='image'" :src="media.url" alt="news image">
-                    <video v-else-if="media.url && media.type==='video'" :src="media.url" controls></video>
-                </div>
-                {{ card.media }}
-            </div>
+            <MediaSlider v-if="card.medias.length>0" :medias="card.medias" />
             <div class="description" v-if="card.description!==''">
                 {{ card.description }}
             </div>
             <div class="time">
                 {{ moment(card.created_at).format('jYYYY/jMM/jDD') }}
             </div>
-            <a class="choose" @click="addToList(card.id)">
-                انتخاب
+            <a class="choose" v-if="hasRule" @click="openCalendarModal(card.id)">
+                بررسی
             </a>
         </div>
     </div>
     <div class="none-cart-error" v-else>
         خبری در محدوده شما وجود ندارد
     </div>
+    <CalendarModal v-if="showModal" @close="showModal = false" @submit="onCalendarSubmit"/>
 </template>
 <script setup>
     import { ref,onMounted } from 'vue'
     import moment from 'moment-jalaali'
     import { sendApi } from '@/utils/api'
-    import { useNotification } from '@kyvg/vue3-notification';
-    const notif=useNotification() 
-    const showNotification = () => {
-        notif.notify({
-            title: 'خبر جدید',
-            text: 'اخبار روز محدوده ی خود را با ما دنبال کنید',
-            type: 'info'
-        });
-    };
-    showNotification();
+    import MediaSlider from '@/components/tooles/media/MediaSlider.vue';
+    import CalendarModal from '@/components/tooles/news/CalendarModal.vue';
+    // import { useNotification } from '@kyvg/vue3-notification';
+    // const notif=useNotification() 
+    // const showNotification = () => {
+    //     notif.notify({
+    //         title: 'خبر جدید',
+    //         text: 'اخبار روز محدوده ی خود را با ما دنبال کنید',
+    //         type: 'info'
+    //     });
+    // };
+    // showNotification();
     // const props = defineProps({
     //     filters: Object,
     // })
+    const showModal = ref(false)
+    const selectedNewsId = ref(null)
     const isLoaded = ref(false)
+    const hasRule = ref(false)
     const cards = ref([])
     onMounted(async () => {
-        
         const news = await sendApi({action: 'get_news',control:'news'});
         if(news.status==="success") {
             if(news.data.length>0){
@@ -75,44 +74,31 @@
                 }))
             }
             isLoaded.value=true
+            if(news.rule) hasRule.value=true
         } else {
             console.warn('دریافت دسته‌بندی‌ها ناموفق بود:', news)
         }
     })
-    // const filteredCards = computed(() => {
-    //     let result = (cards.value || []).filter(card => {
-    //         const f = props.filters
-    //         if (f) {
-    //             // if (f.withInsight && !card.insight) return false
-    //             if (Array.isArray(f.categories) && f.categories.length > 0 && !f.categories.includes(card.category)) {
-    //                 return false
-    //             }
-    //             // if (Array.isArray(f.socialTypes) && f.socialTypes.length > 0 && !f.socialTypes.some(type => (card.type || '').includes(type))) {
-    //             //     return false
-    //             // }
-    //         }
-    //         // if (props.searchTerm) {
-    //         //     const term = props.searchTerm.toLowerCase()
-    //         //     const username = (card.username || '').toLowerCase()
-    //         //     const title = (card.title || '').toLowerCase()
-    //         //     if (!username.includes(term) && !title.includes(term)) return false
-    //         // }
-    //         return true
-    //     })
-    //     // if (props.sortKey) {
-    //     //     result = [...result].sort((a, b) => (b[props.sortKey] ?? 0) - (a[props.sortKey] ?? 0))
-    //     // }
-    //     return result
-    // })
-    async function addToList(id){
-        const response = await sendApi({action: 'add_news_to_list',control:'news',data:id});
-        if(response.status ==='success'){
-        //     const selectedCard = cards.value.find(card => card.id === id)
-        //     if (selectedCard) {
-        //         selectedCard.selected = true
-        //     }
-        }else{
-            alert('ارتباط با اینترنت قطع است');            
+    function openCalendarModal(id) {
+        selectedNewsId.value = id
+        showModal.value = true
+    }
+    async function onCalendarSubmit({ type, date }) {
+        const jsDate = date? moment(date, 'jYYYY/jMM/jDD').toDate(): null;
+        const response = await sendApi({
+            action: 'add_news_to_list',
+            control: 'news',
+            data: {
+                news_id: selectedNewsId.value,
+                type: type,
+                run_time: jsDate ?? null,
+            }
+        });
+        if (response.status === 'success') {
+            showModal.value = false;
+            console.log('ثبت با موفقیت انجام شد');
+        } else {
+            alert('خطا در ثبت تاریخ اجرا');
         }
     }
 </script>

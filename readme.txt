@@ -1,6 +1,7 @@
 set vue3/.env
 in vue3 terminal set
 npm run build
+npm install vue3-persian-datetime-picker
 npm install @kyvg/vue3-notification
 
 npm install @capacitor/core @capacitor/cli
