@@ -96,21 +96,19 @@ class News_handler
         if(!empty($data) && !empty($data['type']) &&
         !empty($data['news_id']) && intval($data['news_id'])>0 &&
         $this->has_category_id() && 
-        intval($this->user->get_user_account_id())>0 )
-        //  &&
-        // $this->CI->Report_model->add_report([
-        //     'news_id'=>intval($data['news_id']),
-        //     'user_account_id'=>intval($this->user->get_user_account_id()),
-        //     'type'=>$data['type'],
-        //     'run_time'=>$data['run_time']??null,
-        // ])
-        //  && $this->CI->News_model->seen_weher_id(intval($data['news_id'])))
-            return ['status'=>'success','data'=>[
+        intval($this->user->get_user_account_id())>0 &&
+        $this->CI->Report_model->add_report([
+            'news_id'=>intval($data['news_id']),
+            'user_account_id'=>intval($this->user->get_user_account_id()),
+            'type'=>$data['type'],
+            'run_time'=>$data['run_time']??null,
+        ]) && $this->CI->News_model->seen_weher_id(intval($data['news_id'])))
+            return ['status'=>'success'];
+        return ['status'=>'error','data'=>[
             'news_id'=>intval($data['news_id']),
             'user_account_id'=>intval($this->user->get_user_account_id()),
             'type'=>$data['type'],
             'run_time'=>$data['run_time']??null,
         ]];    
-        return ['status'=>'error'];
     }
 }

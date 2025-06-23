@@ -25,7 +25,7 @@ class Report_model extends CI_Model
     private function remove_where_array_in_table($tbl,$arr){
         return (!empty($tbl) && is_string($tbl) && !empty($arr) && is_array($arr) && $this->db->delete($tbl, $arr));
     }
-	public function add_report(){
+	public function add_report($arr){
         return (!empty($arr) && is_array($arr) && $this->add_to_table($this->tbl,$arr));
 	}
 }
