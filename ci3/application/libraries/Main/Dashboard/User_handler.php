@@ -6,6 +6,7 @@ class User_handler
 		$this->CI =& get_instance();
         $this->CI->load->model('Users_model');
         $this->CI->load->model('Media_model');
+        $this->CI->load->model('Notification_model');
 	}
     public function get_user_category_id(){
         return ($this->CI->session->has_userdata('category_id') && 
@@ -57,5 +58,30 @@ class User_handler
             return ['status'=>'success','name'=>$name,'wallet'=>(!empty($a['balance']) && intval($a['balance'])>0?intval($a['balance']):0),'image'=>$this->get_user_image()];
         }
         return ['status'=>'error',];
+    }
+    public function get_notifications(){
+        if(($a=$this->get_user_account_id())!==false && !empty($a) && intval($a)>0)
+            return ['status' => 'success', 'data' => $this->CI->Notification_model->get_unread_by_user_account_id(intval($a))];
+        return ['status'=>'error'];
+    }
+    public function get_notifications_counts(){
+        if(($a=$this->get_user_account_id())!==false && !empty($a) && intval($a)>0)
+            return ['status' => 'success', 'data' => count($this->CI->Notification_model->get_unread_by_user_account_id(intval($a)))];
+        return ['status'=>'error'];
+    }
+    public function read_notifications($id){
+        if(!empty($id) && intval($id)>0 && ($a=$this->get_user_account_id())!==false && !empty($a) && intval($a)>0)
+            return ['status'=>'success','data'=>$this->CI->Notification_model->mark_as_read(intval($id),intval($a))];
+        return ['status'=>'error'];
+    }
+    public function add_notification($user_account_id,$title,$body,$type){
+        return (!empty($user_account_id) && intval($user_account_id)>0 && 
+        !empty($title) && !empty($body) && !empty($type) && 
+        $this->CI->Notification_model->insert([
+            'user_account_id' => $user_account_id,
+            'title' => $title,
+            'body'  => $body,
+            'type'  => $type,
+        ]));
     }
 }

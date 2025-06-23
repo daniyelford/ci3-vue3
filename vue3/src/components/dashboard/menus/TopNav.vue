@@ -16,7 +16,7 @@
           {{ formatPrice(userWalletAmount) }}
         </span>
       </div>
-
+      <NotificationMenu />
     </div>
     <div class="logo">
       <img :src="logo" alt="logo">
@@ -27,6 +27,7 @@
   import { ref,onMounted } from 'vue';
   import { sendApi } from '@/utils/api';
   import { BASE_URL } from '@/config';
+  import NotificationMenu from '@/components/tooles/nav/NotificationMenu.vue'
   const logo=BASE_URL+'/assets/images/logo.png'
   const userName=ref('');
   const userImage=ref('');

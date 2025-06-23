@@ -38,25 +38,12 @@
     import { sendApi } from '@/utils/api'
     import MediaSlider from '@/components/tooles/media/MediaSlider.vue';
     import CalendarModal from '@/components/tooles/news/CalendarModal.vue';
-    // import { useNotification } from '@kyvg/vue3-notification';
-    // const notif=useNotification() 
-    // const showNotification = () => {
-    //     notif.notify({
-    //         title: 'خبر جدید',
-    //         text: 'اخبار روز محدوده ی خود را با ما دنبال کنید',
-    //         type: 'info'
-    //     });
-    // };
-    // showNotification();
-    // const props = defineProps({
-    //     filters: Object,
-    // })
     const showModal = ref(false)
     const selectedNewsId = ref(null)
     const isLoaded = ref(false)
     const hasRule = ref(false)
     const cards = ref([])
-    onMounted(async () => {
+    async function getNews() {
         const news = await sendApi({action: 'get_news',control:'news'});
         if(news.status==="success") {
             if(news.data.length>0){
@@ -78,7 +65,7 @@
         } else {
             console.warn('دریافت دسته‌بندی‌ها ناموفق بود:', news)
         }
-    })
+    }
     function openCalendarModal(id) {
         selectedNewsId.value = id
         showModal.value = true
@@ -96,11 +83,14 @@
         });
         if (response.status === 'success') {
             showModal.value = false;
-            console.log('ثبت با موفقیت انجام شد');
+            getNews();
         } else {
             alert('خطا در ثبت تاریخ اجرا');
         }
     }
+    onMounted(()=>{
+        getNews()
+    })
 </script>
 <style scoped>
     .card-inner{

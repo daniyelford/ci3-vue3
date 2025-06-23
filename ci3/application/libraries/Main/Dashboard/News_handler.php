@@ -72,7 +72,9 @@ class News_handler
     private function set_data(){
         if(!empty($this->news))
             foreach ($this->news as $a) {
-                if(!empty($a) && !empty($a['id'])){
+                if(!empty($a) && !empty($a['id']) && 
+                !empty($a['user_account_id']) && intval($a['user_account_id'])>0 && 
+                intval($a['user_account_id'])!==intval($this->user->get_user_account_id())){
                     $arr=[];
                     $arr['id']=$a['id']??'';
                     $arr['created_at']=$a['created_at']??'';
@@ -88,13 +90,18 @@ class News_handler
             log_message('error', 'No news found for public.');
     }
     public function get_news(){
-        $this->get_data();
-        $this->set_data();
-        return ['status'=>'success','data'=>array_reverse($this->result),'rule'=>$this->has_category_id()];
+        if(!empty($this->user->get_user_account_id()) && intval($this->user->get_user_account_id())>0){
+            $this->get_data();
+            $this->set_data();
+            return ['status'=>'success','data'=>array_reverse($this->result),'rule'=>$this->has_category_id()];
+        }
+        return ['status'=>'error'];
     }
     public function add_news_to_list($data){
         if(!empty($data) && !empty($data['type']) &&
         !empty($data['news_id']) && intval($data['news_id'])>0 &&
+        ($a=$this->CI->News_model->select_news_where_id(intval($data['news_id'])))!==false &&
+        !empty($a) && !empty(end($a)) && 
         $this->has_category_id() && 
         intval($this->user->get_user_account_id())>0 &&
         $this->CI->Report_model->add_report([
@@ -102,13 +109,23 @@ class News_handler
             'user_account_id'=>intval($this->user->get_user_account_id()),
             'type'=>$data['type'],
             'run_time'=>$data['run_time']??null,
-        ]) && $this->CI->News_model->seen_weher_id(intval($data['news_id'])))
+        ]) && $this->CI->News_model->seen_weher_id(intval($data['news_id']))){
+            if(!empty(end($a)['user_account_id']) && intval(end($a)['user_account_id'])>0){
+                $this->user->add_notification(
+                    intval(end($a)['user_account_id']),
+                    'بررسی خبر',
+                    'خبری که شما در سیستم قرار دادید در حال بررسی می باشد',
+                    'news'
+                );
+            }
+            $this->user->add_notification(
+                intval($this->user->get_user_account_id()),
+                'بررسی جدید',
+                'شما یک خبر جدید را به لیست خود اضافه کردید',
+                'news'
+            );
             return ['status'=>'success'];
-        return ['status'=>'error','data'=>[
-            'news_id'=>intval($data['news_id']),
-            'user_account_id'=>intval($this->user->get_user_account_id()),
-            'type'=>$data['type'],
-            'run_time'=>$data['run_time']??null,
-        ]];    
+        }
+        return ['status'=>'error'];    
     }
 }
