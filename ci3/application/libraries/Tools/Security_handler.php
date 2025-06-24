@@ -12,6 +12,7 @@ class Security_handler
         'finger_login_challenge',
         'login_code'=>['code','phone'],
         'category_id',
+        'user_city',
         'rule'
     ];
     public function __construct(){

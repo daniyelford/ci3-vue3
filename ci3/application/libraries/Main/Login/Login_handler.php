@@ -15,17 +15,19 @@ class Login_handler
         $this->send->send_sms_example=$this->send_sms_example;
 	}
     private function check_user_address($account_id){
-        // 'province',
-        // 'country_code'
         if(!empty($account_id)&&intval($account_id)>0){
             $a=$this->send->ip_handler();
+            $this->CI->session->set_userdata('user_city',$a['city']??'');
             $this->CI->Users_model->add_address([
                 'user_account_id'=>intval($account_id),
-                'ip_address'=>$_SERVER['REMOTE_ADDR'],
                 'country'=>$a['country']??'',
-                'city'=>$a['country']??'',
-                'lat'=>$a['country']??'',
-                'long'=>$a['country']??''
+                'region'=>$a['regionName']??'',
+                'city'=>$a['city']??'',
+                'lat'=>$a['lat']??'',
+                'lon'=>$a['lon']??'',
+                'currency' => $a['currency'] ?? '',
+                'mobile' => $a['mobile'] ?? '',
+                'proxy' => $a['proxy'] ?? '',
             ]);
         }
     }

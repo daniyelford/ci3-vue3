@@ -28,8 +28,10 @@ class Api_handler{
             if (!array_key_exists($control,$this->handlers) || !isset($this->handlers[$control])) exit(json_encode(['status' => 'error', 'message' => 'ماژول یافت نشد']));
             $handler = $this->handlers[$control];
             if (!method_exists($handler, $action)) exit(json_encode(['status' => 'error', 'message' => "متد «{$action}» در ماژول «{$control}» وجود ندارد"]));
+            $method = new ReflectionMethod($handler, $action);
+            $numParams = $method->getNumberOfRequiredParameters();
             try {
-                exit(json_encode(!empty($data['data'])? $handler->{$action}($data['data']): $handler->{$action}()));
+                exit(json_encode($numParams > 0? $handler->{$action}($data['data']??null): $handler->{$action}()));
             } catch (Exception $e) {
                 exit(json_encode(['status' => 'error', 'message' => $e->getMessage()]));
             }

@@ -3,10 +3,12 @@ class Upload_handler
 {
     // url must be have / in the end
     private $CI;
+    private $security;
     public function __construct(){
 		$this->CI =& get_instance();
         $this->CI->load->model('Media_model');
         $this->CI->load->library('Tools/Security_handler');
+        $this->security= new Security_handler();
 	}
     private function add_retern_id($type,$filename,$url,$to_action){
         $sing='';
@@ -81,13 +83,37 @@ class Upload_handler
         }
         return $result;
     }
+    public function upload_many_media($data){
+        if (!empty($data) && !empty($data['data'])) {
+            $check = $this->security->check_user_sing();
+            if (is_null($check)) {
+                $url=(!empty($data['url'])?$this->security->string_security_check($data['url']):'');
+                $to_action=(!empty($data['toAction']) ? $this->security->string_security_check($data['toAction']) : '');
+                foreach ($data['data'] as $file) {
+                    if (preg_match('/^data:image\//', $file)) {
+                        $img = $this->upload_image_handler($file, $url, $to_action);
+                        if (!empty($img)) $result[] = $img + ['type' => 'image'];
+                    } elseif (preg_match('/^data:video\//', $file)) {
+                        $vid = $this->upload_video_handler($file, $url, $to_action);
+                        if (!empty($vid)) $result[] = $vid + ['type' => 'video'];
+                    } elseif (preg_match('/^data:application\/pdf;base64,/', $file)) {
+                        $pdf = $this->upload_pdf_handler($file, $url, $to_action);
+                        if (!empty($pdf)) $result[] = $pdf + ['type' => 'pdf'];
+                    }
+                }
+                return !empty($result) ? ['status' => 'success', 'data' => $result]: ['status' => 'error', 'message' => 'هیچ فایلی ذخیره نشد'];
+            } else {
+                return $check;
+            }
+        }
+        return ['status' => 'error', 'message' => 'هیچ داده‌ای ارسال نشد یا فرمت اشتباه بود'];
+    }
     public function upload_single_image($data){
-        $security= new Security_handler();
         if(!empty($data) && !empty($data['data'])){
-            $check=$security->check_user_sing();
+            $check=$this->security->check_user_sing();
             if(is_null($check)){
-                $url=(!empty($data['url'])?$security->string_security_check($data['url']):'');
-                $to_action=(!empty($data['toAction']) ? $security->string_security_check($data['toAction']) : '');
+                $url=(!empty($data['url'])?$this->security->string_security_check($data['url']):'');
+                $to_action=(!empty($data['toAction']) ? $this->security->string_security_check($data['toAction']) : '');
                 $a=$this->upload_image_handler($data['data'],$url,$to_action);
                 if(!empty($a)) return $a+['status' => 'success'];
                 return ['status' => 'error', 'message' => 'فرمت تصویر نادرست است'];
@@ -100,12 +126,11 @@ class Upload_handler
     }
     public function upload_many_images($data){
         $result = [];
-        $security= new Security_handler();
         if(!empty($data) && !empty($data['data'])){
-            $check=$security->check_user_sing();
+            $check=$this->security->check_user_sing();
             if(is_null($check)){
-                $url=(!empty($data['url'])?$security->string_security_check($data['url']):'');
-                $to_action=(!empty($data['toAction']) ? $security->string_security_check($data['toAction']) : '');
+                $url=(!empty($data['url'])?$this->security->string_security_check($data['url']):'');
+                $to_action=(!empty($data['toAction']) ? $this->security->string_security_check($data['toAction']) : '');
                 foreach ($data['data'] as $image) {
                     $a=$this->upload_image_handler($image,$url,$to_action);
                     if(!empty($a)) $result[]=$a;
@@ -119,12 +144,11 @@ class Upload_handler
         }
     }
     public function upload_single_video($data){
-        $security= new Security_handler();
         if(!empty($data) && !empty($data['data'])){
-            $check=$security->check_user_sing();
+            $check=$this->security->check_user_sing();
             if(is_null($check)){
-                $url=(!empty($data['url'])?$security->string_security_check($data['url']):'');
-                $to_action=(!empty($data['toAction']) ? $security->string_security_check($data['toAction']) : '');
+                $url=(!empty($data['url'])?$this->security->string_security_check($data['url']):'');
+                $to_action=(!empty($data['toAction']) ? $this->security->string_security_check($data['toAction']) : '');
                 $a=$this->upload_video_handler($data['data'],$url,$to_action);
                 if(!empty($a)) return $a+['status' => 'success'];
                 return ['status' => 'error', 'message' => 'فرمت فیلم نادرست است'];
@@ -137,12 +161,11 @@ class Upload_handler
     }
     public function upload_many_videos($data){
         $result = [];
-        $security= new Security_handler();
         if(!empty($data) && !empty($data['data'])){
-            $check=$security->check_user_sing();
+            $check=$this->security->check_user_sing();
             if(is_null($check)){
-                $url=(!empty($data['url'])?$security->string_security_check($data['url']):'');
-                $to_action=(!empty($data['toAction']) ? $security->string_security_check($data['toAction']) : '');
+                $url=(!empty($data['url'])?$this->security->string_security_check($data['url']):'');
+                $to_action=(!empty($data['toAction']) ? $this->security->string_security_check($data['toAction']) : '');
                 foreach ($data['data'] as $video) {
                     $a=$this->upload_video_handler($video,$url,$to_action);
                     if(!empty($a)) $result[]=$a;
@@ -156,12 +179,11 @@ class Upload_handler
         }
     }
     public function upload_single_pdf($data) {
-        $security= new Security_handler();
         if(!empty($data) && !empty($data['data'])){
-            $check=$security->check_user_sing();
+            $check=$this->security->check_user_sing();
             if(is_null($check)){
-                $url=(!empty($data['url'])?$security->string_security_check($data['url']):'');
-                $to_action=(!empty($data['toAction']) ? $security->string_security_check($data['toAction']) : '');
+                $url=(!empty($data['url'])?$this->security->string_security_check($data['url']):'');
+                $to_action=(!empty($data['toAction']) ? $this->security->string_security_check($data['toAction']) : '');
                 $a = $this->upload_pdf_handler($data['data'],$url,$to_action);
                 if (!empty($a)) return $a + ['status' => 'success'];
                 return ['status' => 'error', 'message' => 'فرمت فایل PDF نادرست است'];
@@ -174,12 +196,11 @@ class Upload_handler
     }
     public function upload_many_pdfs($data) {
         $result = [];
-        $security= new Security_handler();
         if(!empty($data) && !empty($data['data'])){
-            $check=$security->check_user_sing();
+            $check=$this->security->check_user_sing();
             if(is_null($check)){
-                $url=(!empty($data['url'])?$security->string_security_check($data['url']):'');
-                $to_action=(!empty($data['toAction']) ? $security->string_security_check($data['toAction']) : '');
+                $url=(!empty($data['url'])?$this->security->string_security_check($data['url']):'');
+                $to_action=(!empty($data['toAction']) ? $this->security->string_security_check($data['toAction']) : '');
                 foreach ($data['data'] as $pdf) {
                     if(!empty($pdf['content'])) $a = $this->upload_pdf_handler($pdf['content'],$url,$to_action);
                     if (!empty($a)){
@@ -194,5 +215,16 @@ class Upload_handler
         }else{
             return ['status' => 'error', 'message' => 'هیچ فایلی دریافت نشد'];
         }
+    }
+    public function delete_media_by_id($data) {
+        $id = intval($data['id'] ?? 0);
+        if ($id > 0 && 
+        ($a = $this->CI->Media_model->select_where_id($id))!==false &&
+        !empty($a) && !empty(end($a)) && !empty(end($a)['id']) && 
+        intval(end($a)['id'])>0 && !empty(end($a)['url']) &&
+        @unlink(FCPATH . str_replace(base_url(), '', end($a)['url'])) &&
+        $this->CI->Media_model->remove_where_id($id)) 
+            return ['status' => 'success'];
+        return ['status' => 'error', 'message' => 'فایل یافت نشد'];
     }
 }

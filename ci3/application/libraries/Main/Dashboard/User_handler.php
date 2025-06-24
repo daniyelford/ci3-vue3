@@ -8,6 +8,12 @@ class User_handler
         $this->CI->load->model('Media_model');
         $this->CI->load->model('Notification_model');
 	}
+    public function get_user_location(){
+        return ($this->CI->session->has_userdata('user_city') && 
+        !empty($this->CI->session->userdata('user_city'))?
+            intval($this->CI->session->userdata('user_city')): 
+            null);
+    }
     public function get_user_category_id(){
         return ($this->CI->session->has_userdata('category_id') && 
         !empty($this->CI->session->userdata('category_id')) && 
@@ -60,13 +66,8 @@ class User_handler
         return ['status'=>'error',];
     }
     public function get_notifications(){
-        if(($a=$this->get_user_account_id())!==false && !empty($a) && intval($a)>0)
-            return ['status' => 'success', 'data' => $this->CI->Notification_model->get_unread_by_user_account_id(intval($a))];
-        return ['status'=>'error'];
-    }
-    public function get_notifications_counts(){
-        if(($a=$this->get_user_account_id())!==false && !empty($a) && intval($a)>0)
-            return ['status' => 'success', 'data' => count($this->CI->Notification_model->get_unread_by_user_account_id(intval($a)))];
+        if($this->get_user_account_id() && ($a=$this->CI->Notification_model->get_unread_by_user_account_id($this->get_user_account_id()))!==false)
+            return ['status'=>'success','data'=>(!empty($a)?$a:[]),'counts'=>count($a)];
         return ['status'=>'error'];
     }
     public function read_notifications($id){
@@ -83,5 +84,8 @@ class User_handler
             'body'  => $body,
             'type'  => $type,
         ]));
+    }
+    public function get_all_user_address(){
+        return ($this->get_user_account_id()?$this->CI->Users_model->select_address_where_user_account_id($this->get_user_account_id()):null);
     }
 }

@@ -36,7 +36,10 @@ class Users_model extends CI_Model
     public function select_address_where_news(){
 	    return $this->select_where_array_table($this->address,['status'=>'news']);
 	}
-	public function select_where_id($id){
+	public function select_address_where_user_account_id($id){
+	    return (!empty($id) && intval($id)?$this->select_where_array_table($this->address,['user_account_id '=>intval($id)]):false);
+	}
+    public function select_where_id($id){
 	    return (!empty($id) && intval($id)?$this->select_where_array_table($this->tbl,['id'=>intval($id)]):false);
 	}
     public function select_mobile_where_id($id){

@@ -25,6 +25,7 @@
   }
   .nav-top{
     height: 60px;
+    z-index: 9;
     top: 0;
   }
   .content{

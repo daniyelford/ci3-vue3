@@ -20,6 +20,8 @@
     "@capacitor/ios": "^7.4.0",
     "core-js": "^3.8.3",
     "moment-jalaali": "^0.10.4",
+    "pinia": "^3.0.3",
+    "pinia-plugin-persistedstate": "^4.3.0",
     "vue": "^3.2.13",
     "vue-router": "^4.0.3",
     "vue3-persian-datetime-picker": "^1.2.2"

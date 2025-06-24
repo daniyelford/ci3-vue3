@@ -1,18 +1,8 @@
 <template>
     <div class="modal-mask" @click.self="close">
         <div class="modal-container">
-            <h3>انتخاب نوع اجرا</h3>
-            <div class="radio-group">
-                <label>
-                    <input type="radio" value="force" v-model="type" />
-                    فوری
-                </label>
-                <label>
-                    <input type="radio" value="normal" v-model="type" />
-                    عادی
-                </label>
-            </div>
-            <div v-if="type === 'normal'" class="calendar-container">
+            <h3>انتخاب زمان اجرا</h3>
+            <div class="calendar-container">
                 <date-picker
                 v-model="selectedDate"
                 format="jYYYY/jMM/jDD"
@@ -32,17 +22,15 @@
     import DatePicker from 'vue3-persian-datetime-picker'
     const emit = defineEmits(['close', 'submit'])
     const selectedDate = ref(null)
-    const type = ref('force')
     function close() {
         emit('close')
     }
     function submit() {
-        if (type.value === 'normal' && !selectedDate.value) {
+        if (!selectedDate.value) {
             alert('لطفاً تاریخ را انتخاب کنید')
             return
         }
         emit('submit', {
-            type: type.value,
             date: selectedDate.value
         })
         close()

@@ -53,20 +53,36 @@ class Send_handler
 	        return false;
 	    }
 	}
-    private function exploder_ip_response($str){
-	    $c=[];
-	    if(!empty($str) && is_string($str) && ( $a=explode('s:',$str) ) !== FALSE && !empty($a))
-	        for ($b=1; $b <= count($a) -1; $b++) {
-	            if(($d=explode(':',$a[$b]))!==false && !empty($d) && is_array($d) && ($e=end($d))!==FALSE && !empty($e) && ($f=str_replace(['"',"'",';','}','{']," ",$e))!==false && !empty($f))
-	                $c[]=$f;
-            }
-	    return (!empty($c) && !empty($c['1']) && !empty($c['3']) && !empty($c['4']) && !empty($c['5'])?['country'=>trim($c['1']),'city'=>trim($c['3']),'lat'=>trim($c['4']),'long'=>trim($c['5'])]:[]);
-	}
     public function weather_finder(){
 	    return (($a=$this->ip_handler())!==false && !empty($a) && !empty($a['lat']) && !empty($a['lon']) && ($b=$this->resive_data_only('https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/'.$a['lat'].','.$a['lon'].'?key='.WEATHER_API))!==false && !empty($b) && ($c=json_decode($b,true))!==false && !empty($c) && !empty($c['days']) && !empty($c['days']['0']) && !empty($c['days']['0']['description']) && !empty($c['days']['0']['temp'])?['temp'=>$c['days']['0']['temp'],'desc'=>$c['days']['0']['description']]:[]);
 	}
+    private function getClientIp() {
+        $ip = $_SERVER['HTTP_CLIENT_IP']
+            ?? $_SERVER['HTTP_X_FORWARDED_FOR']
+            ?? $_SERVER['HTTP_X_FORWARDED']
+            ?? $_SERVER['HTTP_FORWARDED_FOR']
+            ?? $_SERVER['HTTP_FORWARDED']
+            ?? $_SERVER['REMOTE_ADDR']
+            ?? 'UNKNOWN';
+        if (strpos($ip, ',') !== false) {
+            $ip = explode(',', $ip)[0];
+        }
+        return trim($ip);
+    }
     public function ip_handler(){
-        // countryCode,region,regionName,zip
-        return (!empty($a)?$this->exploder_ip_response($this->resive_data_only("http://ip-api.com/php/".$_SERVER['REMOTE_ADDR']."?fields=country,city,lat,lon,timezone")):[]);
+        $response = $this->resive_data_only("http://ip-api.com/php/" . $this->getClientIp() . "?fields=country,regionName,city,lat,lon,currency,mobile,proxy");
+        if (!$response) return [];
+        $data = @unserialize($response);
+        if (!is_array($data)) return [];
+        return [
+            'country' => $data['country'] ?? '',
+            'regionName' => $data['regionName'] ?? '',
+            'city' => $data['city'] ?? '',
+            'lat' => $data['lat'] ?? '',
+            'lon' => $data['lon'] ?? '',
+            'currency' => $data['currency'] ?? '',
+            'mobile' => $data['mobile'] ?? '',
+            'proxy' => $data['proxy'] ?? '',
+        ];
     }
 }

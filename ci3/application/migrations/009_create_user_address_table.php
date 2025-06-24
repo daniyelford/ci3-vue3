@@ -19,11 +19,6 @@ class Migration_Create_user_address_table extends CI_Migration {
                 'unsigned' => TRUE,
                 'null' => TRUE,
             ],
-            'ip_address' => [
-                'type' => 'VARCHAR',
-                'constraint' => 20,
-                'null' => TRUE,
-            ],
             'address' => [
                 'type' => 'TEXT',
                 'null' => TRUE,
@@ -33,22 +28,17 @@ class Migration_Create_user_address_table extends CI_Migration {
                 'constraint' => 20,
                 'null' => TRUE,
             ],
-            'city' => [
-                'type' => 'VARCHAR',
-                'constraint' => 20,
-                'null' => TRUE,
-            ],
-            'province' => [
-                'type' => 'VARCHAR',
-                'constraint' => 20,
-                'null' => TRUE,
-            ],
             'country' => [
                 'type' => 'VARCHAR',
                 'constraint' => 20,
                 'null' => TRUE,
             ],
-            'country_code' => [
+            'region' => [
+                'type' => 'VARCHAR',
+                'constraint' => 20,
+                'null' => TRUE,
+            ],
+            'city' => [
                 'type' => 'VARCHAR',
                 'constraint' => 20,
                 'null' => TRUE,
@@ -58,19 +48,46 @@ class Migration_Create_user_address_table extends CI_Migration {
                 'constraint' => '10,7',
                 'null' => TRUE,
             ],
-            'long' => [
+            'lon' => [
                 'type' => 'DECIMAL',
                 'constraint' => '10,7',
                 'null' => TRUE,
+            ],
+            'currency' => [
+                'type' => 'VARCHAR',
+                'constraint' => 50,
+                'null' => TRUE,
+            ],
+            'mobile' => [
+                'type' => 'TINYINT',
+                'constraint' => 1,
+                'default' => 0,
+                'null' => FALSE,
+            ],
+            'proxy' => [
+                'type' => 'TINYINT',
+                'constraint' => 1,
+                'default' => 0,
+                'null' => FALSE,
             ],
             'status' => [
                 'type' => 'ENUM("login", "news")',
                 'default' => 'login',
                 'null' => FALSE,
             ],
+            'created_at' => [
+                'type' => 'DATETIME',
+                'null' => TRUE,
+            ],
+            'updated_at' => [
+                'type' => 'DATETIME',
+                'null' => TRUE,
+            ],
         ]);
         $this->dbforge->add_key('id', TRUE);
         $this->dbforge->create_table('user_address');
+        $this->db->query("ALTER TABLE user_address MODIFY created_at DATETIME DEFAULT CURRENT_TIMESTAMP");
+        $this->db->query("ALTER TABLE user_address MODIFY updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP");
         $this->db->query('ALTER TABLE user_address ADD CONSTRAINT fk_user_address_user_account FOREIGN KEY (user_account_id) REFERENCES user_account(id) ON DELETE SET NULL ON UPDATE CASCADE');
     }
 

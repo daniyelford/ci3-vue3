@@ -29,11 +29,6 @@ class Migration_Create_report_list_table extends CI_Migration {
                 'default' => 'checking',
                 'null' => FALSE,
             ],
-            'type'=>[
-                'type' => 'ENUM("force", "normal")',
-                'default' => 'force',
-                'null' => FALSE,
-            ],
             'run_time' => [
                 'type' => 'DATETIME',
                 'null' => TRUE,

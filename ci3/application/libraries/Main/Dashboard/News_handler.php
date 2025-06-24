@@ -75,13 +75,14 @@ class News_handler
                 if(!empty($a) && !empty($a['id']) && 
                 !empty($a['user_account_id']) && intval($a['user_account_id'])>0 && 
                 intval($a['user_account_id'])!==intval($this->user->get_user_account_id())){
+                    $location=$this->search_id_return_value_in_key($this->address,$a['user_address_id']??0,['city','lat','lon']);
                     $arr=[];
                     $arr['id']=$a['id']??'';
                     $arr['created_at']=$a['created_at']??'';
-                    $arr['type']=$a['type']??'';
                     $arr['description']=$a['description']??'';
                     $arr['category']=$this->search_id_return_value_in_key($this->category,$a['category_id']??0,'title');
-                    $arr['location']=$this->search_id_return_value_in_key($this->address,$a['user_address_id']??0,'city');
+                    $arr['location']=$location['city']??'';
+                    $arr['total_location']=$location??[];
                     $arr['media']=$this->medias_finder($a['media_id']??'');
                     $this->result[]=$arr;
                 }
@@ -89,16 +90,46 @@ class News_handler
         else
             log_message('error', 'No news found for public.');
     }
+    private static function haversine_distance($lat1, $lon1, $lat2, $lon2) {
+        $earth_radius = 6371;
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLon = deg2rad($lon2 - $lon1);
+        $a = sin($dLat/2) * sin($dLat/2) + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLon/2) * sin($dLon/2);
+        $c = 2 * atan2(sqrt($a), sqrt(1-$a));
+        return $earth_radius * $c;
+    }
+    private function set_data_user_location(){
+        if(($userLocation = $this->user->get_user_location()) !== false && $userLocation && !empty($this->result)){
+            $user_city = $userLocation['city'];
+            $user_lat = $userLocation['lat'];
+            $user_lon = $userLocation['lon'];
+            usort($this->result, function($a, $b) use ($user_city, $user_lat, $user_lon) {
+                $a_city = $a['total_location']['city'] ?? '';
+                $b_city = $b['total_location']['city'] ?? '';
+                $a_lat = $a['total_location']['lat'] ?? 0;
+                $a_lon = $a['total_location']['lon'] ?? 0;
+                $b_lat = $b['total_location']['lat'] ?? 0;
+                $b_lon = $b['total_location']['lon'] ?? 0;
+                $aMatch = ($a_city === $user_city) ? 0 : 1;
+                $bMatch = ($b_city === $user_city) ? 0 : 1;
+                if ($aMatch !== $bMatch) return $aMatch - $bMatch;
+                $distanceA = $this->haversine_distance($user_lat, $user_lon, $a_lat, $a_lon);
+                $distanceB = $this->haversine_distance($user_lat, $user_lon, $b_lat, $b_lon);
+                return $distanceA <=> $distanceB;
+            });
+        }
+    }
     public function get_news(){
         if(!empty($this->user->get_user_account_id()) && intval($this->user->get_user_account_id())>0){
             $this->get_data();
             $this->set_data();
+            $this->set_data_user_location();
             return ['status'=>'success','data'=>array_reverse($this->result),'rule'=>$this->has_category_id()];
         }
         return ['status'=>'error'];
     }
     public function add_news_to_list($data){
-        if(!empty($data) && !empty($data['type']) &&
+        if(!empty($data) &&
         !empty($data['news_id']) && intval($data['news_id'])>0 &&
         ($a=$this->CI->News_model->select_news_where_id(intval($data['news_id'])))!==false &&
         !empty($a) && !empty(end($a)) && 
@@ -107,7 +138,6 @@ class News_handler
         $this->CI->Report_model->add_report([
             'news_id'=>intval($data['news_id']),
             'user_account_id'=>intval($this->user->get_user_account_id()),
-            'type'=>$data['type'],
             'run_time'=>$data['run_time']??null,
         ]) && $this->CI->News_model->seen_weher_id(intval($data['news_id']))){
             if(!empty(end($a)['user_account_id']) && intval(end($a)['user_account_id'])>0){
@@ -127,5 +157,23 @@ class News_handler
             return ['status'=>'success'];
         }
         return ['status'=>'error'];    
+    }
+    public function use_category(){
+        $this->get_all_category_active();
+        if($this->has_category_id()){
+            return ['status'=>'success','rule'=>true,'data'=>$this->search_id_return_value_in_key($this->category,intval($this->user->get_user_category_id()),['id','title'])];
+        }
+        return ['status'=>'success','rule'=>false,'data'=>$this->category];
+    }
+    public function user_address(){
+        if($this->user->get_user_account_id()){
+            $data=$this->user->get_all_user_address();
+            $data=end($data);
+            return ['status'=>'success','data'=>(!empty($data)?$data:'')];
+        }
+        return ['status'=>'error'];
+    }
+    public function add_news(){
+
     }
 }

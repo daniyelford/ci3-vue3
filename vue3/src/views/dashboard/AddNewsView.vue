@@ -26,6 +26,7 @@
     .nav-top{
         height: 60px;
         top: 0;
+        z-index: 9;
     }
     .content{
         top: 60px;

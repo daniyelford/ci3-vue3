@@ -1,26 +1,13 @@
-<template>
-    <div class="notification-wrapper">
-        <div class="icon-wrapper" @click="toggleList">
-            🔔
-            <span class="badge" v-if="unreadCount > 0">{{ unreadCount }}</span>
-        </div>
-        <div class="dropdown" v-if="showList">
-            <NotificationList @read="updateCount" />
-        </div>
-        <audio ref="notifSound" :src="song" preload="auto"></audio>
-    </div>
-</template>
 <script setup>
     import { ref, onMounted } from 'vue'
     import NotificationList from '@/components/tooles/nav/NotificationList.vue'
-    import { sendApi } from '@/utils/api'
-    import { BASE_URL } from '@/config';
-    const logo = BASE_URL+'/assets/images/logo.png'
-    const song = BASE_URL+'/assets/song/notif.mp3'
+    import { BASE_URL } from '@/config'
+    import { useNotificationStore } from '@/stores/notification'
+    const logo = BASE_URL + '/assets/images/logo.png'
+    const song = BASE_URL + '/assets/song/notif.mp3'
     const showList = ref(false)
-    const unreadCount = ref(0)
-    const lastNotificationId = ref(0)
     const notifSound = ref(null)
+    const store = useNotificationStore()
     function toggleList() {
         showList.value = !showList.value
     }
@@ -39,47 +26,45 @@
             }
         }
     }
-    async function fetchUnreadCount() {
-        const res = await sendApi({ action: 'get_notifications_counts', control: 'user' })
-        if (res.status === 'success') {
-            unreadCount.value = res.data
-        }
-    }
     async function pollNotifications() {
-        const res = await sendApi({ action: 'get_notifications', control: 'user' })
-        if (res.status === 'success' && Array.isArray(res.data)) {
-            for (const notif of res.data) {
-                if (notif.id > lastNotificationId.value) {
-                    lastNotificationId.value = notif.id
-                    playSound()
-                    showNativeNotification(notif.title, notif.body)
-                    fetchUnreadCount()
-                }
+        const prevLastId = store.lastId
+        await store.fetchNotifications()
+        for (const notif of store.notifications) {
+            if (notif.id > prevLastId) {
+            store.lastId = notif.id
+                playSound()
+                showNativeNotification(notif.title, notif.body)
             }
         }
-    }
-    function updateCount() {
-        fetchUnreadCount()
     }
     onMounted(() => {
         if (Notification.permission === 'default') {
             Notification.requestPermission()
         }
-        fetchUnreadCount()
         pollNotifications()
-        setInterval(fetchUnreadCount, 30000)
         setInterval(pollNotifications, 10000)
     })
 </script>
+<template>
+  <div>
+    <div class="icon-wrapper" @click="toggleList">
+      🔔
+      <span class="badge" v-if="store.unreadCount > 0">
+        {{ store.unreadCount }}
+      </span>
+    </div>
+    <div class="dropdown" v-if="showList">
+      <NotificationList
+        :notifications="store.notifications"
+        @update="store.markAsRead"
+      />
+    </div>
+    <audio ref="notifSound" :src="song" preload="auto"></audio>
+  </div>
+</template>
 <style scoped>
-    .notification-wrapper {
-        position: relative;
-        display: inline-block;
-    }
     .icon-wrapper {
-        position: relative;
         font-size: 24px;
-        cursor: pointer;
     }
     .badge {
         position: absolute;
@@ -92,13 +77,12 @@
         font-size: 12px;
     }
     .dropdown {
-        position: absolute;
-        top: 35px;
-        right: 0;
+        position: fixed;
+        top: 60px;
+        left: 0;
         width: 300px;
         background: white;
         border-radius: 10px;
         box-shadow: 0 0 5px rgba(0,0,0,0.2);
-        z-index: 10;
     }
 </style>

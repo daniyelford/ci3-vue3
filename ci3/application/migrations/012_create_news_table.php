@@ -47,11 +47,6 @@ class Migration_Create_news_table extends CI_Migration {
                 'default' => 'checking',
                 'null' => FALSE,
             ],
-            'type'=>[
-                'type' => 'ENUM("force", "normal")',
-                'default' => 'normal',
-                'null' => FALSE,
-            ],
             'created_at' => [
                 'type' => 'DATETIME',
                 'null' => TRUE,

@@ -1,28 +1,25 @@
 <template>
-    <div class="loading" v-if="!isLoaded">
+    <div class="loading" v-if="!newsStore.isLoaded">
         در حال بارگذاری...
     </div>
-    <div class="card-inner" v-else-if="cards.length>0">
-        <div v-for="card in cards" :key="card.id" class="card">
+    <div class="card-inner" v-else-if="newsStore.cards.length > 0">
+        <div v-for="card in newsStore.cards" :key="card.id" class="card">
             <div class="card-header">
-                <div class="location" v-if="card.location!==''">
+                <div class="location" v-if="card.location !== ''">
                     {{ card.location }}
-                </div>
-                <div class="type" v-if="card.type ==='force'">
-                    فوری
                 </div>
                 <div class="card-category">
                     {{ card.category }}
                 </div>
             </div>
-            <MediaSlider v-if="card.medias.length>0" :medias="card.medias" />
-            <div class="description" v-if="card.description!==''">
+            <MediaSlider v-if="card.medias.length > 0" :medias="card.medias" />
+            <div class="description" v-if="card.description !== ''">
                 {{ card.description }}
             </div>
             <div class="time">
                 {{ moment(card.created_at).format('jYYYY/jMM/jDD') }}
             </div>
-            <a class="choose" v-if="hasRule" @click="openCalendarModal(card.id)">
+            <a class="choose" v-if="newsStore.hasRule" @click="openCalendarModal(card.id)">
                 بررسی
             </a>
         </div>
@@ -30,70 +27,53 @@
     <div class="none-cart-error" v-else>
         خبری در محدوده شما وجود ندارد
     </div>
-    <CalendarModal v-if="showModal" @close="showModal = false" @submit="onCalendarSubmit"/>
+    <CalendarModal
+    v-if="showModal"
+    @close="showModal = false"
+    @submit="onCalendarSubmit" />
 </template>
 <script setup>
-    import { ref,onMounted } from 'vue'
+    import { ref, onMounted , onBeforeUnmount } from 'vue'
     import moment from 'moment-jalaali'
     import { sendApi } from '@/utils/api'
-    import MediaSlider from '@/components/tooles/media/MediaSlider.vue';
-    import CalendarModal from '@/components/tooles/news/CalendarModal.vue';
+    import MediaSlider from '@/components/tooles/media/MediaSlider.vue'
+    import CalendarModal from '@/components/tooles/news/CalendarModal.vue'
+    import { useNewsStore } from '@/stores/news'
     const showModal = ref(false)
     const selectedNewsId = ref(null)
-    const isLoaded = ref(false)
-    const hasRule = ref(false)
-    const cards = ref([])
-    async function getNews() {
-        const news = await sendApi({action: 'get_news',control:'news'});
-        if(news.status==="success") {
-            if(news.data.length>0){
-                cards.value = news.data.map(cat => ({
-                    id: cat.id,
-                    location: cat.location,
-                    category: cat.category??'کلی',
-                    description: cat.description,
-                    created_at: cat.created_at,
-                    type: cat.type,
-                    medias: cat.media.map(media=>({
-                        type:media.type,
-                        url:media.url
-                    })),
-                }))
-            }
-            isLoaded.value=true
-            if(news.rule) hasRule.value=true
-        } else {
-            console.warn('دریافت دسته‌بندی‌ها ناموفق بود:', news)
-        }
-    }
+    const newsStore = useNewsStore()
     function openCalendarModal(id) {
         selectedNewsId.value = id
         showModal.value = true
     }
-    async function onCalendarSubmit({ type, date }) {
-        const jsDate = date? moment(date, 'jYYYY/jMM/jDD').toDate(): null;
+    async function onCalendarSubmit({ date }) {
+        const jsDate = date ? moment(date, 'jYYYY/jMM/jDD').toDate() : null
         const response = await sendApi({
             action: 'add_news_to_list',
             control: 'news',
             data: {
-                news_id: selectedNewsId.value,
-                type: type,
-                run_time: jsDate ?? null,
+            news_id: selectedNewsId.value,
+            run_time: jsDate ?? null,
             }
-        });
+        })
         if (response.status === 'success') {
-            showModal.value = false;
-            getNews();
+            showModal.value = false
+            newsStore.fetchNews()
         } else {
-            alert('خطا در ثبت تاریخ اجرا');
+            alert('خطا در ثبت تاریخ اجرا')
         }
     }
-    onMounted(()=>{
-        getNews()
+    let intervalId = null
+    onMounted(() => {
+        newsStore.fetchNews()
+        intervalId = setInterval(() => {
+            newsStore.fetchNews()
+        }, 6000)
     })
+    onBeforeUnmount(() => {if (intervalId) clearInterval(intervalId)})
 </script>
 <style scoped>
-    .card-inner{
+    .card-inner {
         width: 100%;
         height: 100%;
         display: flex;
@@ -103,23 +83,24 @@
         justify-content: center;
         align-items: stretch;
     }
-    .card{
+    .card {
         width: 49%;
         min-height: 300px;
         margin: 0 0.5% 10px 0.5%;
         border-radius: 10px;
         box-shadow: 0 0 5px grey;
     }
-    .media{
+    .media {
         height: 150px;
         width: auto;
         margin: auto;
     }
-    .media img,.media video{
+    .media img,
+    .media video {
         width: 100%;
         height: 100%;
     }
-    .card-header{
+    .card-header {
         display: flex;
         flex-direction: row-reverse;
         flex-wrap: nowrap;
@@ -136,11 +117,11 @@
         text-align: center;
         white-space: nowrap;
     }
-    .time{
+    .time {
         font-size: 10px;
         padding-left: 10px;
     }
-    .choose{
+    .choose {
         width: 95%;
         height: 30px;
         background: blue;
@@ -151,11 +132,8 @@
         display: block;
         padding-top: 10px;
     }
-    /* .media video{ */
-        /* max-width: 400px; max-height: 300px; margin: 0.5rem; */
-    /* } */
-    @media screen and (max-width:600px){
-        .card{
+    @media screen and (max-width: 600px) {
+        .card {
             width: 99%;
         }
     }

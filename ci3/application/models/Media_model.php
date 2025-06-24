@@ -40,7 +40,10 @@ class Media_model extends CI_Model
     public function edit_weher_id($arr,$id){
         return (!empty($id) && intval($id)>0 && !empty($arr) && is_array($arr) && $this->edit_table($this->tbl,$arr,['id'=>intval($id)]));
     }
+    public function remove_where_id($id){
+	    return (!empty($id) && intval($id) && $this->remove_where_array_in_table($this->tbl,['id'=>intval($id)]));
+	}
 	public function remove_file($str){
-	    return (!empty($str) && is_string($str) && unlink($str));
+	    return (!empty($str) && is_string($str) && @unlink($str));
 	}
 }
