@@ -25,7 +25,7 @@
   import RadioGroup from '@/components/tooles/news/address/RadioGroup.vue'
   import MapPicker from '@/components/tooles/news/address/MapPicker.vue'
   import { fullAddress } from '@/utils/geo'
-  const emit = defineEmits(['update'])
+  const emit = defineEmits(['update','loading'])
   const props = defineProps({
     loginCity: String,
     modelValue: Object,
@@ -60,6 +60,9 @@
       value = { type: 'location', value: location.value }
     }
     emit('update', value)
+  })
+  watch(loading, () => {
+    emit('loading', loading.value)
   })
 </script>
 

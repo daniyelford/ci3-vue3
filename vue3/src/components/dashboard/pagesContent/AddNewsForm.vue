@@ -32,13 +32,14 @@
       :loginCity="address"
       :model-value="form.user_address"
       @update="val => form.user_address = val"
+      @loading="isAddressLoading = $event"
     />
-    <button type="submit">ثبت خبر</button>
+    <button type="submit" :disabled="isSubmitDisabled">ثبت خبر</button>
   </form>
 </template>
 
 <script setup>
-    import { ref, onMounted } from 'vue'
+    import { ref, onMounted, computed } from 'vue'
     import { sendApi } from '@/utils/api'
     import UploaderManyMedia from '@/components/tooles/upload/UploaderManyMedia.vue'
     import Multiselect from 'vue-multiselect'
@@ -47,6 +48,7 @@
     const categories = ref([])
     const address = ref('')
     const rule = ref(false)
+    const isAddressLoading = ref(false)
     const form = ref({
         category_id: [],
         user_address: { type: 'city', value: '' },
@@ -67,6 +69,12 @@
             }
             address.value = data.address
         }
+    })
+    const isSubmitDisabled = computed(() => {
+      const isDescriptionEmpty = !form.value.description.trim()
+      const isCategoryInvalid = !rule.value && (!form.value.category_id || form.value.category_id.length === 0)
+      const isAddressInvalid = !form.value.user_address || !form.value.user_address.value
+      return isAddressLoading.value || isDescriptionEmpty || isCategoryInvalid || isAddressInvalid
     })
     const submitForm = async () => {
         const finalData = {
@@ -91,20 +99,28 @@
 </script>
 
 <style scoped>
-    form input,
-    form select,
-    form textarea {
-        width: 100%;
-        padding: 0.5rem;
-        margin-top: 0.25rem;
-    }
-    button {
-        padding: 0.5rem 1rem;
-        background-color: #10b981;
-        color: white;
-        border: none;
-        border-radius: 0.375rem;
-        cursor: pointer;
-        margin-top: 0.5rem;
-    }
+  form input,
+  form select,
+  form textarea {
+      width: 100%;
+      padding: 0.5rem;
+      margin-top: 0.25rem;
+  }
+  button {
+    padding: 0.5rem 1rem;
+    background-color: #10b981;
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+  }
+
+  button:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
 </style>
