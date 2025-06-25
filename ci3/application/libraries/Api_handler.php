@@ -7,14 +7,12 @@ class Api_handler{
 		$this->CI =& get_instance();
         $this->CI->load->library('Tools/Upload_handler');
         $this->CI->load->library('Tools/Security_handler');
-        $this->CI->load->library('Tools/Table_data_handler');
         $this->CI->load->library('Main/Login/Login_handler');
         $this->CI->load->library('Main/Dashboard/User_handler');
         $this->CI->load->library('Main/Dashboard/News_handler');
         $this->handlers = [
             'upload'    => new Upload_handler(),
             'security'  => new Security_handler(),
-            'table'     => new Table_data_handler(),
             'login'     => new Login_handler(),
             'user'      => new User_handler(),
             'news'      => new News_handler(),

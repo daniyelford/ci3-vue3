@@ -1,20 +1,19 @@
 <template>
-  <div class="drop-area" @dragover.prevent @dragenter.prevent @drop.prevent="handleDrop">
+  <div class="drop-area" @click="fileInput.click()" @dragover.prevent @dragenter.prevent @drop.prevent="handleDrop">
     <p>فایل‌ها را بکشید و رها کنید یا کلیک کنید</p>
     <input type="file" multiple ref="fileInput" class="hidden-input" @change="handleFiles" />
-    <button type="button" class="select-button" @click="fileInput.click()">انتخاب فایل</button>
-    <div v-if="uploading" class="uploading-box">
-      <p>در حال آماده‌سازی فایل‌ها برای ارسال...</p>
-      <progress :value="progress" min="0" max="100" class="progress-bar"></progress>
-    </div>
-    <div v-if="mediaList.length > 0" class="preview-box">
-      <p>پیش‌نمایش فایل‌ها:</p>
-      <div class="preview-list">
-        <div v-for="(item, i) in mediaList" :key="item.id || i" class="preview-item">
-          <button @click="deleteMedia(item, i)" class="delete-button">×</button>
-          <img v-if="item.type === 'image'" :src="item.url" class="preview-image" />
-          <video v-else-if="item.type === 'video'" :src="item.url" controls class="preview-video" />
-        </div>
+  </div>
+  <div v-if="uploading" class="uploading-box">
+    <p>در حال آماده‌سازی فایل‌ها برای ارسال...</p>
+    <progress :value="progress" min="0" max="100" class="progress-bar"></progress>
+  </div>
+  <div v-if="mediaList.length > 0" class="preview-box">
+    <p>پیش‌نمایش فایل‌ها:</p>
+    <div class="preview-list">
+      <div v-for="(item, i) in mediaList" :key="item.id || i" class="preview-item">
+        <button @click="deleteMedia(item, i)" class="delete-button">×</button>
+        <img v-if="item.type === 'image'" :src="item.url" class="preview-image" />
+        <video v-else-if="item.type === 'video'" :src="item.url" controls class="preview-video" />
       </div>
     </div>
   </div>
@@ -71,7 +70,6 @@
         },
       })
       if (response.status === 'success') {
-        console.log(response)
         const uploaded = response.data
         mediaList.value.push(...uploaded)
         selectedFilesBase64.value = []

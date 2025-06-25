@@ -3,7 +3,8 @@ in vue3 terminal set
 npm run build
 npm install vue3-persian-datetime-picker
 npm config set registry https://registry.npmmirror.com/
-
+npm install vue-multiselect
+npm install leaflet
 npm install pinia
 npm install @capacitor/core @capacitor/cli
 npx cap init

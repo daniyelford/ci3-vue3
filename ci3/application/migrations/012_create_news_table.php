@@ -20,8 +20,7 @@ class Migration_Create_news_table extends CI_Migration {
                 'null' => TRUE,
             ],
             'category_id' => [
-                'type' => 'INT',
-                'unsigned' => TRUE,
+                'type' => 'TEXT',
                 'null' => TRUE,
             ],
             'user_address_id' => [
@@ -61,7 +60,6 @@ class Migration_Create_news_table extends CI_Migration {
         $this->db->query("ALTER TABLE news MODIFY created_at DATETIME DEFAULT CURRENT_TIMESTAMP");
         $this->db->query("ALTER TABLE news MODIFY updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP");
         $this->db->query('ALTER TABLE news ADD CONSTRAINT fk_news_user_account FOREIGN KEY (user_account_id) REFERENCES user_account(id) ON DELETE SET NULL ON UPDATE CASCADE');
-        $this->db->query('ALTER TABLE news ADD CONSTRAINT fk_news_category FOREIGN KEY (category_id) REFERENCES category(id) ON DELETE SET NULL ON UPDATE CASCADE');
         $this->db->query("ALTER TABLE news ADD CONSTRAINT fk_news_user_address FOREIGN KEY (user_address_id) REFERENCES user_address(id) ON DELETE SET NULL ON UPDATE CASCADE");
     }
 

@@ -16,7 +16,6 @@ async function getToken() {
         isLoggingOut = true;
         localStorage.clear();
         router.push('/');
-        // window.location.replace(`${BASE_URL}/create_token`);
       }
       throw new Error('Unauthorized');
     }else{

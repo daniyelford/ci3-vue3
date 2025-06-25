@@ -11,7 +11,7 @@ class User_handler
     public function get_user_location(){
         return ($this->CI->session->has_userdata('user_city') && 
         !empty($this->CI->session->userdata('user_city'))?
-            intval($this->CI->session->userdata('user_city')): 
+            $this->CI->session->userdata('user_city'):
             null);
     }
     public function get_user_category_id(){

@@ -69,6 +69,15 @@ class News_handler
             }
         return array_reverse($media);
     }
+    private function category_finder($data){
+        $category=[];
+        $category_ids=(!empty($data)?explode(',',$data):[]);
+        if(!empty($category_ids))
+            foreach ($category_ids as $category_id) {
+                if(!empty($category_id) && intval($category_id)>0) $category[]=$this->search_id_return_value_in_key($this->category,intval($category_id),'title');
+            }
+        return implode(',',$category);
+    }
     private function set_data(){
         if(!empty($this->news))
             foreach ($this->news as $a) {
@@ -80,10 +89,10 @@ class News_handler
                     $arr['id']=$a['id']??'';
                     $arr['created_at']=$a['created_at']??'';
                     $arr['description']=$a['description']??'';
-                    $arr['category']=$this->search_id_return_value_in_key($this->category,$a['category_id']??0,'title');
+                    $arr['media']=$this->medias_finder($a['media_id']??'');
+                    $arr['category']=$this->category_finder($a['category_id']??'');
                     $arr['location']=$location['city']??'';
                     $arr['total_location']=$location??[];
-                    $arr['media']=$this->medias_finder($a['media_id']??'');
                     $this->result[]=$arr;
                 }
             }
@@ -158,18 +167,15 @@ class News_handler
         }
         return ['status'=>'error'];    
     }
-    public function use_category(){
+    public function add_data(){
         $this->get_all_category_active();
-        if($this->has_category_id()){
-            return ['status'=>'success','rule'=>true,'data'=>$this->search_id_return_value_in_key($this->category,intval($this->user->get_user_category_id()),['id','title'])];
-        }
-        return ['status'=>'success','rule'=>false,'data'=>$this->category];
-    }
-    public function user_address(){
         if($this->user->get_user_account_id()){
-            $data=$this->user->get_all_user_address();
-            $data=end($data);
-            return ['status'=>'success','data'=>(!empty($data)?$data:'')];
+            return [
+                'status'=>'success',
+                'rule'=>($this->has_category_id()?true:false),
+                'address'=>$this->user->get_user_location(),
+                'category'=>($this->has_category_id()?$this->search_id_return_value_in_key($this->category,intval($this->user->get_user_category_id()),['id','title']):$this->category),
+            ];
         }
         return ['status'=>'error'];
     }

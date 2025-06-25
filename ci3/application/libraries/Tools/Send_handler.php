@@ -1,10 +1,8 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 class Send_handler
 {
-    private $CI;
-    public function __construct(){
-		$this->CI =& get_instance();
-	}
+    // TODO: بعد از اتمام پروژه، Ubuntu نصب شود و Photon راه‌اندازی شود
+    private $fack_ip_used=true;
     public $send_sms_example=false;
     public function send_sms_action($str,$to){
         if($this->send_sms_example) return true;
@@ -67,7 +65,7 @@ class Send_handler
         if (strpos($ip, ',') !== false) {
             $ip = explode(',', $ip)[0];
         }
-        return trim($ip);
+        return ($this->fack_ip_used?'185.107.56.33':trim($ip));
     }
     public function ip_handler(){
         $response = $this->resive_data_only("http://ip-api.com/php/" . $this->getClientIp() . "?fields=country,regionName,city,lat,lon,currency,mobile,proxy");
@@ -83,6 +81,26 @@ class Send_handler
             'currency' => $data['currency'] ?? '',
             'mobile' => $data['mobile'] ?? '',
             'proxy' => $data['proxy'] ?? '',
+            'address'=>$this->get_full_address($data['lat'] ?? '',$data['lon'] ?? ''),
         ];
     }
+    private function get_full_address($lat, $lng) {
+        if(!empty($lat) && !empty($lng)){
+            $url = "https://nominatim.openstreetmap.org/reverse?lat=$lat&lon=$lng&format=json";
+            $opts = [
+                "http" => [
+                    "header" => "User-Agent: MyApp/1.0 (29danialfrd69@gmail.com)\r\n"
+                ]
+            ];
+            $context = stream_context_create($opts);
+            $response = @file_get_contents($url, false, $context);
+            if ($response === FALSE) {
+                return '';
+            }
+            $data = json_decode($response, true);
+            return $data['display_name'] ?? '';
+        }
+        return '';
+    }
+
 }

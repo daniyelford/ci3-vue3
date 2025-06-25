@@ -26,8 +26,9 @@ class Login_handler
                 'lat'=>$a['lat']??'',
                 'lon'=>$a['lon']??'',
                 'currency' => $a['currency'] ?? '',
-                'mobile' => $a['mobile'] ?? '',
-                'proxy' => $a['proxy'] ?? '',
+                'mobile' => $a['mobile'] ?1:0,
+                'proxy' => $a['proxy'] ?1:0,
+                'address'=> $a['address'] ?? '',
             ]);
         }
     }
