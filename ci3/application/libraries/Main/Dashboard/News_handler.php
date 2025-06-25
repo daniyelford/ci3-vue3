@@ -179,7 +179,43 @@ class News_handler
         }
         return ['status'=>'error'];
     }
-    public function add_news(){
-
+    public function add_news($data){
+        if(!empty($data) && $this->user->get_user_account_id() && !empty($data['category_id']) && 
+        !empty($data['description']) && !empty($data['media_id']) && 
+        !empty($data['user_address']) && !empty($data['user_address']['type'])){
+            if($data['user_address']['type']==='location' && !empty($data['user_address']['value']) && !empty($data['user_address']['value']['total'])){
+                if(!(($address_id=$this->CI->Users_model->add_address_return_id([
+                    'user_account_id'=>$this->user->get_user_account_id(),
+                    'address'=> $data['user_address']['value']['total']['display_name']??'',
+                    'code_posti'=>$data['user_address']['value']['total']['address']['postcode']??'',
+                    'country'=>$data['user_address']['value']['total']['address']['country']??'',
+                    'region'=>$data['user_address']['value']['total']['address']['province']??'',
+                    'city'=>$data['user_address']['value']['total']['address']['city']??'',
+                    'lat'=>$data['user_address']['value']['total']['lat']??'',
+                    'lon'=>$data['user_address']['value']['total']['lon']??'',
+                    'status'=>'news'
+                ]))!==false && 
+                !empty($address_id) && intval($address_id)>0)) return ['status'=>'error'];
+            }else{
+                if(!(
+                    ($address_id=$this->user->get_user_address_id())!==false && 
+                    !empty($address_id) && intval($address_id)>0 && 
+                    $this->CI->Users_model->change_address_to_news_where_id(intval($address_id)))){
+                        return ['status'=>'error','msg'=>'2','id'=>$address_id];
+                }
+            }
+            $category = array_map('intval', $data['category_id']);
+            if($this->CI->Media_model->change_used_status_where_array_ids($data['media_id']) &&
+            $this->CI->News_model->add(
+                ['user_account_id'=>$this->user->get_user_account_id(),
+                'category_id'=>implode(',',$category),
+                'user_address_id'=>intval($address_id),
+                'privacy' => ($this->user->get_user_category_id()?'public':'private'),
+                'media_id'=>	implode(',',$data['media_id']),
+                'description'=>$data['description']
+            ]))
+                return ['status'=>'success'];
+        }
+        return ['status'=>'error','msg'=>'3'];
     }
 }

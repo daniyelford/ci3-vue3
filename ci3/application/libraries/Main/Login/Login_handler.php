@@ -18,7 +18,7 @@ class Login_handler
         if(!empty($account_id)&&intval($account_id)>0){
             $a=$this->send->ip_handler();
             $this->CI->session->set_userdata('user_city',$a['city']??'');
-            $this->CI->Users_model->add_address([
+            $b=$this->CI->Users_model->add_address_return_id([
                 'user_account_id'=>intval($account_id),
                 'country'=>$a['country']??'',
                 'region'=>$a['regionName']??'',
@@ -30,6 +30,7 @@ class Login_handler
                 'proxy' => $a['proxy'] ?1:0,
                 'address'=> $a['address'] ?? '',
             ]);
+            if(!empty($b) && intval($b)>0) $this->CI->session->set_userdata('user_address_id',$b);
         }
     }
     private function check_user_rule($account_id){

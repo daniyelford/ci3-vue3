@@ -8,10 +8,18 @@ class User_handler
         $this->CI->load->model('Media_model');
         $this->CI->load->model('Notification_model');
 	}
+    
     public function get_user_location(){
         return ($this->CI->session->has_userdata('user_city') && 
         !empty($this->CI->session->userdata('user_city'))?
             $this->CI->session->userdata('user_city'):
+            null);
+    }
+    public function get_user_address_id(){
+        return ($this->CI->session->has_userdata('user_address_id') && 
+        !empty($this->CI->session->userdata('user_address_id')) && 
+        intval($this->CI->session->userdata('user_address_id'))>0?
+            intval($this->CI->session->userdata('user_address_id')): 
             null);
     }
     public function get_user_category_id(){

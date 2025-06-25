@@ -63,6 +63,9 @@ class Users_model extends CI_Model
     public function add_return_id($arr){
         return (!empty($arr) && is_array($arr)?$this->add_to_table_return_id($this->tbl,$arr):false);
     }
+    public function add_address_return_id($arr){
+        return (!empty($arr) && is_array($arr)?$this->add_to_table_return_id($this->address,$arr):false);
+    }
     public function add_address($arr){
         return (!empty($arr) && is_array($arr) && $this->add_to_table($this->address,$arr));
     }
@@ -80,5 +83,8 @@ class Users_model extends CI_Model
     }
     public function edit_credential_where_id($arr,$id){
         return (!empty($id) && intval($id)>0 && !empty($arr) && is_array($arr) && $this->edit_table($this->credential,$arr,['id'=>intval($id)]));
+    }
+    public function change_address_to_news_where_id($id){
+        return (!empty($id) && intval($id)>0 && $this->edit_table($this->address,['status'=>'news'],['id'=>intval($id)]));
     }
 }

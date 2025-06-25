@@ -43,6 +43,7 @@
     loading.value = true
     try {
       const result = await fullAddress(lat, lng)
+      location.value.total = result || ''
       location.value.address = result.display_name || ''
       emit('update', { type: 'location', value: location.value })
     } catch (e) {
@@ -51,7 +52,6 @@
       loading.value = false
     }
   }
-
   watch([selectedMode, location], () => {
     let value = null
     if (selectedMode.value === 'city') {

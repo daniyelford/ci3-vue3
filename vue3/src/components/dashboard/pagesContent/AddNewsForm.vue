@@ -45,6 +45,7 @@
     import Multiselect from 'vue-multiselect'
     import 'vue-multiselect/dist/vue-multiselect.min.css'
     import AddressSelector from '@/components/tooles/news/AddressSelector .vue'
+    import router from '@/router'
     const categories = ref([])
     const address = ref('')
     const rule = ref(false)
@@ -52,34 +53,37 @@
     const form = ref({
         category_id: [],
         user_address: { type: 'city', value: '' },
-        media_id: '',
+        media_id: [],
         description: '',
     })
     const handleUploadResult = (uploadedData) => {
-      form.value.media_id = uploadedData.map(item => item.id).join(',')
+      form.value.media_id = uploadedData.map(item => item.id)
     }
     onMounted(async () => {
         const data = await sendApi({ control: 'news', action: 'add_data' })
         if (data.status === 'success') {
-            categories.value = data.category
             rule.value = data.rule
-            if (rule.value && data.category.length > 0) {
-                form.value.category_id = [data.category[0].id]
-                form.value.privacy = 'public'
-            }
             address.value = data.address
+            if (rule.value) {
+              categories.value = data.category ? [data.category] : []
+              form.value.category_id = data.category ? [data.category] : []
+            } else {
+              categories.value = data.category ?? []
+            }
         }
     })
     const isSubmitDisabled = computed(() => {
       const isDescriptionEmpty = !form.value.description.trim()
       const isCategoryInvalid = !rule.value && (!form.value.category_id || form.value.category_id.length === 0)
-      const isAddressInvalid = !form.value.user_address || !form.value.user_address.value
-      return isAddressLoading.value || isDescriptionEmpty || isCategoryInvalid || isAddressInvalid
+      const isLocationSelected = form.value.user_address?.type === 'location'
+      const isAddressInvalid = isLocationSelected && (!form.value.user_address?.value || !form.value.user_address.value.address?.trim())
+      const isStillLoading = isLocationSelected && isAddressLoading.value
+      return isDescriptionEmpty || isCategoryInvalid || isAddressInvalid || isStillLoading
     })
     const submitForm = async () => {
         const finalData = {
             ...form.value,
-            category_id: form.value.category_id.map(c => c.id).join(','),
+            category_id: form.value.category_id.map(c => c.id),
         }
         try {
             const res = await sendApi({
@@ -88,7 +92,7 @@
                 data: finalData,
             })
             if (res.status === 'success') {
-                alert('خبر با موفقیت ثبت شد!')
+              router.push('/dashboard')
             } else {
                 alert('خطا در ثبت خبر: ' + res.message)
             }

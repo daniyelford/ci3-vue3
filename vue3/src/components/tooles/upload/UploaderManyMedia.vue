@@ -90,6 +90,7 @@
       })
       if (res.status === 'success') {
         mediaList.value.splice(index, 1)
+        emit('done', mediaList.value)
       } else {
         alert('حذف فایل با خطا مواجه شد: ' + res.message)
       }

@@ -38,4 +38,7 @@ class News_model extends CI_Model
     public function seen_weher_id($id){
         return (!empty($id) && intval($id)>0 && $this->edit_table($this->tbl,['status'=>'seen'],['id'=>intval($id)]));
     }
+    public function add($arr){
+        return (!empty($arr) && is_array($arr) && $this->add_to_table($this->tbl,$arr));
+    }
 }

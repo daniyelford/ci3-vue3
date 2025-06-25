@@ -13,6 +13,7 @@ class Security_handler
         'login_code'=>['code','phone'],
         'category_id',
         'user_city',
+        'user_address_id',
         'rule'
     ];
     public function __construct(){
