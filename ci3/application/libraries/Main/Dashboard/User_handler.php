@@ -8,7 +8,12 @@ class User_handler
         $this->CI->load->model('Media_model');
         $this->CI->load->model('Notification_model');
 	}
-    
+    public function get_user_cordinates(){
+        return ($this->CI->session->has_userdata('user_cordinates') && 
+        !empty($this->CI->session->userdata('user_cordinates'))?
+            $this->CI->session->userdata('user_cordinates'):
+            null);
+    }    
     public function get_user_location(){
         return ($this->CI->session->has_userdata('user_city') && 
         !empty($this->CI->session->userdata('user_city'))?

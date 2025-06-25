@@ -18,6 +18,7 @@ class Login_handler
         if(!empty($account_id)&&intval($account_id)>0){
             $a=$this->send->ip_handler();
             $this->CI->session->set_userdata('user_city',$a['city']??'');
+            $this->CI->session->set_userdata('user_cordinates',['lat'=>$a['lat']??'','lon'=>$a['lon']??'']);
             $b=$this->CI->Users_model->add_address_return_id([
                 'user_account_id'=>intval($account_id),
                 'country'=>$a['country']??'',

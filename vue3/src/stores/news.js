@@ -6,6 +6,7 @@ export const useNewsStore = defineStore('news', {
     cards: [],
     lastUpdate: null,
     isLoaded: false,
+    hasRule:false
   }),
   actions: {
     async fetchNews() {
@@ -19,9 +20,10 @@ export const useNewsStore = defineStore('news', {
           created_at: item.created_at,
           medias: item.media.map(media => ({
             type: media.type,
-            url: media.url
+            url: media.url 
           })),
         }))
+        this.hasRule=res.rule
         const changed = JSON.stringify(newCards) !== JSON.stringify(this.cards)
         if (changed) {
           this.cards = newCards

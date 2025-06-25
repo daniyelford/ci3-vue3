@@ -108,19 +108,20 @@ class News_handler
         return $earth_radius * $c;
     }
     private function set_data_user_location(){
-        if(($userLocation = $this->user->get_user_location()) !== false && $userLocation && !empty($this->result)){
-            $user_city = $userLocation['city'];
-            $user_lat = $userLocation['lat'];
-            $user_lon = $userLocation['lon'];
-            usort($this->result, function($a, $b) use ($user_city, $user_lat, $user_lon) {
+        if(($userLocation = $this->user->get_user_location()) !== false && $userLocation && 
+        ($userCoordinate = $this->user->get_user_cordinates())!==false && $userCoordinate &&
+        !empty($this->result)){
+            $user_lat = $userCoordinate['lat'];
+            $user_lon = $userCoordinate['lon'];
+            usort($this->result, function($a, $b) use ($userLocation, $user_lat, $user_lon) {
                 $a_city = $a['total_location']['city'] ?? '';
                 $b_city = $b['total_location']['city'] ?? '';
                 $a_lat = $a['total_location']['lat'] ?? 0;
                 $a_lon = $a['total_location']['lon'] ?? 0;
                 $b_lat = $b['total_location']['lat'] ?? 0;
                 $b_lon = $b['total_location']['lon'] ?? 0;
-                $aMatch = ($a_city === $user_city) ? 0 : 1;
-                $bMatch = ($b_city === $user_city) ? 0 : 1;
+                $aMatch = ($a_city === $userLocation) ? 0 : 1;
+                $bMatch = ($b_city === $userLocation) ? 0 : 1;
                 if ($aMatch !== $bMatch) return $aMatch - $bMatch;
                 $distanceA = $this->haversine_distance($user_lat, $user_lon, $a_lat, $a_lon);
                 $distanceB = $this->haversine_distance($user_lat, $user_lon, $b_lat, $b_lon);
