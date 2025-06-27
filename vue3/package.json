@@ -26,6 +26,7 @@
     "vue": "^3.2.13",
     "vue-multiselect": "^3.2.0",
     "vue-router": "^4.0.3",
+    "vue3-jalali-calendar": "^1.0.8",
     "vue3-persian-datetime-picker": "^1.2.2"
   },
   "devDependencies": {

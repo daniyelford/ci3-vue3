@@ -6,7 +6,7 @@
         <AddNewsForm/>
     </div>
     <div class="nav-bottom">
-        <BottomNav :Wallet="true" :add="false" :list="true"/>
+        <BottomNav :Wallet="true" :add="false" :list="true" :manage="true" :setting="true"/>
     </div>
 </template>
 <script setup>

@@ -11,11 +11,11 @@ export const useUserStore = defineStore('user', {
       try {
         const { sendApi } = await import('@/utils/api')
         const res = await sendApi({ action: 'get_user_info', control: 'user' })
-
         if (res.status === 'success') {
           this.name = res.name
           this.wallet = res.wallet
           this.image = res.image
+          this.finger = res.finger
           this.isLoaded = true
         } else {
           console.warn('User info error:', res)

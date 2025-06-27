@@ -18,8 +18,15 @@ class Users_model extends CI_Model
 	    return (!empty($tbl) && is_string($tbl) && !empty($arr) && is_array($arr)?$this->db->get_where($tbl,$arr)->result_array():false);
 	}
 	private function select_where_id_table($tbl,$id){
-	    return (!empty($tbl) && is_string($tbl) && !empty($id) && intval($id)>0?$this->select_where_array_table($tbl,['id'=>$id]):false);
+	    return (!empty($tbl) && is_string($tbl) && !empty($id) && intval($id)>0?$this->select_where_array_table($tbl,['id'=>intval($id)]):false);
 	}
+    private function select_where_in_array_table($tbl,$key,$arr){
+        if (!empty($tbl) && is_string($tbl) && !empty($arr) && is_array($arr) && !empty($key) && is_string($key)){
+            $this->db->where_in($key, $$arr);
+            return $this->db->get($tbl)->result();
+        }
+        return [];
+    }
     private function add_to_table($tbl,$arr){
         return (!empty($tbl) && is_string($tbl) && !empty($arr) && is_array($arr) && $this->db->insert($tbl,$arr));
     }
@@ -40,19 +47,22 @@ class Users_model extends CI_Model
 	    return (!empty($id) && intval($id)?$this->select_where_array_table($this->address,['user_account_id '=>intval($id)]):false);
 	}
     public function select_where_id($id){
-	    return (!empty($id) && intval($id)?$this->select_where_array_table($this->tbl,['id'=>intval($id)]):false);
+	    return (!empty($id) && intval($id)?$this->select_where_id_table($this->tbl,intval($id)):false);
 	}
     public function select_mobile_where_id($id){
-	    return (!empty($id) && intval($id)?$this->select_where_array_table($this->mobile,['id'=>intval($id)]):false);
+	    return (!empty($id) && intval($id)?$this->select_where_id_table($this->mobile,intval($id)):false);
 	}
     public function select_mobile($str){
         return (!empty($str) && is_string($str)?$this->select_where_array_table($this->mobile,['phone'=>$str]):false);
 	}
     public function select_account_where_id($id){
-	    return (!empty($id) && intval($id)?$this->select_where_array_table($this->account,['id'=>intval($id)]):false);
+	    return (!empty($id) && intval($id)?$this->select_where_id_table($this->account,intval($id)):false);
 	}
     public function select_account_where_mobile_id($id){
 	    return (!empty($id) && intval($id)?$this->select_where_array_table($this->account,['user_mobile_id'=>intval($id)]):false);
+	}
+    public function select_account_where_category_ids_array($arr){
+	    return (!empty($arr) && is_array($arr)?$this->select_where_in_array_table($this->account,'category_id',$arr):false);
 	}
     public function credential_where_user_mobile_id($id){
 	    return (!empty($id) && intval($id)?$this->select_where_array_table($this->credential,['user_mobile_id'=>intval($id)]):false);

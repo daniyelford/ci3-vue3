@@ -6,7 +6,7 @@
         <WalletCards/>
     </div>
     <div class="nav-bottom">
-        <BottomNav :Wallet="false" :list="true" :add="true"/>
+        <BottomNav :Wallet="false" :list="true" :add="true" :manage="true" :setting="true"/>
     </div>
 </template>
 <script setup>

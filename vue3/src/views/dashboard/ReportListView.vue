@@ -6,7 +6,7 @@
         <ReportList/>
     </div>
     <div class="nav-bottom">
-        <BottomNav :Wallet="true" :list="false" :add="true"/>
+        <BottomNav :Wallet="true" :list="false" :add="true" :manage="true" :setting="true"/>
     </div>
 </template>
 <script setup>

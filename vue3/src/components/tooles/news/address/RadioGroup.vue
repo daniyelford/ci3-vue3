@@ -35,13 +35,14 @@
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: stretch;
+    margin-top: 10px;
   }
   .checkBox-inner input {
     margin: 0;
-    height: 10px;
+    height: 15px;
   }
   .checkBox-inner span {
-    font-size: 9px;
-    padding-right: 2px;
+    font-size: 12px;
+    padding-right: 5px;
   }
 </style>

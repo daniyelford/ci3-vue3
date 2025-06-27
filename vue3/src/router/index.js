@@ -6,6 +6,8 @@ import RegisterView from '@/views/home/RegisterView.vue';
 import WalletView from '@/views/dashboard/WalletView.vue';
 import ReportListView from '@/views/dashboard/ReportListView.vue';
 import AddNewsView from '@/views/dashboard/AddNewsView.vue';
+import ManageNewsViews from '@/views/dashboard/ManageNewsViews.vue';
+import UserSettingView from '@/views/dashboard/UserSettingView.vue';
 import { sendApi } from '@/utils/api';
 
 const routes = [
@@ -38,16 +40,28 @@ const routes = [
     component: WalletView,
     meta: { requiresAuth: true }
   },
-    {
+  {
     path: '/add-news',
     name: 'add-news',
     component: AddNewsView,
     meta: { requiresAuth: true }
   },
-    {
+  {
     path: '/report-list',
     name: 'report-list',
     component: ReportListView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/manage-news',
+    name: 'manage-news',
+    component: ManageNewsViews,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/user-setting',
+    name: 'user-setting',
+    component: UserSettingView,
     meta: { requiresAuth: true }
   },
 ]

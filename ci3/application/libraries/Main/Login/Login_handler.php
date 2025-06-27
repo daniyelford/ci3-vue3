@@ -2,9 +2,12 @@
 class Login_handler
 {
     private $CI;
+    private $send;
+    // in product mode must be false
+    private $fack_ip_used=true;
     private $send_sms_code_in_login=true;
     private $send_sms_example=true;
-    private $send;
+    // in product mode must be false
     public function __construct(){
 		$this->CI =& get_instance();
         $this->CI->load->model('Users_model');
@@ -13,6 +16,7 @@ class Login_handler
         $this->CI->load->library('Main/Login/Finger_print');
         $this->send=new Send_handler();
         $this->send->send_sms_example=$this->send_sms_example;
+        $this->send->fack_ip_used=$this->fack_ip_used;
 	}
     private function check_user_address($account_id){
         if(!empty($account_id)&&intval($account_id)>0){

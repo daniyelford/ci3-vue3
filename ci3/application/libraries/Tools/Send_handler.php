@@ -2,7 +2,7 @@
 class Send_handler
 {
     // TODO: بعد از اتمام پروژه، Ubuntu نصب شود و Photon راه‌اندازی شود
-    private $fack_ip_used=true;
+    public $fack_ip_used=false;
     public $send_sms_example=false;
     public function send_sms_action($str,$to){
         if($this->send_sms_example) return true;

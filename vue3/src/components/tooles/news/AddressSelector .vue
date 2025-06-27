@@ -1,15 +1,15 @@
 <template>
   <div>
-    <label class="address-label">نوع آدرس:</label>
+    <label class="address-label">انتخاب آدرس</label>
     <RadioGroup
       v-model="selectedMode"
       :options="addressModes"
       name="address-mode"
     />
     <div class="section" v-if="selectedMode === 'location'">
-      <label class="text">موقعیت مکانی:</label>
-      <MapPicker @pick="handleMapSelect" />
-      <p v-if="loading">در حال دریافت آدرس از نقشه...</p>
+      <label class="text">موقعیت مکانی</label>
+      <MapPicker :center="props.userCoordinate" @pick="handleMapSelect" />
+      <span class="loading" v-if="loading">در حال دریافت آدرس از نقشه...</span>
       <textarea
         v-if="!loading"
         v-model="location.address"
@@ -29,12 +29,24 @@
   const props = defineProps({
     loginCity: String,
     modelValue: Object,
+    userCoordinate: {
+      type: Object,
+      default: () => ({ lat: '', lon: '' })
+    }
   })
-  const addressModes = computed(() => [
-    { id: 'city', label: `شهر فعلی ${props.loginCity || ''}` },
-    { id: 'location', label: 'انتخاب از نقشه' },
-  ])
-  const selectedMode = ref(props.modelValue?.type || 'city')
+  const addressModes = computed(() => {
+    const modes = []
+    if (props.loginCity) {
+      modes.push({ id: 'city', label: `شهر فعلی ${props.loginCity}` })
+    }
+    modes.push({ id: 'location', label: 'انتخاب از نقشه' })
+    return modes
+  })
+  const selectedMode = ref(
+    props.loginCity
+      ? props.modelValue?.type || 'city'
+      : 'location'
+  )
   const location = ref(props.modelValue?.value || { lat: '', lng: '', address: '' })
   const loading = ref(false)
   const handleMapSelect = async ({ lat, lng }) => {
@@ -67,9 +79,15 @@
 </script>
 
 <style scoped>
+  .loading{
+    position: relative;
+    top: -275px;
+    right: 10px;
+    color: #ff005c;
+  }
   .address-label {
     font-weight: bold;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
     display: block;
   }
   .section {
@@ -82,10 +100,25 @@
   }
   .textarea {
     border: 1px solid #ccc;
-    border-radius: 0.375rem;
+    border-radius: 5px;
     padding: 0.5rem;
-    width: 100%;
+    width: 34%;
+    height: 300px;
     resize: vertical;
-    margin-top: 0.5rem;
+    display: inline-block;
+    margin-top: 0.75rem;
+    margin-right: 1%;
+    box-sizing: border-box;
+  }
+  @media screen and (max-width: 600px) {
+    .loading{
+      position: unset;
+      padding: 10px;
+    }
+    .textarea {
+      width: 100%;
+      height: 80px;
+      margin-right: 0;
+    }
   }
 </style>

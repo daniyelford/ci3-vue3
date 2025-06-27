@@ -72,9 +72,13 @@ class User_handler
     public function get_user_info(){
         if($this->CI->session->has_userdata('user_info') && 
         !empty($this->CI->session->userdata('user_info')) &&
+        $this->get_user_mobile_id() && 
+        !empty($this->get_user_mobile_id()) && 
+        intval($this->get_user_mobile_id())>0 &&
         ($a=$this->get_user_account())!==false && !empty($a)){
+            $has_finger=$this->CI->Users_model->credential_where_user_mobile_id($this->get_user_mobile_id());
             $name=($this->CI->session->userdata('user_info')['name']?$this->CI->session->userdata('user_info')['name']:'').' '.($this->CI->session->userdata('user_info')['family']?$this->CI->session->userdata('user_info')['family']:'');
-            return ['status'=>'success','name'=>$name,'wallet'=>(!empty($a['balance']) && intval($a['balance'])>0?intval($a['balance']):0),'image'=>$this->get_user_image()];
+            return ['status'=>'success','finger'=>(!empty($has_finger) && !empty(end($has_finger))),'name'=>$name,'wallet'=>(!empty($a['balance']) && intval($a['balance'])>0?intval($a['balance']):0),'image'=>$this->get_user_image()];
         }
         return ['status'=>'error',];
     }
@@ -88,17 +92,30 @@ class User_handler
             return ['status'=>'success','data'=>$this->CI->Notification_model->mark_as_read(intval($id),intval($a))];
         return ['status'=>'error'];
     }
-    public function add_notification($user_account_id,$title,$body,$type){
-        return (!empty($user_account_id) && intval($user_account_id)>0 && 
-        !empty($title) && !empty($body) && !empty($type) && 
-        $this->CI->Notification_model->insert([
-            'user_account_id' => $user_account_id,
-            'title' => $title,
-            'body'  => $body,
-            'type'  => $type,
-        ]));
-    }
     public function get_all_user_address(){
         return ($this->get_user_account_id()?$this->CI->Users_model->select_address_where_user_account_id($this->get_user_account_id()):null);
+    }
+    public function get_user_info_where_user_account($id){
+        if(!empty($id) && intval($id)>0 && 
+        ($a=$this->CI->Users_model->select_account_where_id(intval($id)))!==false && 
+        !empty($a) && !empty(end($a)) && 
+        !empty(end($a)['id']) && intval(end($a)['id'])>0 && 
+        !empty(end($a)['user_mobile_id']) && intval(end($a)['user_mobile_id'])>0 &&
+        ($b=$this->CI->Users_model->select_mobile_where_id(intval(end($a)['user_mobile_id'])))!==false &&
+        !empty($b) && !empty(end($b)) && 
+        !empty(end($b)['id']) && intval(end($b)['id'])>0 && 
+        !empty(end($b)['user_id']) && intval(end($b)['user_id'])>0 && 
+        ($c=$this->CI->Users_model->select_where_id(intval(end($b)['user_id'])))!==false &&
+        !empty($c) && !empty(end($c)) && 
+        !empty(end($c)['id']) && intval(end($c)['id'])>0){
+            $image=$this->CI->Media_model->select_where_id($b['image_id']??'');
+            return [
+                'image'=>(!empty($image) && !empty(end($image)) && !empty(end($image)['url'])?end($image)['url']:''),
+                'phone'=>$b['phone']??'',
+                'name'=>$c['name']??'',
+                'family'=>$c['family']??'',
+            ];
+        }
+        return [];
     }
 }

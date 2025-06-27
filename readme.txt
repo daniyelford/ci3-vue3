@@ -6,6 +6,7 @@ npm config set registry https://registry.npmmirror.com/
 npm install vue-multiselect
 npm install leaflet
 npm install pinia
+npm install vue3-jalali-calendar moment-jalaali
 npm install @capacitor/core @capacitor/cli
 npx cap init
 npm install @capacitor/android
