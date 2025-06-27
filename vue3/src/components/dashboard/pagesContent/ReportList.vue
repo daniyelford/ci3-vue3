@@ -12,10 +12,6 @@
     selectedEvent.value = event.raw
     showModal.value = true
   }
-  const noneEventModal =(e)=>{
-    if(e===null) return false
-    console.log(calendar.events)
-  }
   const closeModal = () => {
     showModal.value = false
     selectedEvent.value = null
@@ -31,7 +27,6 @@
     :vacationsList="calendar.vacations"
     disablePastDays
     @on-event-click="showEventModal"
-    @dayClick="noneEventModal"
   />
   <ReportListModal :show="showModal" :event="selectedEvent" @close="closeModal" />
 </template>

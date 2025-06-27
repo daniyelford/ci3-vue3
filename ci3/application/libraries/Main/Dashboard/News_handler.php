@@ -287,12 +287,14 @@ class News_handler
     private function set_all_my_report(){
         if(!empty($this->report))
             foreach ($this->report as $a) {
-                if(!empty($a) && !empty($a['id']) && intval($a['id'])>0){
+                if(!empty($a) && !empty($a['id']) && intval($a['id'])>0 && !empty($a['user_account_id']) && intval($a['user_account_id'])>0){
                     $arr=[];
                     $status=$a['status']??'';
-                    $arr['start']=$a['run_time']??'';
-                    $arr['me']=($a['user_account_id']!==$this->user->get_user_account_id());
-                    $arr['end']=($status==='done'?$a['updated_at']??'':'');
+                    $arr['start'] = (new DateTime($a['run_time'] ?? date('Y-m-d H:i:s')))->format(DateTime::ATOM);
+                    $arr['end'] = ($status === 'done')
+                        ? (new DateTime($a['updated_at'] ?? date('Y-m-d H:i:s')))->format(DateTime::ATOM)
+                        : (new DateTime($a['run_time']))->format(DateTime::ATOM);
+                    $arr['me']=(intval($a['user_account_id'])!==intval($this->user->get_user_account_id()));
                     $news_result=[];
                     $news=$this->search_id_return_value_in_key($this->news_seen,$a['news_id']??'','id',['id','user_account_id','user_address_id','media_id','description']);
                     if(!empty($news) && !empty($news['id']) && intval($news['id'])>0){
@@ -301,10 +303,7 @@ class News_handler
                         $news_result['media']=$this->search_ids_return_value_in_key($this->media,$news['media_id']??'','id',['url','type']);
                         $news_result['address']=$this->search_id_return_value_in_key($this->address,$news['user_address_id']??0,'id',['id','city','lat','lon','address']);
                         if(!empty($news['user_account_id']) && intval($news['user_account_id'])>0){
-                            $user=$this->user->get_user_info_where_user_account(intval($news['user_account_id']));
-                            $news_result['user_image']=$user['image']??'';
-                            $news_result['user_phone']=$user['phone']??'';
-                            $news_result['user_name']=$user['name']??''.' '.$user['family']??'';
+                            $news_result['user']=$this->user->get_user_info_where_user_account(intval($news['user_account_id']));
                         }
                     }
                     $arr['news']=$news_result;

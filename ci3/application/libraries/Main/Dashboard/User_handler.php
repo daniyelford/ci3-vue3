@@ -108,12 +108,12 @@ class User_handler
         ($c=$this->CI->Users_model->select_where_id(intval(end($b)['user_id'])))!==false &&
         !empty($c) && !empty(end($c)) && 
         !empty(end($c)['id']) && intval(end($c)['id'])>0){
-            $image=$this->CI->Media_model->select_where_id($b['image_id']??'');
+            $image=$this->CI->Media_model->select_where_id(end($b)['image_id']??'');
             return [
                 'image'=>(!empty($image) && !empty(end($image)) && !empty(end($image)['url'])?end($image)['url']:''),
-                'phone'=>$b['phone']??'',
-                'name'=>$c['name']??'',
-                'family'=>$c['family']??'',
+                'phone'=>end($b)['phone']??'',
+                'name'=>end($c)['name']??'',
+                'family'=>end($c)['family']??'',
             ];
         }
         return [];
