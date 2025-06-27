@@ -1,30 +1,28 @@
 <script setup>
-import { ref , defineAsyncComponent , onMounted } from 'vue'
-import { useCalendarEventsStore } from '@/stores/calendarEvents'
-
-import ReportListModal from '@/components/tooles/news/ReportListModal.vue'
-
-const calendar = useCalendarEventsStore()
-const showModal = ref(false)
-const selectedEvent = ref(null)
-
-const jalaliCalendar = defineAsyncComponent(() =>
-  import('vue3-jalali-calendar').then(mod => mod.jalaliCalendar)
-)
-
-const showEventModal = (event) => {
-  selectedEvent.value = event.raw
-  showModal.value = true
-}
-
-const closeModal = () => {
-  showModal.value = false
-  selectedEvent.value = null
-}
-
-onMounted(() => {
-  calendar.loadEvents()
-})
+  import { ref , defineAsyncComponent, onMounted } from 'vue'
+  import { useCalendarEventsStore } from '@/stores/calendarEvents'
+  import ReportListModal from '@/components/tooles/news/ReportListModal.vue'
+  const calendar = useCalendarEventsStore()
+  const showModal = ref(false)
+  const selectedEvent = ref(null)
+  const jalaliCalendar = defineAsyncComponent(() =>
+    import('vue3-jalali-calendar').then(mod => mod.jalaliCalendar)
+  )
+  const showEventModal = (event) => {
+    selectedEvent.value = event.raw
+    showModal.value = true
+  }
+  const noneEventModal =(e)=>{
+    if(e===null) return false
+    console.log(calendar.events)
+  }
+  const closeModal = () => {
+    showModal.value = false
+    selectedEvent.value = null
+  }
+  onMounted(() => {
+    calendar.loadEvents()
+  })
 </script>
 
 <template>
@@ -33,6 +31,7 @@ onMounted(() => {
     :vacationsList="calendar.vacations"
     disablePastDays
     @on-event-click="showEventModal"
+    @dayClick="noneEventModal"
   />
   <ReportListModal :show="showModal" :event="selectedEvent" @close="closeModal" />
 </template>

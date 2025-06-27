@@ -67,9 +67,9 @@
         font-size: 24px;
     }
     .badge {
-        position: absolute;
-        top: -6px;
-        right: -6px;
+        position: relative;
+        top: 12px;
+        right: -30px;
         background-color: red;
         color: white;
         border-radius: 50%;
