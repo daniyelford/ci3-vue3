@@ -31,8 +31,8 @@ class Login_handler
                 'lat'=>$a['lat']??'',
                 'lon'=>$a['lon']??'',
                 'currency' => $a['currency'] ?? '',
-                'mobile' => $a['mobile'] ?1:0,
-                'proxy' => $a['proxy'] ?1:0,
+                'mobile' => (!empty($a['mobile']) && $a['mobile'] ?1:0),
+                'proxy' => (!empty($a['proxy']) && $a['proxy'] ?1:0),
                 'address'=> $a['address'] ?? '',
             ]);
             if(!empty($b) && intval($b)>0) $this->CI->session->set_userdata('user_address_id',$b);

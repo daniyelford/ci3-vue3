@@ -50,7 +50,7 @@
     const isAddressLoading = ref(false)
     const form = ref({
         category_id: [],
-        user_address: { type: 'city', value: '' },
+        user_address: { type: 'location', value: '' },
         media_id: [],
         description: '',
     })
@@ -72,9 +72,7 @@
             } else {
               categories.value = data.category ?? []
             }
-        }
-        console.log(userCoordinate.value);
-        
+        }        
     })
     const isSubmitDisabled = computed(() => {
       const isDescriptionEmpty = !form.value.description.trim()
@@ -82,6 +80,9 @@
       const isLocationSelected = form.value.user_address?.type === 'location'
       const isAddressInvalid = isLocationSelected && (!form.value.user_address?.value || !form.value.user_address.value.address?.trim())
       const isStillLoading = isLocationSelected && isAddressLoading.value
+      console.log(form.value);
+      
+      
       return isDescriptionEmpty || isCategoryInvalid || isAddressInvalid || isStillLoading
     })
     const submitForm = async () => {

@@ -57,11 +57,11 @@
       const result = await fullAddress(lat, lng)
       location.value.total = result || ''
       location.value.address = result.display_name || ''
-      emit('update', { type: 'location', value: location.value })
     } catch (e) {
       location.value.address = 'خطا در دریافت آدرس'
     } finally {
       loading.value = false
+      emit('update', { type: 'location', value: location.value })
     }
   }
   watch([selectedMode, location], () => {

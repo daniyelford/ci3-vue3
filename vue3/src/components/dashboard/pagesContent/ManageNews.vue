@@ -2,6 +2,7 @@
   import { onMounted } from 'vue'
   import { useRouter } from 'vue-router'
   import { useManageNewsStore } from '@/stores/manageNews'
+  import MediaSlider from '@/components/tooles/media/MediaSlider.vue'
   const store = useManageNewsStore()
   const router = useRouter()
   const getStatus = (status) => {
@@ -9,7 +10,7 @@
       case 'checking':
         return 'منتشر شد'
       case 'seen':
-        return 'پیگیری شد'
+        return 'درحال پیگیری'
       default:
         return 'نامشخص'
     }
@@ -29,38 +30,26 @@
 
 <template>
   <div class="news-wrapper">
-    <h2 class="title">اخبار من</h2>
-
     <div v-if="store.loading" class="loading">در حال بارگذاری...</div>
-
     <div v-else>
       <div v-if="store.newsList.length === 0" class="no-news">شما هنوز خبری ثبت نکردید.</div>
-
       <ul class="news-list">
         <li v-for="news in store.newsList" :key="news.id" class="news-item">
-          <div class="news-header">
-            <h3 class="news-title">{{ news.description }}</h3>
-            <small class="news-status">وضعیت: {{ getStatus(news.status) }}</small>
+          <div class="media-list" v-if="news.media?.length">
+            <MediaSlider :medias="news.media" />
           </div>
-
-          <p v-if="news.category?.length" class="category">
-            دسته‌بندی:
-            <span v-for="cat in news.category" :key="cat.id" class="category-item">
-              {{ cat.title }}
-            </span>
-          </p>
-
+          <div class="news-header">
+            <p v-if="news.category?.length" class="category">
+              <span v-for="cat in news.category" :key="cat.id" class="category-item">
+                {{ cat.title }}
+              </span>
+            </p>
+          </div>
+          <h3 class="news-title">{{ news.description }}</h3>
           <p v-if="news.address" class="address">
             موقعیت: {{ news.address.city || 'نامشخص' }} - {{ news.address.address || '' }}
           </p>
-
-          <div class="media-list" v-if="news.media?.length">
-            <div class="media-item" v-for="m in news.media" :key="m.id">
-              <img v-if="m.type === 'image'" :src="m.url" class="media-img" />
-              <a v-else :href="m.url" target="_blank" class="media-link">مشاهده فایل</a>
-            </div>
-          </div>
-
+          <small class="news-status">وضعیت: {{ getStatus(news.status) }}</small>
           <div class="actions">
             <button @click="editNews(news.id)">ویرایش</button>
             <button @click="deleteNews(news.id)">حذف</button>
@@ -75,7 +64,8 @@
 .news-wrapper {
   max-width: 800px;
   margin: 0 auto;
-  padding: 2rem;
+  direction: rtl;
+  /* padding: 2rem; */
 }
 .title {
   font-size: 24px;
@@ -123,9 +113,7 @@
   color: #444;
 }
 .media-list {
-  display: flex;
-  flex-wrap: wrap;
-  margin-top: 0.5rem;
+  margin: 0.5rem auto;
 }
 .media-item {
   margin-right: 10px;

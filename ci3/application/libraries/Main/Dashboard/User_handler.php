@@ -78,7 +78,15 @@ class User_handler
         ($a=$this->get_user_account())!==false && !empty($a)){
             $has_finger=$this->CI->Users_model->credential_where_user_mobile_id($this->get_user_mobile_id());
             $name=($this->CI->session->userdata('user_info')['name']?$this->CI->session->userdata('user_info')['name']:'').' '.($this->CI->session->userdata('user_info')['family']?$this->CI->session->userdata('user_info')['family']:'');
-            return ['status'=>'success','finger'=>(!empty($has_finger) && !empty(end($has_finger))),'name'=>$name,'wallet'=>(!empty($a['balance']) && intval($a['balance'])>0?intval($a['balance']):0),'image'=>$this->get_user_image()];
+            return [
+                'status'=>'success',
+                'finger'=>(!empty($has_finger) && !empty(end($has_finger))),
+                'fullName'=>$name,
+                'wallet'=>(!empty($a['balance']) && intval($a['balance'])>0?intval($a['balance']):0),
+                'name'=>($this->CI->session->userdata('user_info')['name']?$this->CI->session->userdata('user_info')['name']:''),
+                'family'=>($this->CI->session->userdata('user_info')['family']?$this->CI->session->userdata('user_info')['family']:''),
+                'mobile'=>$this->get_user_mobile()['phone'],
+                'image'=>$this->get_user_image()];
         }
         return ['status'=>'error',];
     }
@@ -111,9 +119,9 @@ class User_handler
             $image=$this->CI->Media_model->select_where_id(end($b)['image_id']??'');
             return [
                 'image'=>(!empty($image) && !empty(end($image)) && !empty(end($image)['url'])?end($image)['url']:''),
-                'phone'=>end($b)['phone']??'',
                 'name'=>end($c)['name']??'',
                 'family'=>end($c)['family']??'',
+                'phone'=>end($b)['phone']??'',
             ];
         }
         return [];

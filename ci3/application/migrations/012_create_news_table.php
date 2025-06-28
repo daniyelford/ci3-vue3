@@ -19,10 +19,6 @@ class Migration_Create_news_table extends CI_Migration {
                 'unsigned' => TRUE,
                 'null' => TRUE,
             ],
-            'category_id' => [
-                'type' => 'TEXT',
-                'null' => TRUE,
-            ],
             'user_address_id' => [
                 'type' => 'INT',
                 'unsigned' => TRUE,

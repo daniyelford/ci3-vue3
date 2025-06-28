@@ -20,10 +20,10 @@ class Users_model extends CI_Model
 	private function select_where_id_table($tbl,$id){
 	    return (!empty($tbl) && is_string($tbl) && !empty($id) && intval($id)>0?$this->select_where_array_table($tbl,['id'=>intval($id)]):false);
 	}
-    private function select_where_in_array_table($tbl,$key,$arr){
+    private function select_where_in_array_table(String $tbl,String $key,Array $arr){
         if (!empty($tbl) && is_string($tbl) && !empty($arr) && is_array($arr) && !empty($key) && is_string($key)){
-            $this->db->where_in($key, $$arr);
-            return $this->db->get($tbl)->result();
+            $this->db->where_in($key, $arr);
+            return $this->db->get($tbl)->result_array();
         }
         return [];
     }

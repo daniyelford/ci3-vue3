@@ -4,17 +4,23 @@
     </div>
     <div class="card-inner" v-else-if="newsStore.cards.length > 0">
         <div v-for="card in newsStore.cards" :key="card.id" class="card">
-            <div class="card-header">
-                <div class="location" v-if="card.location !== ''">
-                    {{ card.location }}
-                </div>
-                <div class="card-category">
-                    {{ card.category }}
-                </div>
+            <div class="user-info">
+                <img v-if="card.user.image" :src="card.user.image" alt="user icon">
+                <svg v-else xmlns="http://www.w3.org/2000/svg" fill="#000000" enable-background="new 0 0 24 24" viewBox="0 0 24 24"><g><rect fill="none" height="24" width="24"/></g><g><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm0 14c-2.03 0-4.43-.82-6.14-2.88C7.55 15.8 9.68 15 12 15s4.45.8 6.14 2.12C16.43 19.18 14.03 20 12 20z"/></g></svg>
+                <p>{{ card.user.name + ' ' + card.user.family }}</p>
             </div>
-            <MediaSlider v-if="card.medias.length > 0" :medias="card.medias" />
+            <div class="media-inner">
+                <MediaSlider v-if="card.medias.length > 0" :medias="card.medias" />
+            </div>
+            <div class="card-category">
+                {{ card.category }}
+            </div>
             <div class="description" v-if="card.description !== ''">
                 {{ card.description }}
+            </div>
+            <div class="location" v-if="card.location !== ''">
+                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0,0,256,256"><defs><linearGradient x1="11.27" y1="9.259" x2="36.73" y2="34.72" gradientUnits="userSpaceOnUse" id="color-1"><stop offset="0" stop-color="#68e7cc"></stop><stop offset="1" stop-color="#1e2471"></stop></linearGradient><radialGradient cx="24" cy="22" r="9.5" gradientUnits="userSpaceOnUse" id="color-2"><stop offset="0.177" stop-color="#4d9595"></stop><stop offset="1" stop-color="#000000" stop-opacity="0"></stop></radialGradient></defs><g fill="none" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="none" font-weight="none" font-size="none" text-anchor="none" style="mix-blend-mode: normal"><g transform="scale(5.33333,5.33333)"><path d="M36.902,34.536c6.932,-7.126 6.775,-18.521 -0.351,-25.453c-7.126,-6.932 -18.521,-6.775 -25.453,0.35c-6.797,6.987 -6.797,18.116 0,25.103c0.018,0.019 0.03,0.04 0.048,0.059l0.059,0.059c0.047,0.048 0.094,0.095 0.142,0.142l11.239,11.239c0.781,0.781 2.047,0.781 2.828,0v0l11.239,-11.239c0.048,-0.047 0.095,-0.094 0.142,-0.142l0.059,-0.059c0.019,-0.019 0.031,-0.041 0.048,-0.059z" fill="url(#color-1)"></path><circle cx="24" cy="22" r="9.5" fill="url(#color-2)"></circle><circle cx="24" cy="22" r="8" fill="#8129bf"></circle></g></g></svg>
+                {{ card.location }}
             </div>
             <div class="time">
                 {{ moment(card.created_at).format('jYYYY/jMM/jDD') }}
@@ -73,8 +79,44 @@
     onBeforeUnmount(() => {if (intervalId) clearInterval(intervalId)})
 </script>
 <style scoped>
+    .media-inner {
+        background: white;
+        padding: 5px;
+    }
+    .location {
+        margin: 5px;
+        gap: 5px;
+        display: flex;
+        font-size: 11px;
+        align-items: center;
+    }
+    .location svg{
+        height: 20px;
+        width: 20px;
+    }
+    .user-info svg,.user-info img{
+        width: 50px;
+        height: 50px;
+        border-radius: 50px;
+        display: inline-block;
+    }
+    .user-info p{
+        display: inline-block;
+    }
+    .user-info{
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px;
+    }
+    .card-category {
+        text-align: center;
+        padding: 10px;
+        background: floralwhite;
+    }
     .card-inner {
         width: 100%;
+        direction: rtl;
         height: 100%;
         display: flex;
         flex-direction: row-reverse;
@@ -84,6 +126,7 @@
         align-items: stretch;
     }
     .card {
+        background: #f5f5f5;
         width: 49%;
         min-height: 300px;
         margin: 0 0.5% 10px 0.5%;
@@ -109,17 +152,16 @@
         padding: 6px;
     }
     .description {
-        height: 50px;
-        padding: 5px;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        min-height: 50px;
+        padding: 10px;
         width: 95%;
         text-align: center;
-        white-space: nowrap;
     }
     .time {
         font-size: 10px;
         padding-left: 10px;
+        text-align: end;
+        margin: 5px;
     }
     .choose {
         width: 95%;

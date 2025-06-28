@@ -44,7 +44,6 @@ class Migration_Create_report_list_table extends CI_Migration {
         ]);
         $this->dbforge->add_key('id', TRUE);
         $this->dbforge->create_table('report_list');
-        $this->db->query("ALTER TABLE report_list MODIFY run_time DATETIME DEFAULT CURRENT_TIMESTAMP");
         $this->db->query("ALTER TABLE report_list MODIFY created_at DATETIME DEFAULT CURRENT_TIMESTAMP");
         $this->db->query("ALTER TABLE report_list MODIFY updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP");
         $this->db->query('ALTER TABLE report_list ADD CONSTRAINT fk_report_list_user_account FOREIGN KEY (user_account_id) REFERENCES user_account(id) ON DELETE SET NULL ON UPDATE CASCADE');

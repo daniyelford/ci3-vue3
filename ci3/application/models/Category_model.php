@@ -7,6 +7,7 @@ class Category_model extends CI_Model
 		parent::__construct();
 	}
     private $tbl='category';
+    private $relation='category_news';
     private function select_where_array_table($tbl,$arr){
 	    return (!empty($tbl) && is_string($tbl) && !empty($arr) && is_array($arr)?$this->db->get_where($tbl,$arr)->result_array():false);
 	}
@@ -28,7 +29,13 @@ class Category_model extends CI_Model
     public function select_category_where_id($id){
 	    return (!empty($id) && intval($id)?$this->select_where_id_table($this->tbl,intval($id)):false);
 	}
+    public function select_all_relation() {
+        return $this->db->get($this->relation)->result_array();
+    }
     public function select_category_where_active(){
 	    return $this->select_where_array_table($this->tbl,['status'=>'active']);
 	}
+    public function insert_relation_batch($arr){
+        return (!empty($arr) && is_array($arr) && $this->db->insert_batch($this->relation, $arr));
+    }
 }

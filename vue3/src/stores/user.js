@@ -12,7 +12,10 @@ export const useUserStore = defineStore('user', {
         const { sendApi } = await import('@/utils/api')
         const res = await sendApi({ action: 'get_user_info', control: 'user' })
         if (res.status === 'success') {
+          this.fullName = res.fullName
           this.name = res.name
+          this.family = res.family
+          this.mobile = res.mobile
           this.wallet = res.wallet
           this.image = res.image
           this.finger = res.finger

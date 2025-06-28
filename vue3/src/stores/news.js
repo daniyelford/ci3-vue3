@@ -18,6 +18,7 @@ export const useNewsStore = defineStore('news', {
           category: item.category ?? 'کلی',
           description: item.description,
           created_at: item.created_at,
+          user: item.user,
           medias: item.media.map(media => ({
             type: media.type,
             url: media.url 

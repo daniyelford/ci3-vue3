@@ -37,8 +37,20 @@ class News_model extends CI_Model
     public function select_news_where_public_status_checking(){
 	    return $this->select_where_array_table($this->tbl,['status'=>'checking','privacy'=>'public']);
 	}
-    public function select_news_where_category_id_status_checking_private($id){
-	    return (!empty($id) && intval($id)?$this->select_where_array_table($this->tbl,['category_id'=>intval($id),'status'=>'checking','privacy'=>'private']):false);
+    public function select_news_where_category_id_status_checking_private($id){    
+        if (empty($id) || !is_numeric($id)) {
+            return [];
+        }
+        $this->db->select('*');
+        $this->db->from($this->tbl);
+        $this->db->join('category_news', 'category_news.news_id = ' . $this->tbl . '.id');
+        $this->db->where([
+            'category_news.category_id' => (int) $id,
+            $this->tbl . '.status' => 'checking',
+            $this->tbl . '.privacy' => 'private'
+        ]);
+        $query = $this->db->get();
+        return $query->result_array();
 	}
     public function select_news_where_status_seen(){
 	    return $this->select_where_array_table($this->tbl,['status'=>'seen']);
@@ -57,8 +69,8 @@ class News_model extends CI_Model
         $this->db->group_end();
         return $this->db->get()->result_array();
     }
-    public function add($arr){
-        return (!empty($arr) && is_array($arr) && $this->add_to_table($this->tbl,$arr));
+    public function add_return_id($arr){
+        return (!empty($arr) && is_array($arr) && $this->add_to_table_return_id($this->tbl,$arr));
     }
     public function seen_weher_id($id){
         return (!empty($id) && intval($id)>0 && $this->edit_table($this->tbl,['status'=>'seen'],['id'=>intval($id)]));
