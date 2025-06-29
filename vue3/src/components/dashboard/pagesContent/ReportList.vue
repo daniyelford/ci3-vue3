@@ -33,7 +33,7 @@
 
 <style>
   #persian-calendar #vpc_calendar .vpc_week .vpc_day.vpc_week-period-day , #persian-calendar #vpc_calendar .vpc_week .vpc_day{
-    min-height: 150px !important;        
+    min-height: 250px !important;        
   }
   @media screen and (max-width: 600px) {
     #persian-calendar #vpc_header #vpc_date-control .vpc_now-date {

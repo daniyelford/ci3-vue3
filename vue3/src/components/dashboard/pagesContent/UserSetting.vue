@@ -3,6 +3,13 @@
         <h2 class="form-title">ویرایش اطلاعات</h2>
         <form @submit.prevent="submitForm">
             <div class="form-group">
+                <label class="form-label">تصویر پروفایل</label>
+                <input type="file" accept="image/*" @change="handleImageChange" class="form-file" />
+                <div v-if="form.image_preview" class="image-preview">
+                    <img :src="form.image_preview" alt="پیش‌نمایش تصویر" />
+                </div>
+            </div>
+            <div class="form-group">
                 <label class="form-label">نام</label>
                 <input v-model="form.name" type="text" class="form-input" />
             </div>
@@ -14,21 +21,17 @@
                 <label class="form-label">شماره تماس</label>
                 <input v-model="form.mobile" type="text" class="form-input" />
             </div>
-            <div class="form-group">
-                <label class="form-label">تصویر پروفایل</label>
-                <input type="file" accept="image/*" @change="handleImageChange" class="form-file" />
-                <div v-if="form.image_preview" class="image-preview">
-                    <img :src="form.image_preview" alt="پیش‌نمایش تصویر" />
-                </div>
-            </div>
+            
             <button class="form-button" type="submit">ویرایش</button>
         </form>
+        <FingerPrintRegister />
     </div>
 </template>
 <script setup>
     import { ref, onMounted } from 'vue'
     import { useUserStore } from '@/stores/user'
     import { sendApi } from '@/utils/api'
+    import FingerPrintRegister from '@/components/tooles/nav/FingerPrintRegister.vue'
     const userStore = useUserStore()
     const form = ref({
         name: '',

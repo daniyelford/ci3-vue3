@@ -1,5 +1,6 @@
 <script>
   import { sendApi } from '@/utils/api'
+  import { useNotificationStore } from '@/stores/notification'
   export default {
     name: 'LogOutUser',
     methods: {
@@ -9,6 +10,8 @@
           localStorage.removeItem("isLogin")
           window.dispatchEvent(new Event("storage"))
           this.isLoggedIn = false
+          const notificationStore = useNotificationStore()
+          notificationStore.$reset()
           this.$router.push("/")
         } else {
           alert('خطا در خروج از حساب');

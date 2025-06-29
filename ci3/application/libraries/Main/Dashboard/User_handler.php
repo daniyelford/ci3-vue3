@@ -86,6 +86,7 @@ class User_handler
                 'name'=>($this->CI->session->userdata('user_info')['name']?$this->CI->session->userdata('user_info')['name']:''),
                 'family'=>($this->CI->session->userdata('user_info')['family']?$this->CI->session->userdata('user_info')['family']:''),
                 'mobile'=>$this->get_user_mobile()['phone'],
+                'rule'=>(!empty($this->get_user_category_id())),
                 'image'=>$this->get_user_image()];
         }
         return ['status'=>'error',];
@@ -125,5 +126,8 @@ class User_handler
             ];
         }
         return [];
+    }
+    public function edit_user(){
+
     }
 }

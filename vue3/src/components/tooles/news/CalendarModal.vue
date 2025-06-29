@@ -37,6 +37,25 @@
     }
 </script>
 <style scoped>
+    h3{
+        margin-top: 0;
+    }
+    .actions button{
+        width: 48%;
+        margin: 1%;
+        padding: 10px 0;
+        border: none;
+        color: white;
+        font-size: 15px;
+        font-weight: bold;
+        border-radius: 10px;
+    }
+    .actions button:last-child{
+        background: red;
+    }
+    .actions button:first-child{
+        background: green;
+    }
     .modal-mask {
         position: fixed;
         top: 0;

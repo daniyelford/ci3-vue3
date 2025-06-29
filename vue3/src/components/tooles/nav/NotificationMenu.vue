@@ -18,7 +18,7 @@
         if (Notification.permission === 'granted') {
             const notification = new Notification(title, {
                 body,
-                icon: logo
+                icon: logo,
             })
             notification.onclick = () => {
                 window.focus()
@@ -27,15 +27,16 @@
         }
     }
     async function pollNotifications() {
-        const prevLastId = store.lastId
-        await store.fetchNotifications()
-        for (const notif of store.notifications) {
-            if (notif.id > prevLastId) {
-            store.lastId = notif.id
-                playSound()
-                showNativeNotification(notif.title, notif.body)
-            }
-        }
+    const prevLastId = store.lastId
+    await store.fetchNotifications()
+    const newOnes = store.notifications.filter(n => n.id > prevLastId)
+        newOnes.forEach(n => {
+            playSound()
+            showNativeNotification(n.title, n.body)
+        })
+    }
+    function handleMarkAsRead(id) {
+        store.markAsRead(id)
     }
     onMounted(() => {
         if (Notification.permission === 'default') {
@@ -46,30 +47,32 @@
     })
 </script>
 <template>
-  <div>
-    <div class="icon-wrapper" @click="toggleList">
-      🔔
-      <span class="badge" v-if="store.unreadCount > 0">
-        {{ store.unreadCount }}
-      </span>
+    <div>
+        <div class="icon-wrapper" @click="toggleList">
+            🔔
+            <span class="badge" v-if="store.unreadCount > 0">
+                {{ store.unreadCount }}
+            </span>
+        </div>
+        <div class="dropdown" v-if="showList">
+            <NotificationList
+            :notifications="store.notifications"
+            @update="handleMarkAsRead"
+            />
+        </div>
+        <audio ref="notifSound" :src="song" preload="auto"></audio>
     </div>
-    <div class="dropdown" v-if="showList">
-      <NotificationList
-        :notifications="store.notifications"
-        @update="store.markAsRead"
-      />
-    </div>
-    <audio ref="notifSound" :src="song" preload="auto"></audio>
-  </div>
 </template>
 <style scoped>
     .icon-wrapper {
         font-size: 24px;
+        cursor: pointer;
+        position: relative;
     }
     .badge {
-        position: relative;
-        top: 12px;
-        right: -30px;
+        position: absolute;
+        top: -6px;
+        right: -10px;
         background-color: red;
         color: white;
         border-radius: 50%;
@@ -83,6 +86,6 @@
         width: 300px;
         background: white;
         border-radius: 10px;
-        box-shadow: 0 0 5px rgba(0,0,0,0.2);
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
     }
 </style>

@@ -1,53 +1,72 @@
 <template>
+  <div>
     <div class="loading" v-if="!newsStore.isLoaded">
-        در حال بارگذاری...
+      در حال بارگذاری...
     </div>
-    <div class="card-inner" v-else-if="newsStore.cards.length > 0">
-        <div v-for="card in newsStore.cards" :key="card.id" class="card">
-            <div class="user-info">
-                <img v-if="card.user.image" :src="card.user.image" alt="user icon">
-                <svg v-else xmlns="http://www.w3.org/2000/svg" fill="#000000" enable-background="new 0 0 24 24" viewBox="0 0 24 24"><g><rect fill="none" height="24" width="24"/></g><g><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm0 14c-2.03 0-4.43-.82-6.14-2.88C7.55 15.8 9.68 15 12 15s4.45.8 6.14 2.12C16.43 19.18 14.03 20 12 20z"/></g></svg>
-                <p>{{ card.user.name + ' ' + card.user.family }}</p>
-            </div>
-            <div class="media-inner">
-                <MediaSlider v-if="card.medias.length > 0" :medias="card.medias" />
-            </div>
-            <div class="card-category">
-                {{ card.category }}
-            </div>
-            <div class="description" v-if="card.description !== ''">
-                {{ card.description }}
-            </div>
-            <div class="location" v-if="card.location !== ''">
-                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0,0,256,256"><defs><linearGradient x1="11.27" y1="9.259" x2="36.73" y2="34.72" gradientUnits="userSpaceOnUse" id="color-1"><stop offset="0" stop-color="#68e7cc"></stop><stop offset="1" stop-color="#1e2471"></stop></linearGradient><radialGradient cx="24" cy="22" r="9.5" gradientUnits="userSpaceOnUse" id="color-2"><stop offset="0.177" stop-color="#4d9595"></stop><stop offset="1" stop-color="#000000" stop-opacity="0"></stop></radialGradient></defs><g fill="none" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="none" font-weight="none" font-size="none" text-anchor="none" style="mix-blend-mode: normal"><g transform="scale(5.33333,5.33333)"><path d="M36.902,34.536c6.932,-7.126 6.775,-18.521 -0.351,-25.453c-7.126,-6.932 -18.521,-6.775 -25.453,0.35c-6.797,6.987 -6.797,18.116 0,25.103c0.018,0.019 0.03,0.04 0.048,0.059l0.059,0.059c0.047,0.048 0.094,0.095 0.142,0.142l11.239,11.239c0.781,0.781 2.047,0.781 2.828,0v0l11.239,-11.239c0.048,-0.047 0.095,-0.094 0.142,-0.142l0.059,-0.059c0.019,-0.019 0.031,-0.041 0.048,-0.059z" fill="url(#color-1)"></path><circle cx="24" cy="22" r="9.5" fill="url(#color-2)"></circle><circle cx="24" cy="22" r="8" fill="#8129bf"></circle></g></g></svg>
-                {{ card.location }}
-            </div>
-            <div class="time">
-                {{ moment(card.created_at).format('jYYYY/jMM/jDD') }}
-            </div>
-            <a class="choose" v-if="newsStore.hasRule" @click="openCalendarModal(card.id)">
-                بررسی
-            </a>
+    <div class="card-inner" v-else-if="visibleNews.length > 0">
+      <div v-for="card in visibleNews" :key="card.id" class="card">
+        <div class="user-info">
+          <img v-if="card.user.image" :src="card.user.image" alt="user" />
+          <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 ... 12 20z" />
+          </svg>
+          <p>{{ card.user.name + ' ' + card.user.family }}</p>
         </div>
+
+        <div class="media-inner">
+          <MediaSlider v-if="card.medias.length > 0" :medias="card.medias" />
+        </div>
+
+        <div class="card-category" v-if="!newsStore.hasRule">
+          {{ card.category }}
+        </div>
+
+        <div class="description" v-if="card.description">
+          {{ card.description }}
+        </div>
+
+        <div class="location" v-if="card.location">
+          📍 {{ card.location }}
+        </div>
+
+        <div class="time">
+          {{ moment(card.created_at).format('jYYYY/jMM/jDD') }}
+        </div>
+        <a class="choose" v-if="newsStore.hasRule" @click="openCalendarModal(card.id)">
+            بررسی
+        </a>
+      </div>
+      <button
+        v-if="visibleCount < newsStore.cards.length"
+        @click="loadMore"
+        :disabled="loadingMore"
+      >
+        {{ loadingMore ? 'در حال بارگذاری...' : 'نمایش بیشتر' }}
+      </button>
     </div>
-    <div class="none-cart-error" v-else>
-        خبری در محدوده شما وجود ندارد
+    <div v-else class="none-cart-error">
+      خبری در محدوده شما وجود ندارد
     </div>
-    <CalendarModal
+    <div v-if="toastMsg" class="toast">{{ toastMsg }}</div>
+        <CalendarModal
     v-if="showModal"
     @close="showModal = false"
     @submit="onCalendarSubmit" />
+  </div>
 </template>
 <script setup>
-    import { ref, onMounted , onBeforeUnmount } from 'vue'
+    import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
     import moment from 'moment-jalaali'
+    import { useNewsStore } from '@/stores/news'
     import { sendApi } from '@/utils/api'
     import MediaSlider from '@/components/tooles/media/MediaSlider.vue'
     import CalendarModal from '@/components/tooles/news/CalendarModal.vue'
-    import { useNewsStore } from '@/stores/news'
-    const showModal = ref(false)
-    const selectedNewsId = ref(null)
     const newsStore = useNewsStore()
+    const visibleCount = ref(10)
+    const loadingMore = ref(false)
+    const toastMsg = ref('')
+    const selectedNewsId = ref(null)
+    const showModal = ref(false)
     function openCalendarModal(id) {
         selectedNewsId.value = id
         showModal.value = true
@@ -58,8 +77,8 @@
             action: 'add_news_to_list',
             control: 'news',
             data: {
-            news_id: selectedNewsId.value,
-            run_time: jsDate ?? null,
+                news_id: selectedNewsId.value,
+                run_time: jsDate ?? null,
             }
         })
         if (response.status === 'success') {
@@ -69,16 +88,86 @@
             alert('خطا در ثبت تاریخ اجرا')
         }
     }
+    const visibleNews = computed(() =>
+        newsStore.cards.slice(0, visibleCount.value)
+    )
+    function loadMore() {
+        loadingMore.value = true
+        setTimeout(() => {
+            visibleCount.value += 10
+            loadingMore.value = false
+        }, 300)
+    }
+    function showToast(msg) {
+        toastMsg.value = msg
+        setTimeout(() => (toastMsg.value = ''), 3000)
+    }
     let intervalId = null
+    async function pollNews() {
+        const prevTopId = newsStore.cards.length ? newsStore.cards[0].id : 0
+        await newsStore.fetchNews()
+        const newTopId = newsStore.cards.length ? newsStore.cards[0].id : 0
+        if (newTopId > prevTopId) {
+            showToast('خبر جدید رسید!')
+        }
+    }
+    function handleVisibilityChange() {
+        if (document.visibilityState === 'visible') {
+            pollNews()
+            startPolling()
+        } else {
+            stopPolling()
+        }
+    }
+    function startPolling() {
+        stopPolling()
+        intervalId = setInterval(() => {
+            pollNews()
+        }, 6000)
+    }
+    function stopPolling() {
+        if (intervalId) clearInterval(intervalId)
+        intervalId = null
+    }
     onMounted(() => {
         newsStore.fetchNews()
-        intervalId = setInterval(() => {
-            newsStore.fetchNews()
-        }, 6000)
+        startPolling()
+        document.addEventListener('visibilitychange', handleVisibilityChange)
     })
-    onBeforeUnmount(() => {if (intervalId) clearInterval(intervalId)})
+    onBeforeUnmount(() => {
+        stopPolling()
+        document.removeEventListener('visibilitychange', handleVisibilityChange)
+    })
 </script>
 <style scoped>
+    .toast {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        background: #2ecc71;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    }
+    .loading{
+        text-align: center;
+        padding: 15px;
+        background: blue;
+        color: white;
+        font-size: 20px;
+        border-radius: 5px;
+        font-weight: bold;
+    }
+    .none-cart-error {
+        text-align: center;
+        padding: 15px;
+        background: red;
+        color: white;
+        font-size: 20px;
+        border-radius: 5px;
+        font-weight: bold;
+    }
     .media-inner {
         background: white;
         padding: 5px;

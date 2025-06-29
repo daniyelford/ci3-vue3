@@ -1,12 +1,11 @@
 import { defineStore } from 'pinia'
 import { sendApi } from '@/utils/api'
-
 export const useNewsStore = defineStore('news', {
   state: () => ({
     cards: [],
     lastUpdate: null,
     isLoaded: false,
-    hasRule:false
+    hasRule: false
   }),
   actions: {
     async fetchNews() {
@@ -19,18 +18,22 @@ export const useNewsStore = defineStore('news', {
           description: item.description,
           created_at: item.created_at,
           user: item.user,
-          medias: item.media.map(media => ({
-            type: media.type,
-            url: media.url 
-          })),
+          medias: Array.isArray(item.media)
+            ? item.media.map(media => ({
+                type: media.type,
+                url: media.url
+              }))
+            : []
         }))
-        this.hasRule=res.rule
-        const changed = JSON.stringify(newCards) !== JSON.stringify(this.cards)
-        if (changed) {
+        this.hasRule = res.rule ?? false
+        const currentIds = this.cards.map(c => c.id).sort((a, b) => a - b)
+        const newIds = newCards.map(c => c.id).sort((a, b) => a - b)
+        const isDifferent = JSON.stringify(currentIds) !== JSON.stringify(newIds)
+        if (isDifferent) {
           this.cards = newCards
           this.lastUpdate = new Date().toISOString()
         }
-        this.isLoaded=true
+        this.isLoaded = true
       }
     }
   }

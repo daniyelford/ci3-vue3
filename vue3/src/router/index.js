@@ -8,6 +8,7 @@ import ReportListView from '@/views/dashboard/ReportListView.vue';
 import AddNewsView from '@/views/dashboard/AddNewsView.vue';
 import ManageNewsViews from '@/views/dashboard/ManageNewsViews.vue';
 import UserSettingView from '@/views/dashboard/UserSettingView.vue';
+import CartableView from '@/views/dashboard/CartableView.vue';
 import { sendApi } from '@/utils/api';
 
 const routes = [
@@ -62,6 +63,12 @@ const routes = [
     path: '/user-setting',
     name: 'user-setting',
     component: UserSettingView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/cartable',
+    name: 'cartable',
+    component: CartableView,
     meta: { requiresAuth: true }
   },
 ]

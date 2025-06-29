@@ -1,9 +1,14 @@
 import { defineStore } from 'pinia'
 export const useUserStore = defineStore('user', {
   state: () => ({
+    fullName: '',
     name: '',
+    family: '',
+    mobile: '',
     wallet: 0,
     image: '',
+    finger:false,
+    rule:false,
     isLoaded: false,
   }),
   actions: {
@@ -19,6 +24,7 @@ export const useUserStore = defineStore('user', {
           this.wallet = res.wallet
           this.image = res.image
           this.finger = res.finger
+          this.rule = res.rule
           this.isLoaded = true
         } else {
           console.warn('User info error:', res)

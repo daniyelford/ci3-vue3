@@ -100,6 +100,12 @@
   color: #666;
 }
 .category {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 5px;
   margin-top: 0.5rem;
 }
 .category-item {

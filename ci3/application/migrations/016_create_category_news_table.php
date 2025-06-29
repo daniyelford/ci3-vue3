@@ -38,7 +38,7 @@ class Migration_Create_category_news_table extends CI_Migration {
         $this->db->query("ALTER TABLE category_news MODIFY created_at DATETIME DEFAULT CURRENT_TIMESTAMP");
         $this->db->query("ALTER TABLE category_news MODIFY updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP");
         $this->db->query('ALTER TABLE category_news ADD CONSTRAINT fk_category_news_news FOREIGN KEY (news_id) REFERENCES news(id) ON DELETE CASCADE ON UPDATE CASCADE');
-        $this->db->query('ALTER TABLE category_news ADD CONSTRAINT fk_category_news_category FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE ON UPDATE CASCADE');
+        $this->db->query('ALTER TABLE category_news ADD CONSTRAINT fk_category_news_category FOREIGN KEY (category_id) REFERENCES category(id) ON DELETE CASCADE ON UPDATE CASCADE');
     }
 
     public function down() {

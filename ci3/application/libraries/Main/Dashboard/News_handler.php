@@ -3,6 +3,7 @@ class News_handler
 {
     private $CI;
     private $user;
+    private $security;
     private $category=[];
     private $category_news=[];
     private $media=[];
@@ -22,8 +23,10 @@ class News_handler
         $this->CI->load->model('Users_model');
         $this->CI->load->model('Media_model');
         $this->CI->load->model('Category_model');
+        $this->CI->load->library('Tools/Security_handler');
         $this->CI->load->library('Main/Dashboard/User_handler');
         $this->user=new User_handler();
+        $this->security=new Security_handler();
 	}
     private function has_category_id(){
         return (!empty($this->user->get_user_category_id()) && intval($this->user->get_user_category_id())>0);
@@ -99,8 +102,11 @@ class News_handler
         return '';
     }
     private function search_ids_return_value_in_key($data,$ids,$key,$key_wanted){
-        $result=[];
         $ids=(!empty($ids)?explode(',',$ids):[]);
+        return $this->search_ids_array_return_value_in_key($data,$ids,$key,$key_wanted);
+    }
+    private function search_ids_array_return_value_in_key($data,$ids,$key,$key_wanted){
+        $result=[];
         if(!empty($data) && !empty($ids) && !empty($key) && !empty($key_wanted))
             foreach ($ids as $id) {
                 if(!empty($id) && intval($id)>0) $result[]=$this->search_id_return_value_in_key($data,intval($id),$key,$key_wanted);
@@ -119,7 +125,7 @@ class News_handler
                     $arr['created_at']=$a['created_at']??'';
                     $arr['description']=$a['description']??'';
                     $arr['media']=$this->search_ids_return_value_in_key($this->media,$a['media_id']??'','id',['id','url','type']);
-                    $arr['category']=$this->get_all_category_array_where_news_id(intval($a['id']));
+                    $arr['category']=$this->search_ids_array_return_value_in_key($this->category,$this->get_all_category_array_where_news_id(intval($a['id'])),'id','title');
                     $arr['location']=$location['city']??'';
                     $user=$this->user->get_user_info_where_user_account(intval($a['user_account_id']));
                     array_pop($user);
@@ -197,7 +203,7 @@ class News_handler
             $this->CI->Notification_model->insert_batch($notif);
             return ['status'=>'success'];
         }
-        return ['status'=>'error'];    
+        return ['status'=>'error' ];    
     }
     public function add_data(){
         $this->get_all_category_active();
@@ -245,7 +251,7 @@ class News_handler
             if($data['user_address']['type']==='location' && !empty($data['user_address']['value']) && !empty($data['user_address']['value']['total'])){
                 if(!(($address_id=$this->CI->Users_model->add_address_return_id([
                     'user_account_id'=>$this->user->get_user_account_id(),
-                    'address'=> $data['user_address']['value']['total']['display_name']??'',
+                    'address'=> $this->security->string_secutory_week_check($data['user_address']['value']['total']['display_name']??''),
                     'code_posti'=>$data['user_address']['value']['total']['address']['postcode']??'',
                     'country'=>$data['user_address']['value']['total']['address']['country']??'',
                     'region'=>$data['user_address']['value']['total']['address']['province']??'',
@@ -270,14 +276,13 @@ class News_handler
                 'user_address_id'=>intval($address_id),
                 'privacy' => ($this->user->get_user_category_id()?'public':'private'),
                 'media_id'=>	implode(',',$data['media_id']),
-                'description'=>$data['description']
+                'description'=>$this->security->string_secutory_week_check($data['description'])
             ]))!==false && !empty($news_id) && intval($news_id)>0){
-                $arr = array_map(function($cat_id) use ($news_id) {
-                    return [
-                        'news_id' => $news_id,
-                        'category_id' => $cat_id
-                    ];
-                }, $category);
+                $arr = [];
+                foreach ($category as $cat) {
+                    if(!empty($cat) && intval($cat)>0)
+                        $arr[]=['news_id' => $news_id,'category_id' => intval($cat)];
+                }
                 $this->CI->Category_model->insert_relation_batch($arr);
                 $this->send_add_news_notification($category);
                 return ['status'=>'success'];
@@ -299,7 +304,7 @@ class News_handler
                     $arr=[];
                     $arr['id']=$a['id'];
                     $arr['address']=$this->search_id_return_value_in_key($this->address,$a['user_address_id']??0,'id',['id','city','lat','lon','address']);
-                    $arr['category']=$this->get_all_category_array_where_news_id(intval($a['id']));
+                    $arr['category']=$this->search_ids_array_return_value_in_key($this->category,$this->get_all_category_array_where_news_id(intval($a['id'])),'id',['id','title']);
                     $arr['media']=$this->search_ids_return_value_in_key($this->media,$a['media_id']??'','id',['id','url','type']);
                     $arr['description']=$a['description']??'';
                     $arr['status']=$a['status']??'';

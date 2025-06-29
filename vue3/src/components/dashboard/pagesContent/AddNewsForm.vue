@@ -97,7 +97,7 @@
                 data: finalData,
             })
             if (res.status === 'success') {
-              router.push('/dashboard')
+              router.push('/manage-news')
             } else {
                 alert('خطا در ثبت خبر: ' + res.message)
             }

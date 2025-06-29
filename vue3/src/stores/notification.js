@@ -10,20 +10,17 @@ export const useNotificationStore = defineStore('notification', {
   actions: {
     async fetchNotifications() {
       const userStore = useUserStore()
-      if (userStore.isLoggedIn) {
-        const res = await sendApi({ action: 'get_notifications', control: 'user' })
-        if (res.status === 'success' && Array.isArray(res.data)) {
-          const newNotifs = res.data
-          const maxNewId = Math.max(...newNotifs.map(n => n.id), 0)
-          if (maxNewId > this.lastId) {
-            this.notifications = newNotifs
-            this.unreadCount = newNotifs.filter(n => n.is_read === 'dont').length
-            this.lastId = maxNewId
-          }
+      if (!userStore.isLoggedIn) return
+      const res = await sendApi({ action: 'get_notifications', control: 'user' })
+      if (res.status === 'success' && Array.isArray(res.data)) {
+        const newNotifs = res.data.filter(n => n.id > this.lastId)
+        if (newNotifs.length > 0) {
+          this.notifications = [...newNotifs, ...this.notifications]
+          this.lastId = Math.max(...this.notifications.map(n => n.id))
+          this.unreadCount = this.notifications.filter(n => n.is_read === 'dont').length
         }
       }
     },
-
     markAsRead(id) {
       const notif = this.notifications.find(n => n.id === id)
       if (notif && notif.is_read === 'dont') {
@@ -31,13 +28,14 @@ export const useNotificationStore = defineStore('notification', {
         this.unreadCount = this.notifications.filter(n => n.is_read === 'dont').length
       }
     },
-
     pushNotification(notif) {
-      this.notifications.unshift(notif)
-      if (notif.is_read === 'dont') this.unreadCount++
-      this.lastId = Math.max(this.lastId, notif.id)
+      const exists = this.notifications.some(n => n.id === notif.id)
+      if (!exists) {
+        this.notifications.unshift(notif)
+        if (notif.is_read === 'dont') this.unreadCount++
+        this.lastId = Math.max(this.lastId, notif.id)
+      }
     }
   },
-
   persist: true
 })
