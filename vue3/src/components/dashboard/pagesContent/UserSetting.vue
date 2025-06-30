@@ -3,7 +3,11 @@
         <h2 class="form-title">ویرایش اطلاعات</h2>
         <form @submit.prevent="submitForm">
             <div class="form-group image-inner">
-                <UploadSingleImageUser url="register/" toAction="user-mobile" :image="form.image_preview" @uploaded="(url) => { form.image_preview = url }"/>
+                <UploadSingleImageUser url="register/" toAction="user-mobile" :image="form.image_preview" 
+                @uploaded="({ id, url }) => {
+                    form.image_preview = url
+                    form.image_id = id
+                }"/>
             </div>
             <div class="form-group">
                 <label class="form-label">نام</label>
@@ -15,12 +19,14 @@
             </div>
             <div class="form-group">
                 <label class="form-label">شماره تماس</label>
-                <input v-model="form.mobile" type="text" class="form-input" />
+                <input v-model="form.mobile" disabled type="text" class="form-input" />
             </div>
-            
+            <div class="form-group tx-c">
+                <label class="form-label">تغییر اثر انگشت</label>
+                <FingerPrintRegister :hasFinger="false"/>
+            </div>
             <button class="form-button" type="submit">ویرایش</button>
         </form>
-        <FingerPrintRegister :hasFinger="false"/>
     </div>
 </template>
 <script setup>
@@ -29,11 +35,13 @@
     import { sendApi } from '@/utils/api'
     import UploadSingleImageUser from '@/components/tooles/upload/UploadSingleImageUser.vue'
     import FingerPrintRegister from '@/components/tooles/nav/FingerPrintRegister.vue'
+    import router from '@/router'
     const userStore = useUserStore()
     const form = ref({
         name: '',
         family: '',
         mobile: '',
+        image_id: null,
         image_preview: '' 
     })
     onMounted(() => {
@@ -52,6 +60,10 @@
         form.value.image_preview = userStore.image || ''
     }
     const submitForm = async () => {
+        if (!form.value.name || !form.value.family) {
+            alert('لطفاً تمام فیلدها را وارد کنید.')
+            return
+        }
         try {
             const data = await sendApi({
                 control: 'user',
@@ -59,18 +71,26 @@
                 data: {
                     name: form.value.name,
                     family: form.value.family,
-                    mobile: form.value.mobile,
-                    image_url: form.value.image_preview
+                    image_id: form.value.image_id,
                 },
             })
-            alert(data.data.message)
-            await userStore.fetchUserInfo()
+            if(data.status==='success'){
+                await userStore.fetchUserInfo()
+                router.push('/dashboard')
+            }
         } catch (e) {
-            alert('خطا: ' + (e.response?.data?.message || e.message))
+            alert('خطا: ')
         }
     }
 </script>
 <style scoped>
+    .image-inner{
+        width: 50%;
+        margin: auto;
+    }
+    .tx-c{
+        text-align: center;
+    }
     .form-container {
         padding: 20px;
         max-width: 500px;

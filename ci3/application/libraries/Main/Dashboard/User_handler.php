@@ -2,12 +2,22 @@
 class User_handler
 {
     private $CI;
+    private $security;
     public function __construct(){
 		$this->CI =& get_instance();
         $this->CI->load->model('Users_model');
+        $this->CI->load->library('Tools/Security_handler');
         $this->CI->load->model('Media_model');
         $this->CI->load->model('Notification_model');
+        $this->security=new Security_handler();
 	}
+    public function reset_user_info_session(){
+        if(($id=$this->get_user_id())!==false && !empty($id) && intval($id)>0 &&
+        ($user_info=$this->CI->Users_model->select_where_id(intval($id)))!==false &&
+        !empty($user_info) && !empty(end($user_info))){
+            $this->CI->session->set_userdata('user_info',end($user_info));
+        }
+    }
     public function get_user_cordinates(){
         return ($this->CI->session->has_userdata('user_cordinates') && 
         !empty($this->CI->session->userdata('user_cordinates'))?
@@ -32,6 +42,13 @@ class User_handler
         !empty($this->CI->session->userdata('category_id')) && 
         intval($this->CI->session->userdata('category_id'))>0?
             intval($this->CI->session->userdata('category_id')): 
+            null);
+    }
+    public function get_user_id(){
+        return ($this->CI->session->has_userdata('id') && 
+        !empty($this->CI->session->userdata('id')) &&
+        intval($this->CI->session->userdata('id'))>0?
+            intval($this->CI->session->userdata('id')):
             null);
     }
     public function get_user_account_id(){
@@ -127,7 +144,24 @@ class User_handler
         }
         return [];
     }
-    public function edit_user(){
-
+    public function edit_user($data){
+        if(!empty($data) && !empty($data['name']) && !empty($data['family']) &&
+        ($id=$this->get_user_id())!==false && !empty($id) && intval($id)>0 &&
+        ($mobile=$this->get_user_mobile())!==false && !empty($mobile) && 
+        !empty($mobile['id']) && intval($mobile['id'])>0 &&
+        $this->CI->Users_model->edit_weher_id(['name'=>$this->security->string_secutory_week_check($data['name']),'family'=>$this->security->string_secutory_week_check($data['family'])],intval($id))){
+            $this->reset_user_info_session();
+            if(!empty($data['image_id']) && intval($data['image_id'])>0 &&
+            $this->CI->Users_model->edit_mobile_weher_id(['image_id'=>intval($data['image_id'])],intval($mobile['id']))){
+                if(!empty($mobile['image_id']) && intval($mobile['image_id'])>0 &&    
+                ($image=$this->CI->Media_model->select_where_id(intval($mobile['image_id'])))!==false && 
+                !empty($image) && !empty(end($image)) && !empty(end($image)['id']) && intval(end($image)['id'])>0 && !empty(end($image)['url'])){
+                    $this->CI->Media_model->remove_where_id(intval(end($image)['id']));
+                    $this->CI->Media_model->remove_file(end($image)['url']);
+                }
+            }
+            return ['status'=>'success'];
+        }
+        return ['status'=>'error'];
     }
 }

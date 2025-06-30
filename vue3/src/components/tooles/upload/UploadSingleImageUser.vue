@@ -85,7 +85,7 @@
             if (response.status === 'success' && response.url) {
                 imageUrl.value = response.url;
                 imageId.value = response.id;
-                emit('uploaded', response.url);
+                emit('uploaded', { id:response.id,url:response.url });
             } else {
                 alert(response.message || 'آپلود موفق نبود');
             }
