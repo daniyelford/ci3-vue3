@@ -76,7 +76,7 @@
             })
             if(data.status==='success'){
                 await userStore.fetchUserInfo()
-                router.push('/dashboard')
+                router.push({ path:'/dashboard' })
             }
         } catch (e) {
             alert('خطا: ')

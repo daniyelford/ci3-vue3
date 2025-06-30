@@ -60,6 +60,9 @@ class News_handler
             })
         ));
     }
+    private function get_all_report_where_news_id($id){
+        return (!empty($id) && intval($id)>0 && ($a=$this->CI->News_model->select_report_where_news_id(intval($id)))!==false && !empty($a)?$a:null);
+    }
     private function get_all_my_report(){
         $this->get_all_my_news();
         $my_seenIds = array_column(array_filter($this->news_manager, function($item) {
@@ -302,12 +305,14 @@ class News_handler
             foreach ($this->news_manager as $a) {
                 if(!empty($a) && !empty($a['id']) && intval($a['id'])>0){
                     $arr=[];
-                    $arr['id']=$a['id'];
+                    $arr['id']=intval($a['id']);
                     $arr['address']=$this->search_id_return_value_in_key($this->address,$a['user_address_id']??0,'id',['id','city','lat','lon','address']);
                     $arr['category']=$this->search_ids_array_return_value_in_key($this->category,$this->get_all_category_array_where_news_id(intval($a['id'])),'id',['id','title']);
                     $arr['media']=$this->search_ids_return_value_in_key($this->media,$a['media_id']??'','id',['id','url','type']);
                     $arr['description']=$a['description']??'';
                     $arr['status']=$a['status']??'';
+                    $a=$this->get_all_report_where_news_id(intval($a['id']));
+                    $arr['report']=(!empty($a));
                     $this->result_manager[]=$arr;
                 }
             }
@@ -360,5 +365,15 @@ class News_handler
         $this->get_all_my_report();
         $this->set_all_my_report();
         return ['status'=>'success','data'=>$this->result_report];
+    }
+    public function delete_news($data){
+        if(!empty($data) && !empty($data['id']) && intval($data['id'])>0 && ($a=$this->user->get_user_account_id())!==false && !empty($a) && intval($a)>0 && $this->CI->News_model->seen_weher_id_and_user_account_id(intval($data['id']),intval($a)))
+            return ['status'=>'success'];
+        return ['status'=>'error'];
+    }
+    public function restore_news($data){
+        if(!empty($data) && !empty($data['id']) && intval($data['id'])>0 && ($a=$this->user->get_user_account_id())!==false && !empty($a) && intval($a)>0 && $this->CI->News_model->checking_weher_id_and_user_account_id(intval($data['id']),intval($a)))
+            return ['status'=>'success'];
+        return ['status'=>'error'];
     }
 }

@@ -2,7 +2,6 @@
     <div v-if="show" class="modal-overlay">
         <div class="modal-content">
             <button @click="$emit('close')" class="modal-close">×</button>
-            <h2 class="modal-title">جزئیات رویداد</h2>
             <div class="modal-item user" v-if="!event?.me">
                 <div class="user-info">
                     <img
@@ -27,9 +26,9 @@
                 <strong>آدرس:</strong>
                 {{ event?.news?.address?.address || 'ثبت نشده' }}
             </p>
-            <button v-if="!event?.me" class="done">
-                شروع
-            </button>
+            <RouterLink v-if="event?.news?.id" :to="{ path:`/show-cartable/${event.news.id}` }" class="done">
+                {{ event?.me?'پیگیری':'بررسی' }}
+            </RouterLink>
         </div>
     </div>
 </template>
@@ -43,16 +42,19 @@
     defineEmits(['close'])
 </script>
 <style scoped>
-    button.done {
+    .done {
         width: 100%;
         padding: 10px;
-        background: aquamarine;
-        border: none;
-        outline: none;
+        background: #7fffd4;
+        color: black;
+        text-decoration: none;
         cursor: pointer;
         border-radius: 5px;
         font-size: 15px;
-        font-weight: bold;
+        font-weight: 700;
+        display: inline-block;
+        text-align: center;
+        box-sizing: border-box;
     }
     .user-info{
         display: flex;

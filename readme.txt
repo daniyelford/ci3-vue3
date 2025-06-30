@@ -7,6 +7,8 @@ npm install vue-multiselect
 npm install leaflet
 npm install pinia
 npm install vue3-jalali-calendar moment-jalaali
+// npm install lodash.isequal
+
 npm install @capacitor/core @capacitor/cli
 npx cap init
 npm install @capacitor/android

@@ -1,6 +1,5 @@
 <?php
 
-use Ramsey\Uuid\Type\Integer;
 
 class News_model extends CI_Model
 {
@@ -63,6 +62,9 @@ class News_model extends CI_Model
     public function select_news_where_status_seen(){
 	    return $this->select_where_array_table($this->tbl,['status'=>'seen']);
 	}
+    public function select_report_where_news_id($id){
+	    return (!empty($id) && intval($id)?$this->select_where_array_table($this->report,['news_id'=>intval($id)]):false);
+	}
     public function select_report_where_user_account_id($id){
 	    return (!empty($id) && intval($id)?$this->select_where_array_table($this->report,['user_account_id'=>intval($id)]):false);
 	}
@@ -82,5 +84,11 @@ class News_model extends CI_Model
     }
     public function seen_weher_id($id){
         return (!empty($id) && intval($id)>0 && $this->edit_table($this->tbl,['status'=>'seen'],['id'=>intval($id)]));
+    }
+    public function seen_weher_id_and_user_account_id($id,$user_id){
+        return (!empty($id) && intval($id)>0 && !empty($user_id) && intval($user_id)>0 && $this->edit_table($this->tbl,['status'=>'seen'],['id'=>intval($id),'user_account_id'=>intval($user_id)]));
+    }
+    public function checking_weher_id_and_user_account_id($id,$user_id){
+        return (!empty($id) && intval($id)>0 && !empty($user_id) && intval($user_id)>0 && $this->edit_table($this->tbl,['status'=>'checking'],['id'=>intval($id),'user_account_id'=>intval($user_id)]));
     }
 }
