@@ -11,7 +11,7 @@
             <nav class="bottom-menu">
                 <ul>
                     <li>
-                        <FingerPrintRegister />
+                        <FingerPrintRegister :hasFinger="user.finger"/>
                     </li>
                     <li>
                         <LogOutUser/>
