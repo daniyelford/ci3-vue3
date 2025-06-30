@@ -4,6 +4,8 @@
   import FingerPrintLogin from '@/components/home/FingerPrintLogin.vue'
   import { sendApi } from '@/utils/api'
   import { BASE_URL } from '@/config';
+  const cityIcon=BASE_URL+'/assets/images/city.png'
+  const carIcon=BASE_URL+'/assets/images/car.png'
   const logo=BASE_URL+'/assets/images/logo.png'
   const showFingerPrint = ref(false)
   async function handleValidPhone(isValid) {
@@ -29,8 +31,22 @@
 </script>
 <template>
     <section class="home">
-      <img alt="logo" :src="logo" />
+        <svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+            <image :href="cityIcon" x="0" y="0" width="800" height="400" />
+            <g>
+                <image :href="carIcon" width="300" height="150">
+                <animateTransform
+                    attributeName="transform"
+                    type="translate"
+                    from="-250 280"
+                    to="900 280"
+                    dur="2s"
+                    repeatCount="indefinite" />
+                </image>
+            </g>
+        </svg>
       <div>
+        <img alt="logo" :src="logo" />
         <PhoneLogin @validPhone="handleValidPhone" />
         <br v-if="showFingerPrint">
         <FingerPrintLogin v-if="showFingerPrint" />
@@ -45,28 +61,22 @@
     direction: rtl;
     justify-content: space-evenly;
     align-items: center;
-    margin-top: 50px;
     width: 100%;
     gap: 20px;
   }
   div{
     border-radius: 10px;
-    background: #e0e4ed;
+    text-align:center;
     width:40%;
     padding: 20px;
     box-shadow: 0 0 10px grey;
   }
   img{
-    width:40%;
-    height:auto;
+    width:100%;
   }
   @media screen and (max-width:600px){
     .home{
       flex-direction: column;
-    }
-    img{
-      margin:0 auto;
-      width:50%;
     }
     div{
       width:80%;

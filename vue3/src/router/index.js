@@ -1,22 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import UploadView from "@/views/home/UploadView.vue";
 import LoginView from '@/views/home/LoginView.vue';
-import DashboardView from '@/views/dashboard/DashboardView.vue';
 import RegisterView from '@/views/home/RegisterView.vue';
-import WalletView from '@/views/dashboard/WalletView.vue';
-import ReportListView from '@/views/dashboard/ReportListView.vue';
-import AddNewsView from '@/views/dashboard/AddNewsView.vue';
-import ManageNewsViews from '@/views/dashboard/ManageNewsViews.vue';
-import UserSettingView from '@/views/dashboard/UserSettingView.vue';
-import CartableView from '@/views/dashboard/CartableView.vue';
+import MainDashboard from '@/views/dashboard/MainDashboard.vue';
 import { sendApi } from '@/utils/api';
-
 const routes = [
-  {
-    path: '/upload',
-    name: 'upload',
-    component: UploadView
-  },
   {
     path: '/',
     name: 'login',
@@ -32,43 +19,57 @@ const routes = [
   {
     path: '/dashboard',
     name: 'dashboard',
-    component: DashboardView,
-    meta: { requiresAuth: true }
+    component: MainDashboard,
+    meta: { requiresAuth: true },
+    props: { view: 'dashboard' } 
   },
   {
     path: '/wallet',
     name: 'wallet',
-    component: WalletView,
-    meta: { requiresAuth: true }
+    component: MainDashboard,
+    meta: { requiresAuth: true },
+    props: { view: 'wallet' } 
   },
   {
     path: '/add-news',
     name: 'add-news',
-    component: AddNewsView,
-    meta: { requiresAuth: true }
+    component: MainDashboard,
+    meta: { requiresAuth: true },
+    props: { view: 'add-news' } 
   },
   {
     path: '/report-list',
     name: 'report-list',
-    component: ReportListView,
-    meta: { requiresAuth: true }
+    component: MainDashboard,
+    meta: { requiresAuth: true },
+    props: { view: 'report-list' } 
   },
   {
     path: '/manage-news',
     name: 'manage-news',
-    component: ManageNewsViews,
-    meta: { requiresAuth: true }
+    component: MainDashboard,
+    meta: { requiresAuth: true },
+    props: { view: 'manage-news' } 
   },
   {
     path: '/user-setting',
     name: 'user-setting',
-    component: UserSettingView,
-    meta: { requiresAuth: true }
+    component: MainDashboard,
+    meta: { requiresAuth: true },
+    props: { view: 'user-setting' } 
   },
   {
     path: '/cartable',
     name: 'cartable',
-    component: CartableView,
+    component: MainDashboard,
+    props: { view: 'cartable' },
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/show-cartable/:id',
+    name: 'show-cartable',
+    component: MainDashboard,
+    props: route => ({ view: 'show-cartable', id: route.params.id }),
     meta: { requiresAuth: true }
   },
 ]
