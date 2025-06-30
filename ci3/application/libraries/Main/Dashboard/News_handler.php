@@ -376,4 +376,7 @@ class News_handler
             return ['status'=>'success'];
         return ['status'=>'error'];
     }
+    public function get_cartables(){
+        return ['status'=>'success','data'=>[]];
+    }
 }
