@@ -24,6 +24,14 @@ class Migration_Create_report_list_table extends CI_Migration {
                 'unsigned' => TRUE,
                 'null' => TRUE,
             ],
+            'media_id' => [
+                'type' => 'TEXT',
+                'null' => TRUE,
+            ],
+            'description' => [
+                'type' => 'TEXT',
+                'null' => TRUE,
+            ],
             'status' => [
                 'type' => 'ENUM("checking", "done")',
                 'default' => 'checking',

@@ -398,15 +398,19 @@ $config['encryption_key'] = '';
 | except for 'cookie_prefix' and 'cookie_httponly', which are ignored here.
 |
 */
-$config['sess_driver'] = 'files';
+$conn = new mysqli(HOST, USERNAME, PASSWORD, DBNAME);
+$tableCheck = $conn->query("SHOW TABLES LIKE 'ci_sessions'");
+$useDatabase = $tableCheck && $tableCheck->num_rows > 0;
+$conn->close();
+$config['sess_driver'] = $useDatabase ? 'database' : 'files';
+$config['sess_save_path'] = $useDatabase ? 'ci_sessions' : NULL;
 $config['sess_cookie_name'] = 'ci_session';
+$config['sess_expiration'] = 86400 * 30;
+$config['sess_time_to_update'] = 86400;
+$config['cookie_lifetime'] = 86400 * 30;
 $config['sess_samesite'] = 'Lax';
-$config['sess_expiration'] = 7200;
-$config['sess_save_path'] = NULL;
-$config['sess_match_ip'] = FALSE;
-$config['sess_time_to_update'] = 300;
+$config['sess_match_ip'] = TRUE;
 $config['sess_regenerate_destroy'] = FALSE;
-
 /*
 |--------------------------------------------------------------------------
 | Cookie Related Variables

@@ -29,6 +29,9 @@ class News_model extends CI_Model
         return (!empty($tbl) && is_string($tbl) && !empty($arr) && is_array($arr) && $this->db->delete($tbl, $arr));
     }
     // costum
+    public function select_news(){
+        return $this->db->get($this->tbl)->result_array();
+    }
     public function select_news_where_id($id){
 	    return (!empty($id) && intval($id)?$this->select_where_id_table($this->tbl,intval($id)):false);
 	}

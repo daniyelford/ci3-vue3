@@ -8,10 +8,7 @@ class Users_model extends CI_Model
 	}
 	private $tbl="users";
 	private $mobile='user_mobile';
-	private $info='user_info';
-	private $cart="user_cart";
 	private $account='user_account';
-	private $account_withdraws ='user_account_withdraws';
 	private $address='user_address';
 	private $credential='user_credentials';
 	private function select_where_array_table($tbl,$arr){

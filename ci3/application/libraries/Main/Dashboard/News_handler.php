@@ -7,14 +7,18 @@ class News_handler
     private $category=[];
     private $category_news=[];
     private $media=[];
+    private $report_media=[];
     private $address=[];
     private $news=[];
+    private $all_news=[];
     private $report=[];
+    private $cartables=[];
     private $news_manager=[];
     private $news_seen=[];
     private $result=[];
     private $result_manager=[];
     private $result_report=[];
+    private $result_cartables=[];
     public function __construct(){
 		$this->CI =& get_instance();
         $this->CI->load->model('News_model');
@@ -37,6 +41,9 @@ class News_handler
     private function get_all_media_used_news(){
         $this->media = $this->CI->Media_model->select_where_news_used();
     }
+    private function get_all_media_used_report(){
+        $this->report_media = $this->CI->Media_model->select_where_report_used();
+    }
     private function get_all_category_news_relation(){
         $this->category_news=$this->CI->Category_model->select_all_relation();
     }
@@ -45,6 +52,9 @@ class News_handler
     }
     private function get_all_my_news(){
         $this->news_manager=$this->CI->News_model->select_news_where_user_account_id($this->user->get_user_account_id());
+    }
+    private function get_all_news(){
+        $this->all_news=$this->CI->News_model->select_news();
     }
     private function get_all_news_seen(){
         $this->news_seen=$this->CI->News_model->select_news_where_status_seen();
@@ -313,6 +323,7 @@ class News_handler
                     $arr['status']=$a['status']??'';
                     $a=$this->get_all_report_where_news_id(intval($a['id']));
                     $arr['report']=(!empty($a));
+                    $arr['reportList']=(!empty($a)?$a:[]);
                     $this->result_manager[]=$arr;
                 }
             }
@@ -343,7 +354,7 @@ class News_handler
                     }
                     $arr['me']=(intval($a['user_account_id'])!==intval($this->user->get_user_account_id()));
                     $news_result=[];
-                    $news=$this->search_id_return_value_in_key($this->news_seen,$a['news_id']??'','id',['id','user_account_id','user_address_id','media_id','description']);
+                    $news=$this->search_id_return_value_in_key($this->all_news,$a['news_id']??'','id',['id','user_account_id','user_address_id','media_id','description']);
                     if(!empty($news) && !empty($news['id']) && intval($news['id'])>0){
                         $news_result['id']=$news['id'];
                         $news_result['description']=$news['description']??'';
@@ -361,7 +372,7 @@ class News_handler
     public function get_news_for_month(){
         $this->get_all_media_used_news();
         $this->get_all_address_news();
-        $this->get_all_news_seen();
+        $this->get_all_news();
         $this->get_all_my_report();
         $this->set_all_my_report();
         return ['status'=>'success','data'=>$this->result_report];
@@ -376,7 +387,62 @@ class News_handler
             return ['status'=>'success'];
         return ['status'=>'error'];
     }
+    private function get_cartables_data(){
+        $this->get_all_category_active();
+        $this->get_all_category_news_relation();
+        $this->get_all_media_used_news();
+        $this->get_all_media_used_report();
+        $this->get_all_address_news();
+        $this->get_all_news();
+        $this->get_all_my_news();
+        $my_seenIds = array_column($this->news_manager, 'id');
+        if(!empty($my_seenIds))
+            $this->cartables=$this->CI->News_model->get_reports_by_account_or_news_ids($this->user->get_user_account_id(),$my_seenIds);
+        else
+            $this->cartables=$this->CI->News_model->select_report_where_user_account_id($this->user->get_user_account_id());
+    }
+    private function set_cartables_data(){
+        if(!empty($this->cartables))
+            foreach($this->cartables as $a){
+                if(!empty($a) && !empty($a['id']) && intval($a['id'])>0 && !empty($a['news_id']) && intval($a['news_id'])>0 && !empty($a['user_account_id']) && intval($a['user_account_id'])>0){
+                    $news=$this->search_array($this->all_news,'id',intval($a['news_id']));
+                    if(!empty($news) && !empty($news['user_account_id']) && intval($news['user_account_id'])>0){
+                        $arr=[];
+                        $arr['id']=intval($a['id']);
+                        if($this->has_category_id() && intval($a['user_account_id'])===intval($this->user->get_user_account_id())){
+                            $arr['user']=$this->user->get_user_info_where_user_account(intval($news['user_account_id']));
+                            $arr['has_rule']=true;
+                        }else{
+                            $arr['user']=$this->user->get_user_info_where_user_account(intval($a['user_account_id']));
+                            $arr['has_rule']=false;
+                        }
+                        $report_result=$news_result=[];
+                        $news_result['id']=$news['id']??'';
+                        // $arr['id']=intval($news['id']);
+                        $news_result['description']=$news['description']??'';
+                        $news_result['media']=$this->search_ids_return_value_in_key($this->media,$news['media_id']??'','id',['url','type']);
+                        $news_result['address']=$this->search_id_return_value_in_key($this->address,$news['user_address_id']??0,'id',['id','city','lat','lon','address']);
+                        $report_result['description']=$a['description']??'';
+                        $report_result['media']=$this->search_ids_return_value_in_key($this->report_media,$a['media_id']??'','id',['url','type']);
+                        $report_result['run_time']=$a['run_time']??'';
+                        $report_result['created_at']=$a['created_at']??'';
+                        $arr['report']=$report_result;
+                        $arr['news']=$news_result;
+                        $this->result_cartables[]=$arr;
+                    }
+                }
+            }
+    }
     public function get_cartables(){
-        return ['status'=>'success','data'=>[]];
+        if(!empty($this->user->get_user_account_id()) && intval($this->user->get_user_account_id())>0){
+            $this->get_cartables_data();
+            $this->set_cartables_data();
+            return ['status'=>'success','data'=>array_reverse($this->result_cartables),'rule'=>(!empty($this->has_category_id()))];
+        }
+        return ['status'=>'error'];
+    }
+    public function edit_report($data){
+        return ['status'=>'success','data'=>$data];
+        return ['status'=>'error'];
     }
 }

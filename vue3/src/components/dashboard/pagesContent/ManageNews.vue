@@ -26,9 +26,9 @@
           </p>
           <small class="news-status">وضعیت: {{ getStatus(news.status) }}</small>
           <div class="actions">
-            <button class="c-b" v-if="news.status === 'seen' && news.report" @click="showCartable(news.id)">
+            <RouterLink class="c-b" v-if="news.status === 'seen' && news?.reportList[0]?.id" :to="{ path:`/show-cartable/${news.reportList[0].id}`}">
               پیگیری
-            </button>
+            </RouterLink>
             <button class="c-s" v-if="news.status === 'seen' && !news.report" @click="restoreNews(news.id)">
               پخش مجدد
             </button>
@@ -43,11 +43,9 @@
 </template>
 <script setup>
   import { onMounted, onUnmounted } from 'vue'
-  import { useRouter } from 'vue-router'
   import { useManageNewsStore } from '@/stores/manageNews'
   import MediaSlider from '@/components/tooles/media/MediaSlider.vue'
   const store = useManageNewsStore()
-  const router = useRouter()
   const getStatus = (status) => {
     switch (status) {
       case 'checking':
@@ -69,9 +67,6 @@
     if (ok) {
       store.loadNews()
     }
-  }
-  const showCartable = (id) => {
-    router.push({ path:`/show-cartable/${id}`})
   }
   const handleVisibilityChange = () => {
     if (document.visibilityState === 'visible') {
@@ -173,14 +168,17 @@
   .actions {
     margin-top: 1rem;
   }
-  .actions button {
+  .actions button ,.c-b{
     width: 100%;
+    display: block;
+    text-align: center;
     padding: 6px 12px;
     border: none;
     background: #4e3a85;
     color: white;
     border-radius: 5px;
     cursor: pointer;
+    text-decoration: none;
     margin-top: 10px;
   }
   .c-r {

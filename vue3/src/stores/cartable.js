@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { sendApi } from '@/utils/api'
 export const useCartableStore = defineStore('cartable', () => {
     const allItems = ref([])
+    const rule = ref(true)
     const loading = ref(true)
     let pollingInterval = null
     const simplifyNews = (items) =>
@@ -20,6 +21,7 @@ export const useCartableStore = defineStore('cartable', () => {
                 if (!isSame) {
                     allItems.value = newData
                 }
+                rule.value=res.rule
             } else {
                 alert('خطا در دریافت اطلاعات: ' + res.message)
             }
@@ -45,6 +47,7 @@ export const useCartableStore = defineStore('cartable', () => {
     return {
         allItems,
         loading,
+        rule,
         fetchCartables,
         startPolling,
         stopPolling,
