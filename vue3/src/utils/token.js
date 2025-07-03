@@ -20,6 +20,7 @@ export async function getToken() {
     .then(res => res.json())
     .then(tokenJson => {
       if (tokenJson.status === 'error') {
+        window.location.reload();
         throw new Error('Unauthorized')
       }
       tokenCache = tokenJson

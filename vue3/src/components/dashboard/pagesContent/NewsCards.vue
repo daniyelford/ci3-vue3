@@ -150,23 +150,20 @@
         border-radius: 8px;
         box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
     }
-    .loading{
+    .loading,.none-cart-error{
         text-align: center;
-        padding: 15px;
-        background: blue;
+        padding: 20px;
         color: white;
         font-size: 20px;
-        border-radius: 5px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px grey;
         font-weight: bold;
     }
+    .loading{
+        background: rgb(16, 16, 143);
+    }
     .none-cart-error {
-        text-align: center;
-        padding: 15px;
-        background: red;
-        color: white;
-        font-size: 20px;
-        border-radius: 5px;
-        font-weight: bold;
+        background: rgb(128, 12, 12);
     }
     .media-inner {
         background: white;

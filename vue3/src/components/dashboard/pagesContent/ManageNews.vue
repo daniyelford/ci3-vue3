@@ -99,7 +99,12 @@
   .loading,
   .no-news {
     font-style: italic;
+    text-align: center;
+    padding: 10px;
     color: #888;
+    border-radius: 20px;
+    box-shadow: 0 0 10px grey;
+    background: #e0d4e3;
   }
   .news-list {
     list-style: none;
