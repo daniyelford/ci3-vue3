@@ -16,7 +16,7 @@ class Migration_Create_orders_table extends CI_Migration {
             'report_list_id' => [
                 'type' => 'INT',
                 'unsigned' => TRUE,
-                'null' => FALSE,
+                'null' => TRUE,
             ],
             'product_id' => [
                 'type' => 'INT',

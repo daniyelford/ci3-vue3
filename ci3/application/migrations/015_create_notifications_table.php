@@ -28,7 +28,7 @@ class Migration_Create_notifications_table extends CI_Migration {
                 'type' => 'TEXT',
                 'null' => FALSE,
             ],
-            'type' => [
+            'url' => [
                 'type' => 'VARCHAR',
                 'constraint' => 255,
                 'null' => TRUE,

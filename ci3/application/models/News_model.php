@@ -85,6 +85,9 @@ class News_model extends CI_Model
     public function add_report($arr){
         return (!empty($arr) && is_array($arr) && $this->add_to_table($this->report,$arr));
     }
+    public function add_report_return_id($arr){
+        return (!empty($arr) && is_array($arr)?$this->add_to_table_return_id($this->report,$arr):false);
+    }
     public function add_return_id($arr){
         return (!empty($arr) && is_array($arr)?$this->add_to_table_return_id($this->tbl,$arr):false);
     }

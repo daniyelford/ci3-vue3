@@ -26,7 +26,7 @@ class Wallet_model extends CI_Model
         }
         return false;
 	}
-    private function select_where_in_array_table(String $tbl,String $key,Array $arr){
+    private function select_where_in_array_table($tbl,$key,$arr){
         if (!empty($tbl) && is_string($tbl) && !empty($arr) && is_array($arr) && !empty($key) && is_string($key)){
             $this->db->where_in($key, $arr);
             return $this->db->get($tbl)->result_array();
@@ -52,6 +52,9 @@ class Wallet_model extends CI_Model
     public function select_carts_where_id($id){
         return (!empty($id) && intval($id)>0 ? $this->select_where_id_table($this->cart, $id) : false);
     }
+    public function select_product_where_id($id){
+        return (!empty($id) && intval($id)>0 ? $this->select_where_id_table($this->product, $id) : false);
+    }
     public function select_carts_where_user_id($id){
         return (!empty($id) && intval($id)>0 ? $this->select_where_array_table($this->cart, ['user_id' => $id]) : false);
     }
@@ -59,7 +62,10 @@ class Wallet_model extends CI_Model
         return (!empty($id) && intval($id)>0 ? $this->select_where_array_table($this->account_withdraws, ['user_account_id' => $id]) : false);
     }
     public function select_carts_where_in_cart_ids($cart){
-        return (!empty($account_ids) && is_array($cart) ? $this->select_where_in_array_table($this->cart, 'id', $cart): []);
+        return (!empty($cart) && is_array($cart) ? $this->select_where_in_array_table($this->cart, 'id', $cart): []);
+    }
+    public function select_orders_where_in_order_ids($orders){
+        return (!empty($orders) && is_array($orders) ? $this->select_where_in_array_table($this->order, 'id', $orders): []);
     }
     public function add_withdraw($arr){
         return (!empty($arr) && is_array($arr) ? $this->add_to_table($this->account_withdraws, $arr) : false);

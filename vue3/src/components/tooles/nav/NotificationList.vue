@@ -3,15 +3,17 @@
         <h3>نوتیفیکیشن‌ها</h3>
         <div v-if="props.notifications.length === 0">نوتیفیکیشنی وجود ندارد.</div>
         <ul>
-            <li
-                v-for="notif in props.notifications"
-                :key="notif.id"
-                :class="{ unread: notif.is_read === 'dont' }"
-                @click="markAsRead(notif)"
-            >
-                <strong>{{ notif.title }}</strong>
-                <p>{{ notif.body }}</p>
-                <small>{{ formatDate(notif.created_at) }}</small>
+            <li v-for="notif in props.notifications" :key="notif.id" :class="{ unread: notif.is_read === 'dont' }" @click="markAsRead(notif)">
+                <a v-if="notif.url" :href="notif.url">
+                    <strong>{{ notif.title }}</strong>
+                    <p>{{ notif.body }}</p>
+                    <small>{{ formatDate(notif.created_at) }}</small>
+                </a>
+                <span v-else>
+                    <strong>{{ notif.title }}</strong>
+                    <p>{{ notif.body }}</p>
+                    <small>{{ formatDate(notif.created_at) }}</small>
+                </span>
             </li>
         </ul>
     </div>

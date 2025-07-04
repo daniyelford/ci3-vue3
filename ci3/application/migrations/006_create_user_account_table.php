@@ -45,6 +45,11 @@ class Migration_Create_user_account_table extends CI_Migration {
                 'default' => 0,
                 'null' => FALSE,
             ],
+            'token_score' => [
+                'type' => 'DECIMAL',
+                'default' => 0,
+                'null' => FALSE,
+            ],
         ]);
         $this->dbforge->add_key('id', TRUE);
         $this->dbforge->create_table('user_account');

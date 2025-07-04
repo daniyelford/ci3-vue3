@@ -28,6 +28,10 @@ class Migration_Create_product_table extends CI_Migration {
                 'type' => 'TEXT',
                 'null' => TRUE,
             ],
+            'media_id' => [
+                'type' => 'TEXT',
+                'null' => TRUE,
+            ],
             'price' => [
                 'type' => 'DECIMAL',
                 'constraint' => '15,2',
@@ -37,6 +41,20 @@ class Migration_Create_product_table extends CI_Migration {
             'per_unit' => [
                 'type' => 'ENUM("geram", "adad")',
                 'default' => 'adad',
+                'null' => FALSE,
+            ],
+            'max_token' => [
+                'type' => 'DECIMAL',
+                'null' => TRUE,
+            ],
+            'per_token_price' => [
+                'type' => 'DECIMAL',
+                'constraint' => '15,2',
+                'null' => TRUE,
+            ],
+            'can_buy_user' => [
+                'type' => 'ENUM("yes", "no")',
+                'default' => 'no',
                 'null' => FALSE,
             ],
             'status' => [

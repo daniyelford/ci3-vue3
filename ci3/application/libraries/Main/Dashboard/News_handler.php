@@ -193,24 +193,25 @@ class News_handler
         !empty($a) && !empty(end($a)) && 
         $this->has_category_id() && 
         intval($this->user->get_user_account_id())>0 &&
-        $this->CI->News_model->add_report([
+        ($id=$this->CI->News_model->add_report_return_id([
             'news_id'=>intval($data['news_id']),
             'user_account_id'=>intval($this->user->get_user_account_id()),
             'run_time'=>$data['run_time']??null,
-        ]) && $this->CI->News_model->seen_weher_id(intval($data['news_id']))){
+        ]))!==false && !empty($id) && intval($id)>0 && $this->CI->News_model->seen_weher_id(intval($data['news_id']))){
             $notif=[];
             if(!empty(end($a)['user_account_id']) && intval(end($a)['user_account_id'])>0)
                 $notif[]=[
                     'user_account_id'=>intval(end($a)['user_account_id']),
                     'title'=>'بررسی خبر',
                     'body'=>'خبری که شما در سیستم قرار دادید در حال بررسی می باشد',
-                    'type'=>'add_news_to_list',
+                    'url'=>base_url('show-cartable/'.intval($id)),
+
                 ];
             $notif[]=[
                 'user_account_id'=>intval($this->user->get_user_account_id()),
                 'title'=>'بررسی جدید',
                 'body'=>'شما یک خبر جدید را به لیست خود اضافه کردید',
-                'type'=>'add_news_to_list',
+                'url'=>base_url('show-cartable/'.intval($id)),
             ];
             $this->CI->Notification_model->insert_batch($notif);
             return ['status'=>'success'];
@@ -241,14 +242,14 @@ class News_handler
                             'user_account_id'=>intval($b['id']),
                             'title'=>'گزارش کاربران',
                             'body'=>'یک خبر جدید برای سازمان شما توسط کاربران ثبت شده است',
-                            'type'=>'add_news'
+                            'url'=>base_url()
                         ];
                 }
             $arr[]=[
                 'user_account_id'=>$this->user->get_user_account_id(),
                 'title'=>'ثبت گرازش',
                 'body'=>'گزارش شما برای سازمان مورد نظر ارسال شد',
-                'type'=>'add_news'
+                'url'=>base_url('manage-news')
             ];
             $this->CI->Notification_model->insert_batch($arr);
         }

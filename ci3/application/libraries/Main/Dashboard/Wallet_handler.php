@@ -19,9 +19,17 @@ class Wallet_handler
 	}
   private function find_order($ids){
     $result=[];
-    if(!empty($ids) && is_string($ids)){
+    if(!empty($ids) && is_string($ids) && ($a=explode(',',$ids))!==false &&
+    !empty($a) && ($b=$this->CI->Wallet_model->select_orders_where_in_order_ids($a))!==false && !empty($b)){
+      foreach ($b as $c) {
+        if(!empty($c) && !empty($c['product_id']) && intval($c['product_id'])>0){
+        // report_list_id	product_count	amount	created_at	updated_at
+          $this->CI->Wallet_model->select_product_where_id(intval($c['product_id']));
 
-    }
+        }
+      }
+      $result[]=[];
+    }  
     return $result;
   }
   public function get_cards() {
