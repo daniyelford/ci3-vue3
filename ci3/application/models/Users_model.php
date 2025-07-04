@@ -91,6 +91,9 @@ class Users_model extends CI_Model
     public function edit_mobile_weher_id($arr,$id){
         return (!empty($id) && intval($id)>0 && !empty($arr) && is_array($arr) && $this->edit_table($this->mobile,$arr,['id'=>intval($id)]));
     }
+    public function edit_account_weher_id($arr,$id){
+        return (!empty($id) && intval($id)>0 && !empty($arr) && is_array($arr) && $this->edit_table($this->account,$arr,['id'=>intval($id)]));
+    }
     public function edit_credential_where_id($arr,$id){
         return (!empty($id) && intval($id)>0 && !empty($arr) && is_array($arr) && $this->edit_table($this->credential,$arr,['id'=>intval($id)]));
     }

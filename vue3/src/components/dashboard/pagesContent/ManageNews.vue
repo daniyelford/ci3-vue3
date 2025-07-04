@@ -100,9 +100,10 @@
   .no-news {
     font-style: italic;
     text-align: center;
-    padding: 10px;
+    padding: 20px;
+    font-weight: bold;
     color: #888;
-    border-radius: 20px;
+    border-radius: 10px;
     box-shadow: 0 0 10px grey;
     background: #e0d4e3;
   }

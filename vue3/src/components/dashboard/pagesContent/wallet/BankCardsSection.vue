@@ -1,123 +1,111 @@
 <template>
   <div class="bank-cards-section">
     <h2 class="section-title">کارت‌های بانکی</h2>
-
-    <div v-if="loading" class="loading">در حال بارگذاری...</div>
-
+    <div v-if="store.loading" class="loading">در حال بارگذاری...</div>
     <div v-else>
-      <div v-if="cards.length === 0" class="no-cards">کارت بانکی ثبت نشده است.</div>
-
+      <div v-if="store.cards.length === 0" class="no-cards">کارت بانکی ثبت نشده است.</div>
       <ul class="card-list">
-        <li v-for="card in cards" :key="card.id" class="card-item">
+        <li v-for="card in store.cards" :key="card.id" class="card-item">
           <div class="card-info">
-            <p><strong>شماره کارت:</strong> {{ card.card_number }}</p>
-            <p><strong>شماره شبا:</strong> {{ card.iban }}</p>
+            <p v-if="card.shomare_cart"><strong>شماره کارت:</strong> {{ card.shomare_cart }}</p>
+            <p v-if="card.shomare_shaba"><strong>شماره شبا:</strong> {{ card.shomare_shaba }}</p>
+            <p v-if="card.shomare_hesab"><strong>شماره حساب:</strong> {{ card.shomare_hesab }}</p>
           </div>
           <button class="delete-btn" @click="removeCard(card.id)">حذف</button>
         </li>
       </ul>
-
       <div class="add-card">
         <h3>افزودن کارت جدید</h3>
-        <input v-model="newCard.card_number" placeholder="شماره کارت" />
-        <input v-model="newCard.iban" placeholder="شماره شبا" />
+        <input v-model="newCard.shomare_cart" placeholder="شماره کارت" />
+        <input v-model="newCard.shomare_shaba" placeholder="شماره شبا" />
+        <input v-model="newCard.shomare_hesab" placeholder="شماره حساب" />
         <button @click="addCard">ثبت کارت</button>
       </div>
     </div>
   </div>
 </template>
-
 <script setup>
-import { ref, onMounted } from 'vue'
-import { sendApi } from '@/utils/api'
-
-const cards = ref([])
-const loading = ref(false)
-const newCard = ref({
-  card_number: '',
-  iban: ''
-})
-
-const loadCards = async () => {
-  loading.value = true
-  const res = await sendApi({ control: 'wallet', action: 'get_cards' })
-  if (res.status === 'success') {
-    cards.value = res.data || []
-  } else {
-    alert('خطا در بارگذاری کارت‌ها')
-  }
-  loading.value = false
-}
-
-const addCard = async () => {
-  if (!newCard.value.card_number || !newCard.value.iban) {
-    return alert('لطفاً تمام فیلدها را پر کنید.')
-  }
-  const res = await sendApi({
-    control: 'wallet',
-    action: 'add_card',
-    data: newCard.value
+  import { ref, onMounted, onBeforeUnmount } from 'vue'
+  import { useWalletStore } from '@/stores/wallet'
+  let pollingInterval=null
+  const store = useWalletStore()
+  const newCard = ref({
+    shomare_cart: '',
+    shomare_hesab: '',
+    shomare_shaba: ''
   })
-  if (res.status === 'success') {
-    await loadCards()
-    newCard.value = { card_number: '', iban: '' }
-  } else {
-    alert('خطا در افزودن کارت')
+  const startPolling = () => {
+    if (pollingInterval) return
+    pollingInterval = setInterval(() => {
+      store.fetchCards()
+    }, 10000)
   }
-}
-
-const removeCard = async (id) => {
-  const confirmed = confirm('آیا از حذف این کارت مطمئن هستید؟')
-  if (!confirmed) return
-
-  const res = await sendApi({
-    control: 'wallet',
-    action: 'delete_card',
-    data: { id }
+  const stopPolling = () => {
+    if (pollingInterval) {
+      clearInterval(pollingInterval)
+      pollingInterval = null
+    }
+  }
+  const addCard = async () => {
+    if (!(newCard.value.shomare_hesab || newCard.value.shomare_cart || newCard.value.shomare_shaba)) {
+      return alert('لطفاً فیلدها را پر کنید.')
+    }
+    const res = await store.addCard(newCard.value)
+    if (res.status === 'success') {
+      newCard.value = { shomare_cart: '', shomare_hesab: '', shomare_shaba: '' }
+    } else {
+      alert(res.message || 'خطا در افزودن کارت')
+    }
+  }
+  const removeCard = async (id) => {
+    const confirmed = confirm('آیا از حذف این کارت مطمئن هستید؟')
+    if (!confirmed) return
+    const res = await store.deleteCard(id)
+    if (res.status !== 'success') {
+      alert(res.message || 'خطا در حذف کارت')
+    }
+  }
+  onMounted(() => {
+    store.fetchCards()
+    startPolling()
   })
-  if (res.status === 'success') {
-    cards.value = cards.value.filter(card => card.id !== id)
-  } else {
-    alert('خطا در حذف کارت')
-  }
-}
-
-onMounted(loadCards)
+  onBeforeUnmount(() => {
+    stopPolling()
+  })
 </script>
-
 <style scoped>
-.bank-cards-section {
-  padding: 1rem;
-}
-.section-title {
-  font-size: 1.2rem;
-  font-weight: bold;
-}
-.card-list {
-  margin-top: 1rem;
-}
-.card-item {
-  border: 1px solid #ddd;
-  padding: 0.75rem;
-  margin-bottom: 0.5rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.add-card {
-  margin-top: 1rem;
-}
-.add-card input {
-  display: block;
-  margin: 0.5rem 0;
-  padding: 0.5rem;
-  width: 100%;
-}
-.delete-btn {
-  background-color: crimson;
-  color: white;
-  border: none;
-  padding: 0.4rem 0.8rem;
-  cursor: pointer;
-}
+  .bank-cards-section {
+    padding: 1rem;
+  }
+  .section-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+  .card-list {
+    margin-top: 1rem;
+  }
+  .card-item {
+    border: 1px solid #ddd;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .add-card {
+    margin-top: 1rem;
+  }
+  .add-card input {
+    display: block;
+    margin: 0.5rem 0;
+    padding: 0.5rem;
+    width: 100%;
+  }
+  .delete-btn {
+    background-color: crimson;
+    color: white;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    cursor: pointer;
+  }
 </style>

@@ -23,7 +23,6 @@ class News_handler
 		$this->CI =& get_instance();
         $this->CI->load->model('News_model');
         $this->CI->load->model('Notification_model');
-        $this->CI->load->model('Report_model');
         $this->CI->load->model('Users_model');
         $this->CI->load->model('Media_model');
         $this->CI->load->model('Category_model');
@@ -194,7 +193,7 @@ class News_handler
         !empty($a) && !empty(end($a)) && 
         $this->has_category_id() && 
         intval($this->user->get_user_account_id())>0 &&
-        $this->CI->Report_model->add_report([
+        $this->CI->News_model->add_report([
             'news_id'=>intval($data['news_id']),
             'user_account_id'=>intval($this->user->get_user_account_id()),
             'run_time'=>$data['run_time']??null,

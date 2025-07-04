@@ -1,71 +1,105 @@
 <template>
-  <div>
+  <div class="transaction-list">
     <h3>لیست تراکنش‌ها</h3>
+
     <div v-if="store.transactions.length === 0">تراکنشی وجود ندارد.</div>
+
     <ul>
-      <li v-for="tx in paginatedTransactions" :key="tx.id">
-        {{ tx.amount }} تومان - {{ tx.type }}
+      <li v-for="tx in paginatedTransactions" :key="tx.id" class="transaction-item">
+        <p><strong>مبلغ:</strong> {{ formatAmount(tx.amount) }} تومان</p>
+        <p><strong>نوع:</strong> {{ getType(tx) }}</p>
+        <p><strong>کارت مقصد:</strong> {{ tx.give_money_user_cart_id || '---' }}</p>
+        <p><strong>وضعیت:</strong> {{ getStatus(tx.status) }}</p>
+        <p><strong>تاریخ:</strong> {{ formatDate(tx.created_at) }}</p>
       </li>
     </ul>
+
     <button v-if="hasMore" @click="loadMore">نمایش بیشتر</button>
   </div>
 </template>
+
 <script setup>
-  import { onMounted, onUnmounted, ref, computed } from 'vue'
-  import { useWalletStore } from '@/stores/wallet'
-  const store = useWalletStore()
-  const currentPage = ref(1)
-  const perPage = 5
-  let pollingInterval = null
+import { onMounted, onUnmounted, ref, computed } from 'vue'
+import { useWalletStore } from '@/stores/wallet'
+const store = useWalletStore()
+const currentPage = ref(1)
+const perPage = 5
+let pollingInterval = null
 
-  // onMounted(async () => {
-  //   if (!store.transactionsLoaded) await store.fetchTransactions()
-  //   store.startPolling()
-  // })
-  // onUnmounted(() => {
-  //   store.stopPolling()
-  // })
-  const paginatedTransactions = computed(() => {
-    return store.transactions.slice(0, currentPage.value * perPage)
-  })
-  const hasMore = computed(() => {
-    return store.transactions.length > paginatedTransactions.value.length
-  })
-  const loadMore = () => {
-    currentPage.value++
+const paginatedTransactions = computed(() =>
+  store.transactions.slice(0, currentPage.value * perPage)
+)
+
+const hasMore = computed(() =>
+  store.transactions.length > paginatedTransactions.value.length
+)
+
+const loadMore = () => {
+  currentPage.value++
+}
+
+const formatAmount = (num) =>
+  Number(num).toLocaleString('fa-IR')
+
+const formatDate = (datetime) =>
+  new Date(datetime).toLocaleString('fa-IR')
+
+const getStatus = (status) => {
+  switch (status) {
+    case 'do': return 'انجام شده'
+    case 'dont': return 'در انتظار'
+    default: return 'نامشخص'
   }
-  
-  const startPolling = () => {
-    if (pollingInterval) return
+}
+
+const getType = (tx) => {
+  // تشخیص این که کاربر پرداخت کرده یا دریافت
+  return tx.pay_money_user_account_id === store.userAccountId
+    ? 'برداشت/خروج پول'
+    : 'دریافت/ورود پول'
+}
+
+const startPolling = () => {
+  if (pollingInterval) return
+  store.fetchTransactions()
+  pollingInterval = setInterval(() => {
     store.fetchTransactions()
-    pollingInterval = setInterval(() => {
-      store.fetchData()
-    }, 10000)
-  }
+  }, 10000)
+}
 
-  const stopPolling = () => {
-    clearInterval(pollingInterval)
-    pollingInterval = null
-  }
+const stopPolling = () => {
+  clearInterval(pollingInterval)
+  pollingInterval = null
+}
 
-  const handleVisibilityChange = () => {
-    if (document.visibilityState === 'visible') {
-      startPolling()
-    } else {
-      stopPolling()
-    }
-  }
-
-  onMounted(() => {
-    document.addEventListener('visibilitychange', handleVisibilityChange)
-    if (document.visibilityState === 'visible') {
-      startPolling()
-    }
-  })
-
-  onUnmounted(() => {
-    document.removeEventListener('visibilitychange', handleVisibilityChange)
+const handleVisibilityChange = () => {
+  if (document.visibilityState === 'visible') {
+    startPolling()
+  } else {
     stopPolling()
-  })
-  
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('visibilitychange', handleVisibilityChange)
+  if (document.visibilityState === 'visible') {
+    startPolling()
+  }
+})
+
+onUnmounted(() => {
+  document.removeEventListener('visibilitychange', handleVisibilityChange)
+  stopPolling()
+})
 </script>
+
+<style scoped>
+.transaction-list {
+  padding: 1rem;
+}
+.transaction-item {
+  border: 1px solid #ddd;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+</style>

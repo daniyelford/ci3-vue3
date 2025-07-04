@@ -7,7 +7,31 @@ export const useWalletStore = defineStore('wallet', () => {
     const discountCards = ref([])
     const discountCardsLoaded = ref(false)
     const loading = ref(false)
-    // let pollingInterval = null
+    const cards = ref([])
+    const withdrawals = ref([])
+    const fetchWithdrawals = async () => {
+        const res = await sendApi({ control: 'wallet', action: 'get_withdrawals' })
+        if (res.status === 'success') withdrawals.value = res.data || []
+    }
+    const requestWithdrawal = async (data) => {
+        const res = await sendApi({ control: 'wallet', action: 'request_withdrawal', data })
+        if (res.status === 'success') await fetchWithdrawals()
+        return res
+    }
+    const fetchCards = async () => {
+        const res = await sendApi({ control: 'wallet', action: 'get_cards' })
+        if (res.status === 'success') cards.value = res.data || []
+    }
+    const addCard = async (data) => {
+        const res = await sendApi({ control: 'wallet', action: 'add_card', data })
+        if (res.status === 'success') await fetchCards()
+        return res
+    }
+    const deleteCard = async (id) => {
+        const res = await sendApi({ control: 'wallet', action: 'delete_card', data: { id } })
+        if (res.status === 'success') cards.value = cards.value.filter(c => c.id !== id)
+        return res
+    }
     const fetchTransactions = async () => {
         const res = await sendApi({ control: 'wallet', action: 'get_transactions' })
         if (res.status === 'success') {
@@ -30,25 +54,21 @@ export const useWalletStore = defineStore('wallet', () => {
             discountCardsLoaded.value = true
         }
     }
-    // const startPolling = () => {
-    //     if (pollingInterval) return
-    //     pollingInterval = setInterval(() => {
-    //         if (transactionsLoaded.value) fetchTransactions()
-    //         if (discountCardsLoaded.value) fetchDiscountCards()
-    //     }, 10000)
-    // }
-    // const stopPolling = () => {
-    //     clearInterval(pollingInterval)
-    //     pollingInterval = null
-    // }
     return {
         transactions,
         transactionsLoaded,
         discountCards,
         discountCardsLoaded,
         loading,
+        cards,
+        withdrawals,
+        fetchWithdrawals,
+        requestWithdrawal,
         fetchTransactions,
         fetchDiscountCards,
+        fetchCards,
+        addCard,
+        deleteCard
         // startPolling,
         // stopPolling,
     }
