@@ -4,13 +4,11 @@ class Wallet_handler
   private $CI;
   private $user;
   private $security;
-  // change user wallet amount in request_withdrawal
   public function __construct(){
 		$this->CI =& get_instance();
-    $this->CI->load->model('Report_model');
     $this->CI->load->model('Users_model');
-    $this->CI->load->model('Media_model');
     $this->CI->load->model('Wallet_model');
+    $this->CI->load->model('Media_model');
     $this->CI->load->model('Category_model');
     $this->CI->load->library('Tools/Security_handler');
     $this->CI->load->library('Main/Dashboard/User_handler');
@@ -73,11 +71,15 @@ class Wallet_handler
   }
   public function request_withdrawal($input){
     $user_id = $this->user->get_user_account_id();
+    $user_info=$this->user->get_user_info();
+    $user_wallet=(!empty($user_info) && !empty($user_info['wallet'])?floatval($user_info['wallet']):0);
     $amount = floatval($input['amount'] ?? 0);
     $card_id = intval($input['card_id'] ?? 0);
-    if (intval($user_id) <= 0 || $amount <= 0 || $card_id <= 0) {
+    $result_money=$user_wallet-$amount;
+    if ($user_wallet <= 0 || $result_money <= 0 || $amount > $user_wallet || intval($user_id) <= 0 || $amount <= 0 || $card_id <= 0) {
       return ['status' => 'error', 'message' => 'مبلغ یا کارت نامعتبر است'];
     }
+    $user_id=intval($user_id);
     $card = $this->CI->Wallet_model->select_carts_where_id($card_id);
     if (empty($card) || $card[0]['user_id'] != $this->user->get_user_id()) {
         return ['status' => 'error', 'message' => 'کارت متعلق به شما نیست'];
@@ -104,6 +106,7 @@ class Wallet_handler
         'updated_at' => date('Y-m-d H:i:s'),
     ];
     $this->CI->Wallet_model->add_payement($paymentData);
+    $this->CI->Users_model->edit_account_weher_id(['balance'=>$result_money],$user_id);
     return ['status' => 'success'];
   }
   public function get_transactions() {
