@@ -9,26 +9,41 @@ class Wallet_handler
     $this->CI->load->model('Users_model');
     $this->CI->load->model('Wallet_model');
     $this->CI->load->model('Media_model');
-    $this->CI->load->model('Category_model');
     $this->CI->load->library('Tools/Security_handler');
     $this->CI->load->library('Main/Dashboard/User_handler');
-    $this->CI->load->model('News_model');
-    $this->CI->load->model('Notification_model');
     $this->user=new User_handler();
     $this->security=new Security_handler();
+    // $this->CI->load->model('Category_model');
+    // $this->CI->load->model('News_model');
+    // $this->CI->load->model('Notification_model');
 	}
+  private function find_product_info($id){
+    if(!empty($id) && intval($id)>0 && 
+    ($a=$this->CI->Wallet_model->select_product_where_id(intval($id)))!==false &&
+    !empty($a)){
+
+    }
+
+  }
+  private function find_report_info($id){
+
+  }
   private function find_order($ids){
     $result=[];
     if(!empty($ids) && is_string($ids) && ($a=explode(',',$ids))!==false &&
     !empty($a) && ($b=$this->CI->Wallet_model->select_orders_where_in_order_ids($a))!==false && !empty($b)){
       foreach ($b as $c) {
         if(!empty($c) && !empty($c['product_id']) && intval($c['product_id'])>0){
-        // report_list_id	product_count	amount	created_at	updated_at
-          $this->CI->Wallet_model->select_product_where_id(intval($c['product_id']));
-
+          $arr=[];  
+          $arr['total_price']=$c['amount']??0;
+          $arr['product_count']=$c['product_count']??1;
+          $arr['created_at']=$c['created_at']??'';
+          $arr['updated_at']=$c['updated_at']??'';
+          $arr['report']=$this->find_report_info($c['report_list_id']??0);
+          $arr['product_info']=$this->find_product_info(intval($c['product_id']));
+          $result[]=$arr;
         }
       }
-      $result[]=[];
     }  
     return $result;
   }
