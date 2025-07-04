@@ -157,7 +157,6 @@ class News_handler
         return ['status'=>'error'];
     }
     public function edit_report($data){
-        return ['status'=>'success','data'=>$data];
-        return ['status'=>'error'];
+        return (!empty($data) && !empty($data['id']) && intval($data['id'])>0 &&$this->CI->News_model->edit_report_weher_id(['media_id'=>$data['media_id']??'','description'=>$data['description']??''],intval($data['id']))?['status'=>'success','data'=>$data]:['status'=>'error']);
     }
 }

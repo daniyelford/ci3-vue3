@@ -25,9 +25,6 @@ class News_model extends CI_Model
     private function edit_table($tbl,$arr,$where){
         return (!empty($tbl) && is_string($tbl) && !empty($arr) && is_array($arr) && !empty($where) && is_array($where) && $this->db->update($tbl,$arr,$where));
     }
-    private function remove_where_array_in_table($tbl,$arr){
-        return (!empty($tbl) && is_string($tbl) && !empty($arr) && is_array($arr) && $this->db->delete($tbl, $arr));
-    }
     // costum
     public function select_news(){
         return $this->db->get($this->tbl)->result_array();
@@ -99,5 +96,8 @@ class News_model extends CI_Model
     }
     public function checking_weher_id_and_user_account_id($id,$user_id){
         return (!empty($id) && intval($id)>0 && !empty($user_id) && intval($user_id)>0 && $this->edit_table($this->tbl,['status'=>'checking'],['id'=>intval($id),'user_account_id'=>intval($user_id)]));
+    }
+    public function edit_report_weher_id($arr,$id){
+        return (!empty($id) && intval($id)>0 && !empty($arr) && is_array($arr) && $this->edit_table($this->report,$arr,['id'=>intval($id)]));
     }
 }

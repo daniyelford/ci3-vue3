@@ -7,6 +7,7 @@ class Functions_handler
     public $category_news=[];
     public $media=[];
     public $report_media=[];
+    public $product_media=[];
     public $address=[];
     public $news=[];
     public $all_news=[];
@@ -25,6 +26,7 @@ class Functions_handler
         $this->CI->load->model('Users_model');
         $this->CI->load->model('Media_model');
         $this->CI->load->model('Category_model');
+        $this->CI->load->model('Wallet_model');
         $this->CI->load->library('Main/Dashboard/User_handler');
         $this->user=new User_handler();
 	}
@@ -39,6 +41,9 @@ class Functions_handler
     }
     public function get_all_media_used_report(){
         $this->report_media = $this->CI->Media_model->select_where_report_used();
+    }
+    public function get_all_media_used_product(){
+        $this->product_media = $this->CI->Media_model->select_where_product_used();
     }
     public function get_all_category_news_relation(){
         $this->category_news=$this->CI->Category_model->select_all_relation();
@@ -205,7 +210,6 @@ class Functions_handler
                         }
                         $report_result=$news_result=[];
                         $news_result['id']=$news['id']??'';
-                        // $arr['id']=intval($news['id']);
                         $news_result['description']=$news['description']??'';
                         $news_result['media']=$this->search_ids_return_value_in_key($this->media,$news['media_id']??'','id',['url','type']);
                         $news_result['address']=$this->search_id_return_value_in_key($this->address,$news['user_address_id']??0,'id',['id','city','lat','lon','address']);
@@ -300,5 +304,36 @@ class Functions_handler
             ];
             $this->CI->Notification_model->insert_batch($arr);
         }
+    }
+    public function find_order($ids){
+        $result=[];
+        if(!empty($ids) && is_string($ids) && ($a=explode(',',$ids))!==false &&
+        !empty($a) && ($b=$this->CI->Wallet_model->select_orders_where_in_order_ids($a))!==false && !empty($b))
+            foreach ($b as $c) {
+                if(!empty($c) && !empty($c['product_id']) && intval($c['product_id'])>0){
+                $arr=[];  
+                $arr['total_price']=$c['amount']??0;
+                $arr['product_count']=$c['product_count']??1;
+                $arr['created_at']=$c['created_at']??'';
+                $arr['updated_at']=$c['updated_at']??'';
+                $arr['report']=$this->find_report_info($c['report_list_id']??0);
+                $arr['product_info']=$this->find_product_info(intval($c['product_id']));
+                $result[]=$arr;
+                }
+            }
+        return $result;
+    }
+    public function find_product_info($id){
+        $result=[];
+        if(!empty($id) && intval($id)>0 && 
+        ($a=$this->CI->Wallet_model->select_product_where_id(intval($id)))!==false &&
+        !empty($a) && !empty(end($a))){
+            $result=end($a);
+            $result['media']=$this->search_ids_return_value_in_key($this->product_media,end($a)['media_id']??'','id',['url','type']);
+        }
+        return $result;
+    }
+    public function find_report_info($id){
+        return (!empty($id) && intval($id)>0?$this->search_array($this->result_cartables,'id',intval($id)):[]);
     }
 }

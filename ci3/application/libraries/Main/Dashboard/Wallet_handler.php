@@ -3,50 +3,23 @@ class Wallet_handler
 {
   private $CI;
   private $user;
-  private $security;
+  private $security;    
+  private $function;
   public function __construct(){
-		$this->CI =& get_instance();
+    $this->CI =& get_instance();
     $this->CI->load->model('Users_model');
     $this->CI->load->model('Wallet_model');
     $this->CI->load->model('Media_model');
+    $this->CI->load->library('Tools/Functions_handler');
     $this->CI->load->library('Tools/Security_handler');
     $this->CI->load->library('Main/Dashboard/User_handler');
     $this->user=new User_handler();
     $this->security=new Security_handler();
+    $this->function= new Functions_handler();
     // $this->CI->load->model('Category_model');
     // $this->CI->load->model('News_model');
     // $this->CI->load->model('Notification_model');
 	}
-  private function find_product_info($id){
-    if(!empty($id) && intval($id)>0 && 
-    ($a=$this->CI->Wallet_model->select_product_where_id(intval($id)))!==false &&
-    !empty($a)){
-
-    }
-
-  }
-  private function find_report_info($id){
-
-  }
-  private function find_order($ids){
-    $result=[];
-    if(!empty($ids) && is_string($ids) && ($a=explode(',',$ids))!==false &&
-    !empty($a) && ($b=$this->CI->Wallet_model->select_orders_where_in_order_ids($a))!==false && !empty($b)){
-      foreach ($b as $c) {
-        if(!empty($c) && !empty($c['product_id']) && intval($c['product_id'])>0){
-          $arr=[];  
-          $arr['total_price']=$c['amount']??0;
-          $arr['product_count']=$c['product_count']??1;
-          $arr['created_at']=$c['created_at']??'';
-          $arr['updated_at']=$c['updated_at']??'';
-          $arr['report']=$this->find_report_info($c['report_list_id']??0);
-          $arr['product_info']=$this->find_product_info(intval($c['product_id']));
-          $result[]=$arr;
-        }
-      }
-    }  
-    return $result;
-  }
   public function get_cards() {
     $user_id = $this->user->get_user_id();
     if (!$user_id) return ['status' => 'error', 'message' => 'شناسه کاربر یافت نشد'];
@@ -137,6 +110,8 @@ class Wallet_handler
     $user = $this->user->get_user_account_id();
     if (!$user) return ['status' => 'error', 'message' => 'کاربر یافت نشد'];
     $info=$this->CI->Wallet_model->select_payment_info_where_user_account_id(intval($user));
+    $this->function->get_cartables_data();
+    $this->function->set_cartables_data();
     foreach($info as $a){
       $arr=[];
       if(!empty($a) && !empty($a['pay_money_user_account_id']) && intval($a['pay_money_user_account_id'])>0 && !empty($a['give_money_user_account_id']) && intval($a['give_money_user_account_id'])>0){
@@ -153,11 +128,11 @@ class Wallet_handler
         }elseif(intval($a['pay_money_user_account_id'])===intval($user)){
           $arr['action']='p';
           $arr['user']=$this->user->get_user_info_where_user_account(intval($a['give_money_user_account_id']));
-          $arr['order']=$this->find_order($a['order_ids']??'');
+          $arr['order']=$this->function->find_order($a['order_ids']??'');
         }elseif(intval($a['give_money_user_account_id'])===intval($user)){
           $arr['action']='g';
           $arr['user']=$this->user->get_user_info_where_user_account(intval($a['pay_money_user_account_id']));
-          $arr['order']=$this->find_order($a['order_ids']??'');
+          $arr['order']=$this->function->find_order($a['order_ids']??'');
         }
       }
       $res[]=$arr;

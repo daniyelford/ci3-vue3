@@ -45,6 +45,9 @@ class Media_model extends CI_Model
     public function select_where_report_used(){
 	    return $this->select_where_array_table($this->tbl,['upload_place'=>'report','used_status'=>'used']);
 	}
+    public function select_where_product_used(){
+	    return $this->select_where_array_table($this->tbl,['upload_place'=>'product','used_status'=>'used']);
+	}
     public function add($arr){
         return (!empty($arr) && is_array($arr) && $this->add_to_table($this->tbl,$arr));
     }
