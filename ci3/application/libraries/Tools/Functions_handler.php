@@ -1,8 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 class Functions_handler
 {
-    private $CI;
-    private $user;
     public $category=[];
     public $category_news=[];
     public $media=[];
@@ -19,46 +17,59 @@ class Functions_handler
     public $result_manager=[];
     public $result_report=[];
     public $result_cartables=[];
-    public function __construct(){
-		$this->CI =& get_instance();
-        $this->CI->load->model('News_model');
-        $this->CI->load->model('Notification_model');
-        $this->CI->load->model('Users_model');
-        $this->CI->load->model('Media_model');
-        $this->CI->load->model('Category_model');
-        $this->CI->load->model('Wallet_model');
-        $this->CI->load->library('Main/Dashboard/User_handler');
-        $this->user=new User_handler();
+    private User_handler $user;
+    private Wallet_model $wallet_model;
+    private Category_model $category_model;
+    private Media_model $media_model;
+    private Users_model $users_model;
+    private Notification_model $notification_model;
+    private News_model $news_model;
+    public function __construct(
+        User_handler $user_handler,
+        Wallet_model $wallet_model,
+        Category_model $category_model,
+        Media_model $media_model,
+        Users_model $users_model,
+        Notification_model $notification_model,
+        News_model $news_model
+    ){
+        $this->user = $user_handler;
+        $this->wallet_model = $wallet_model;
+        $this->category_model = $category_model;
+        $this->media_model = $media_model;
+        $this->users_model = $users_model;
+        $this->notification_model = $notification_model;
+        $this->news_model = $news_model;
 	}
     public function has_category_id(){
         return (!empty($this->user->get_user_category_id()) && intval($this->user->get_user_category_id())>0);
     }
     public function get_all_category_active(){
-        $this->category = $this->CI->Category_model->select_category_where_active();
+        $this->category = $this->category_model->select_category_where_active();
     }
     public function get_all_media_used_news(){
-        $this->media = $this->CI->Media_model->select_where_news_used();
+        $this->media = $this->media_model->select_where_news_used();
     }
     public function get_all_media_used_report(){
-        $this->report_media = $this->CI->Media_model->select_where_report_used();
+        $this->report_media = $this->media_model->select_where_report_used();
     }
     public function get_all_media_used_product(){
-        $this->product_media = $this->CI->Media_model->select_where_product_used();
+        $this->product_media = $this->media_model->select_where_product_used();
     }
     public function get_all_category_news_relation(){
-        $this->category_news=$this->CI->Category_model->select_all_relation();
+        $this->category_news=$this->category_model->select_all_relation();
     }
     public function get_all_address_news(){
-        $this->address = $this->CI->Users_model->select_address_where_news();
+        $this->address = $this->users_model->select_address_where_news();
     }
     public function get_all_my_news(){
-        $this->news_manager=$this->CI->News_model->select_news_where_user_account_id($this->user->get_user_account_id());
+        $this->news_manager=$this->news_model->select_news_where_user_account_id($this->user->get_user_account_id());
     }
     public function get_all_news(){
-        $this->all_news=$this->CI->News_model->select_news();
+        $this->all_news=$this->news_model->select_news();
     }
     public function get_all_news_seen(){
-        $this->news_seen=$this->CI->News_model->select_news_where_status_seen();
+        $this->news_seen=$this->news_model->select_news_where_status_seen();
     }
     public function get_all_category_array_where_news_id($id) {
         $id = (int) $id;
@@ -72,7 +83,7 @@ class Functions_handler
         ));
     }
     public function get_all_report_where_news_id($id){
-        return (!empty($id) && intval($id)>0 && ($a=$this->CI->News_model->select_report_where_news_id(intval($id)))!==false && !empty($a)?$a:null);
+        return (!empty($id) && intval($id)>0 && ($a=$this->news_model->select_report_where_news_id(intval($id)))!==false && !empty($a)?$a:null);
     }
     public function get_all_my_report(){
         $this->get_all_my_news();
@@ -80,9 +91,9 @@ class Functions_handler
             return isset($item['status']) && $item['status'] === 'seen';
         }), 'id');
         if(!empty($my_seenIds))
-            $this->report=$this->CI->News_model->get_reports_by_account_or_news_ids($this->user->get_user_account_id(),$my_seenIds);
+            $this->report=$this->news_model->get_reports_by_account_or_news_ids($this->user->get_user_account_id(),$my_seenIds);
         else
-            $this->report=$this->CI->News_model->select_report_where_user_account_id($this->user->get_user_account_id());
+            $this->report=$this->news_model->select_report_where_user_account_id($this->user->get_user_account_id());
     }
     public function get_data(){
         $this->get_all_category_active();
@@ -90,9 +101,9 @@ class Functions_handler
         $this->get_all_media_used_news();
         $this->get_all_address_news();
         if($this->has_category_id())
-            $this->news = $this->CI->News_model->select_news_where_category_id_status_checking_private(intval($this->user->get_user_category_id()));
+            $this->news = $this->news_model->select_news_where_category_id_status_checking_private(intval($this->user->get_user_category_id()));
         else
-            $this->news = $this->CI->News_model->select_news_where_public_status_checking();
+            $this->news = $this->news_model->select_news_where_public_status_checking();
     }
     public function search_array($data,$key,$value){
         $result=[];
@@ -189,9 +200,9 @@ class Functions_handler
         $this->get_all_my_news();
         $my_seenIds = array_column($this->news_manager, 'id');
         if(!empty($my_seenIds))
-            $this->cartables=$this->CI->News_model->get_reports_by_account_or_news_ids($this->user->get_user_account_id(),$my_seenIds);
+            $this->cartables=$this->news_model->get_reports_by_account_or_news_ids($this->user->get_user_account_id(),$my_seenIds);
         else
-            $this->cartables=$this->CI->News_model->select_report_where_user_account_id($this->user->get_user_account_id());
+            $this->cartables=$this->news_model->select_report_where_user_account_id($this->user->get_user_account_id());
     }
     public function set_cartables_data(){
         if(!empty($this->cartables))
@@ -214,7 +225,7 @@ class Functions_handler
                         $news_result['media']=$this->search_ids_return_value_in_key($this->media,$news['media_id']??'','id',['url','type']);
                         $news_result['address']=$this->search_id_return_value_in_key($this->address,$news['user_address_id']??0,'id',['id','city','lat','lon','address']);
                         $report_result['description']=$a['description']??'';
-                        $report_result['media']=$this->search_ids_return_value_in_key($this->report_media,$a['media_id']??'','id',['url','type']);
+                        $report_result['media']=$this->search_ids_return_value_in_key($this->report_media,$a['media_id']??'','id',['id','url','type']);
                         $report_result['run_time']=$a['run_time']??'';
                         $report_result['created_at']=$a['created_at']??'';
                         $arr['report']=$report_result;
@@ -285,10 +296,10 @@ class Functions_handler
     public function send_add_news_notification($category){
         if(!empty($category) && is_array($category)){
             $arr=[];
-            $a=$this->CI->Users_model->select_account_where_category_ids_array($category);
+            $a=$this->users_model->select_account_where_category_ids_array($category);
             if(!empty($a))
                 foreach ($a as $b) {
-                    if(!empty($b) && !empty($b['id']) && intval($b['id'])>0)
+                    if(!empty($b) && !empty($b['id']) && intval($b['id'])>0 && intval($b['id'])!==$this->user->get_user_account_id())
                         $arr[]=[
                             'user_account_id'=>intval($b['id']),
                             'title'=>'گزارش کاربران',
@@ -298,17 +309,17 @@ class Functions_handler
                 }
             $arr[]=[
                 'user_account_id'=>$this->user->get_user_account_id(),
-                'title'=>'ثبت گرازش',
+                'title'=>'ثبت گزارش',
                 'body'=>'گزارش شما برای سازمان مورد نظر ارسال شد',
                 'url'=>base_url('manage-news')
             ];
-            $this->CI->Notification_model->insert_batch($arr);
+            $this->notification_model->insert_batch($arr);
         }
     }
     public function find_order($ids){
         $result=[];
         if(!empty($ids) && is_string($ids) && ($a=explode(',',$ids))!==false &&
-        !empty($a) && ($b=$this->CI->Wallet_model->select_orders_where_in_order_ids($a))!==false && !empty($b))
+        !empty($a) && ($b=$this->wallet_model->select_orders_where_in_order_ids($a))!==false && !empty($b))
             foreach ($b as $c) {
                 if(!empty($c) && !empty($c['product_id']) && intval($c['product_id'])>0){
                 $arr=[];  
@@ -326,7 +337,7 @@ class Functions_handler
     public function find_product_info($id){
         $result=[];
         if(!empty($id) && intval($id)>0 && 
-        ($a=$this->CI->Wallet_model->select_product_where_id(intval($id)))!==false &&
+        ($a=$this->wallet_model->select_product_where_id(intval($id)))!==false &&
         !empty($a) && !empty(end($a))){
             $result=end($a);
             $result['media']=$this->search_ids_return_value_in_key($this->product_media,end($a)['media_id']??'','id',['url','type']);

@@ -112,6 +112,7 @@
         font-size: 0.9rem;
         color: #555;
         margin-bottom: 0.5rem;
+        word-break: break-all;
     }
     button {
         display: block;

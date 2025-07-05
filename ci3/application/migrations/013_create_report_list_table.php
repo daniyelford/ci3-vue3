@@ -24,12 +24,12 @@ class Migration_Create_report_list_table extends CI_Migration {
                 'unsigned' => TRUE,
                 'null' => TRUE,
             ],
-            'media_id' => [
+            'description' => [
                 'type' => 'TEXT',
                 'null' => TRUE,
             ],
-            'description' => [
-                'type' => 'TEXT',
+            'token' => [
+                'type' => 'DECIMAL',
                 'null' => TRUE,
             ],
             'status' => [

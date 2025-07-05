@@ -32,6 +32,9 @@
         <div class="time">
           {{ moment(card.created_at).format('jYYYY/jMM/jDD') }}
         </div>
+        <RouterLink class="c-d" :to="{ path:`/show-news/${card.id}`}">
+          مشاهده
+        </RouterLink>
         <a class="choose" v-if="newsStore.hasRule" @click="openCalendarModal(card.id)">
             بررسی
         </a>
@@ -91,12 +94,15 @@
     const visibleNews = computed(() =>
         newsStore.cards.slice(0, visibleCount.value)
     )
-    function loadMore() {
+    async function loadMore() {
         loadingMore.value = true
-        setTimeout(() => {
-            visibleCount.value += 10
-            loadingMore.value = false
-        }, 300)
+        await newsStore.fetchNews({
+            limit: 10,
+            offset: newsStore.cards.length,
+            append: true
+        })
+        visibleCount.value += 10
+        loadingMore.value = false
     }
     function showToast(msg) {
         toastMsg.value = msg
@@ -249,16 +255,21 @@
         text-align: end;
         margin: 5px;
     }
-    .choose {
+    .choose ,.c-d {
         width: 95%;
-        height: 30px;
-        background: blue;
+        /* height: 30px; */
+        background: rgb(7, 71, 11);
         margin: 5px auto;
         text-align: center;
         border-radius: 10px;
         color: white;
         display: block;
-        padding-top: 10px;
+        padding: 10px;
+        box-sizing: border-box;
+    }
+    .c-d {
+        background: #071847;
+        text-decoration: none;
     }
     @media screen and (max-width: 600px) {
         .card {

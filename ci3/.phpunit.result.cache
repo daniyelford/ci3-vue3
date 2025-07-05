@@ -1,0 +1,1 @@
+C:37:"PHPUnit\Runner\DefaultTestResultCache":318:{a:2:{s:7:"defects";a:2:{s:57:"Category_modelTest::testSelectCategoryWhereIdReturnsArray";i:4;s:54:"Category_modelTest::testInsertRelationBatchReturnsTrue";i:4;}s:5:"times";a:2:{s:57:"Category_modelTest::testSelectCategoryWhereIdReturnsArray";d:0.005;s:54:"Category_modelTest::testInsertRelationBatchReturnsTrue";d:0;}}}

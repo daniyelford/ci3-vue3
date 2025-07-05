@@ -72,6 +72,13 @@ const routes = [
     props: route => ({ view: 'show-cartable', id: route.params.id }),
     meta: { requiresAuth: true }
   },
+  {
+    path: '/show-news/:id',
+    name: 'show-news',
+    component: MainDashboard,
+    props: route => ({ view: 'show-news', id: route.params.id }),
+    meta: { requiresAuth: true }
+  },
 ]
 
 const router = createRouter({

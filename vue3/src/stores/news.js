@@ -8,8 +8,12 @@ export const useNewsStore = defineStore('news', {
     hasRule: false
   }),
   actions: {
-    async fetchNews() {
-      const res = await sendApi({ action: 'get_news', control: 'news' })
+    async fetchNews({ limit = 10, offset = 0, append = false } = {}) {
+      const res = await sendApi({
+        action: 'get_news',
+        control: 'news',
+        data: { limit:limit, offset:offset }
+      })
       if (res.status === 'success') {
         const newCards = res.data.map(item => ({
           id: item.id,
@@ -26,15 +30,11 @@ export const useNewsStore = defineStore('news', {
             : []
         }))
         this.hasRule = res.rule ?? false
-        const currentIds = this.cards.map(c => c.id).sort((a, b) => a - b)
-        const newIds = newCards.map(c => c.id).sort((a, b) => a - b)
-        const isDifferent = JSON.stringify(currentIds) !== JSON.stringify(newIds)
-        if (isDifferent) {
-          this.cards = newCards
-          this.lastUpdate = new Date().toISOString()
-        }
+        this.cards = append ? [...this.cards, ...newCards] : newCards
+        this.lastUpdate = new Date().toISOString()
         this.isLoaded = true
       }
     }
+
   }
 })

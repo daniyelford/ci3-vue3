@@ -23,7 +23,7 @@
   </div>
 </template>
 <script setup>
-  import { ref, defineProps, defineEmits } from 'vue'
+  import { ref, defineProps, defineEmits, watch } from 'vue'
   import { sendApi } from '@/utils/api'
   const fileInput = ref(null)
   const selectedFilesBase64 = ref([])
@@ -32,8 +32,12 @@
   const props = defineProps({
     url: String,
     toAction: String,
+    modelValue: {
+      type: Array,
+      default: () => []
+    }
   })
-  const mediaList = ref([])
+  const mediaList = ref([...props.modelValue])
   const emit = defineEmits(['done'])
   const handleDrop = (e) => {
     const files = e.dataTransfer.files
@@ -77,6 +81,7 @@
         const uploaded = response.data
         mediaList.value.push(...uploaded)
         selectedFilesBase64.value = []
+        emit('update:modelValue', mediaList.value)
         emit('done', mediaList.value)
       } else {
         alert('آپلود با خطا مواجه شد: ' + response.message)
@@ -94,6 +99,7 @@
       })
       if (res.status === 'success') {
         mediaList.value.splice(index, 1)
+        emit('update:modelValue', mediaList.value)
         emit('done', mediaList.value)
       } else {
         alert('حذف فایل با خطا مواجه شد: ' + res.message)
@@ -102,6 +108,9 @@
       alert('خطا در حذف: ' + err.message)
     }
   }
+  watch(() => props.modelValue, (val) => {
+    mediaList.value = [...val]
+  }, { immediate: true })
 </script>
 <style scoped>
     .drop-area {

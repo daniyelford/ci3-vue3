@@ -24,11 +24,6 @@ class Migration_Create_user_account_table extends CI_Migration {
                 'unsigned' => TRUE,
                 'null' => TRUE,
             ],
-            'rule' => [
-                'type' => 'VARCHAR',
-                'constraint' => 150,
-                'null' => TRUE,
-            ],
             'gmail' => [
                 'type' => 'VARCHAR',
                 'constraint' => 150,

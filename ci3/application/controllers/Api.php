@@ -91,7 +91,6 @@ class Api extends CI_Controller {
 			]]);
 			return;
 		}
-		$handler = new Api_handler();
-		$handler->handler($data);
+		$this->api_handler->handler($data);
 	}
 }

@@ -9,8 +9,6 @@
  */
 namespace PHPUnit\Framework\MockObject\Builder;
 
-use PHPUnit\Framework\Constraint\Constraint;
-
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
@@ -20,9 +18,9 @@ interface MethodNameMatch extends ParametersMatch
      * Adds a new method name match and returns the parameter match object for
      * further matching possibilities.
      *
-     * @param Constraint $constraint Constraint for matching method, if a string is passed it will use the PHPUnit_Framework_Constraint_IsEqual
+     * @param \PHPUnit\Framework\Constraint\Constraint $name Constraint for matching method, if a string is passed it will use the PHPUnit_Framework_Constraint_IsEqual
      *
      * @return ParametersMatch
      */
-    public function method($constraint);
+    public function method($name);
 }

@@ -1,25 +1,24 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 class Api_handler{
-    private $CI;
     private $handlers=[];
-    public function __construct(){
-		$this->CI =& get_instance();
-        $this->CI->load->library('Tools/Upload_handler');
-        $this->CI->load->library('Tools/Security_handler');
-        $this->CI->load->library('Main/Login/Login_handler');
-        $this->CI->load->library('Main/Dashboard/User_handler');
-        $this->CI->load->library('Main/Dashboard/News_handler');
-        $this->CI->load->library('Main/Dashboard/Wallet_handler');
+    public function __construct(
+        Upload_handler $upload,
+        Security_handler $security,
+        Login_handler $login,
+        User_handler $user,
+        News_handler $news,
+        Wallet_handler $wallet
+    ) {
         $this->handlers = [
-            'upload'    => new Upload_handler(),
-            'security'  => new Security_handler(),
-            'login'     => new Login_handler(),
-            'user'      => new User_handler(),
-            'news'      => new News_handler(),
-            'wallet'    => new Wallet_handler(),
+            'upload'   => $upload,
+            'security' => $security,
+            'login'    => $login,
+            'user'     => $user,
+            'news'     => $news,
+            'wallet'   => $wallet,
         ];
-	}
+    }
     public function handler($data){
         header('Content-Type: application/json');
         if (!empty($data) && !empty($data['control']) && !empty($data['action'])) {

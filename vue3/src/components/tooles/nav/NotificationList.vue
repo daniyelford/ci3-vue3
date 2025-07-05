@@ -1,6 +1,6 @@
 <template>
     <div class="notification-list">
-        <h3>نوتیفیکیشن‌ها</h3>
+        <h3 style="padding-right: 5px;margin-top: 5px;">نوتیفیکیشن‌ها</h3>
         <div v-if="props.notifications.length === 0">نوتیفیکیشنی وجود ندارد.</div>
         <ul>
             <li v-for="notif in props.notifications" :key="notif.id" :class="{ unread: notif.is_read === 'dont' }" @click="markAsRead(notif)">
@@ -11,8 +11,8 @@
                 </a>
                 <span v-else>
                     <strong>{{ notif.title }}</strong>
-                    <p>{{ notif.body }}</p>
-                    <small>{{ formatDate(notif.created_at) }}</small>
+                    <span>{{ notif.body }}</span>
+                    <small style="direction: ltr;font-size: 10.3px;">{{ formatDate(notif.created_at) }}</small>
                 </span>
             </li>
         </ul>
@@ -52,9 +52,9 @@
         overflow-y: auto;
     }
     .notification-list li {
-        padding: 10px;
+        border-radius: 10px;
         margin-bottom: 5px;
-        background-color: white;
+        background-color: #edfcfa;
         border-bottom: 1px solid #ddd;
         cursor: pointer;
         transition: background 0.3s;
@@ -65,5 +65,16 @@
     }
     .notification-list li:hover {
         background-color: #eef;
+    }
+    a{
+        text-decoration: none;
+        color: #2f285a;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex-wrap: nowrap;
+        text-align: center;
+        gap: 15px;
     }
 </style>

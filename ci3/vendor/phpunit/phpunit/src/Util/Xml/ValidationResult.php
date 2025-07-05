@@ -9,7 +9,6 @@
  */
 namespace PHPUnit\Util\Xml;
 
-use const PHP_EOL;
 use function sprintf;
 use function trim;
 

@@ -36,7 +36,58 @@ class Users_model extends CI_Model
     private function remove_where_array_in_table($tbl,$arr){
         return (!empty($tbl) && is_string($tbl) && !empty($arr) && is_array($arr) && $this->db->delete($tbl, $arr));
     }
-    // costum 
+    // costum
+    public function get_info_user_data_by_account_id($user_account_id){
+        if (empty($user_account_id) || !is_numeric($user_account_id)) return false;
+        $this->db->select('
+            user_account.*,
+            user_mobile.phone AS phone,
+            user_mobile.image_id AS user_image_id,
+            users.name,
+            users.family,
+            users.status AS user_status,
+            media.url AS image
+        ');
+        $this->db->from('user_account');
+        $this->db->join('user_mobile', 'user_account.user_mobile_id = user_mobile.id', 'left');
+        $this->db->join('users', 'user_mobile.user_id = users.id', 'left');
+        $this->db->join('media', 'user_mobile.image_id = media.id', 'left');
+        $this->db->where('user_account.id', $user_account_id);
+        $query = $this->db->get();
+        return $query->row_array();
+    }
+    public function get_full_user_data_by_account_id($user_account_id){
+        if (empty($user_account_id) || !is_numeric($user_account_id)) return false;
+        $this->db->select('
+            user_account.*,
+            user_mobile.phone AS phone,
+            user_mobile.id AS user_mobile_id,
+            user_mobile.image_id AS user_image_id,
+            users.name,
+            users.family,
+            users.status AS user_status,
+            media.url AS image
+        ');
+        $this->db->from('user_account');
+        $this->db->join('user_mobile', 'user_account.user_mobile_id = user_mobile.id', 'left');
+        $this->db->join('users', 'user_mobile.user_id = users.id', 'left');
+        $this->db->join('media', 'user_mobile.image_id = media.id', 'left');
+        $this->db->where('user_account.id', $user_account_id);
+        $query = $this->db->get();
+        $result = $query->row_array();
+        if (!$result) return false;
+        $this->db->from('user_credentials');
+        $this->db->where('user_mobile_id', $result['user_mobile_id']);
+        $this->db->limit(1);
+        $credential_query = $this->db->get();
+        $result['has_finger'] = $credential_query->num_rows() > 0;
+        return $result;
+    }
+
+
+
+
+
     public function select_address_where_news(){
 	    return $this->select_where_array_table($this->address,['status'=>'news']);
 	}

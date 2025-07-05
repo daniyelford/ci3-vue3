@@ -18,7 +18,6 @@ use PHPUnit\Framework\Constraint\IsAnything;
 use PHPUnit\Framework\Constraint\IsEqual;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\MockObject\Invocation as BaseInvocation;
-use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
@@ -48,7 +47,7 @@ final class Parameters implements ParametersRule
         foreach ($parameters as $parameter) {
             if (!($parameter instanceof Constraint)) {
                 $parameter = new IsEqual(
-                    $parameter,
+                    $parameter
                 );
             }
 
@@ -94,7 +93,7 @@ final class Parameters implements ParametersRule
      * if an expectation is met.
      *
      * @throws ExpectationFailedException
-     * @throws InvalidArgumentException
+     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
     public function verify(): void
     {
@@ -103,7 +102,7 @@ final class Parameters implements ParametersRule
 
     /**
      * @throws ExpectationFailedException
-     * @throws InvalidArgumentException
+     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
     private function doVerify(): bool
     {
@@ -128,7 +127,7 @@ final class Parameters implements ParametersRule
             }
 
             throw new ExpectationFailedException(
-                sprintf($message, $this->invocation->toString()),
+                sprintf($message, $this->invocation->toString())
             );
         }
 
@@ -139,8 +138,8 @@ final class Parameters implements ParametersRule
                     'Parameter %s for invocation %s does not match expected ' .
                     'value.',
                     $i,
-                    $this->invocation->toString(),
-                ),
+                    $this->invocation->toString()
+                )
             );
         }
 

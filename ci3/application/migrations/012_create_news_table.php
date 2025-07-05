@@ -29,10 +29,6 @@ class Migration_Create_news_table extends CI_Migration {
                 'default' => 'public',
                 'null' => FALSE,
             ],
-            'media_id' => [
-                'type' => 'TEXT',
-                'null' => TRUE,
-            ],
             'description' => [
                 'type' => 'TEXT',
                 'null' => FALSE,

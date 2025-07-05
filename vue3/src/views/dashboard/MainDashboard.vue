@@ -11,6 +11,7 @@
         <UserSetting v-else-if="props.view === 'user-setting'" />
         <AllCartables v-else-if="props.view === 'cartable'" />
         <ShowCartable v-else-if="props.view === 'show-cartable'" :id="props.id" />
+        <ShowNews v-else-if="props.view === 'show-news'" :id="props.id" />
         <p v-else>نمایش مشخصی یافت نشد</p>
     </div>
     <div class="nav-bottom">
@@ -19,6 +20,7 @@
         <BottomNav v-else-if="props.view === 'wallet'" :Wallet="false" :list="true" :add="true" :manage="true" :setting="true"/>
         <BottomNav v-else-if="props.view === 'report-list'" :Wallet="true" :list="false" :add="true" :manage="true" :setting="true"/>
         <BottomNav v-else-if="props.view === 'manage-news'" :Wallet="true" :list="true" :add="true" :manage="false" :setting="true"/>
+        <BottomNav v-else-if="props.view === 'show-news'" :Wallet="true" :list="true" :add="true" :manage="false" :setting="true"/>
         <BottomNav v-else-if="props.view === 'user-setting'" :Wallet="true" :list="true" :add="true" :manage="true" :setting="false"/>
         <BottomNav v-else-if="props.view === 'cartable'" :Wallet="false" :list="true" :add="true" :manage="true" :setting="true"/>
         <BottomNav v-else-if="props.view === 'show-cartable'" :Wallet="true" :list="true" :add="true" :manage="true" :setting="true"/>
@@ -34,6 +36,7 @@
     import ManageNews from '@/components/dashboard/pagesContent/ManageNews.vue';
     import ReportList from '@/components/dashboard/pagesContent/ReportList.vue';
     import ShowCartable from '@/components/dashboard/pagesContent/ShowCartable.vue';
+    import ShowNews from '@/components/dashboard/pagesContent/ShowNews.vue';
     import UserSetting from '@/components/dashboard/pagesContent/UserSetting.vue';
     import WalletCards from '@/components/dashboard/pagesContent/WalletCards.vue';
     import { defineProps } from 'vue'

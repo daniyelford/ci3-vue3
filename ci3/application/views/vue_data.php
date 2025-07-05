@@ -1,0 +1,1 @@
+<?= "<script>window.APP_CONFIG = " . json_encode(['apiSecretKey' => $api_key]) . ";</script>" ?>

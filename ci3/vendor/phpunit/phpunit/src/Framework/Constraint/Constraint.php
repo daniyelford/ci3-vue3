@@ -15,7 +15,6 @@ use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\SelfDescribing;
 use SebastianBergmann\Comparator\ComparisonFailure;
 use SebastianBergmann\Exporter\Exporter;
-use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 /**
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
@@ -38,7 +37,7 @@ abstract class Constraint implements Countable, SelfDescribing
      * failure.
      *
      * @throws ExpectationFailedException
-     * @throws InvalidArgumentException
+     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
     public function evaluate($other, string $description = '', bool $returnResult = false): ?bool
     {
@@ -83,7 +82,6 @@ abstract class Constraint implements Countable, SelfDescribing
      * This method can be overridden to implement the evaluation algorithm.
      *
      * @param mixed $other value or object to evaluate
-     *
      * @codeCoverageIgnore
      */
     protected function matches($other): bool
@@ -94,19 +92,20 @@ abstract class Constraint implements Countable, SelfDescribing
     /**
      * Throws an exception for the given compared value and test description.
      *
-     * @param mixed  $other       evaluated value or object
-     * @param string $description Additional information about the test
+     * @param mixed             $other             evaluated value or object
+     * @param string            $description       Additional information about the test
+     * @param ComparisonFailure $comparisonFailure
      *
      * @throws ExpectationFailedException
-     * @throws InvalidArgumentException
+     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      *
      * @psalm-return never-return
      */
-    protected function fail($other, $description, ?ComparisonFailure $comparisonFailure = null): void
+    protected function fail($other, $description, ComparisonFailure $comparisonFailure = null): void
     {
         $failureDescription = sprintf(
             'Failed asserting that %s.',
-            $this->failureDescription($other),
+            $this->failureDescription($other)
         );
 
         $additionalFailureDescription = $this->additionalFailureDescription($other);
@@ -121,7 +120,7 @@ abstract class Constraint implements Countable, SelfDescribing
 
         throw new ExpectationFailedException(
             $failureDescription,
-            $comparisonFailure,
+            $comparisonFailure
         );
     }
 
@@ -149,7 +148,7 @@ abstract class Constraint implements Countable, SelfDescribing
      *
      * @param mixed $other evaluated value or object
      *
-     * @throws InvalidArgumentException
+     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
     protected function failureDescription($other): string
     {
@@ -180,7 +179,7 @@ abstract class Constraint implements Countable, SelfDescribing
      * Returns the description of the failure when this constraint appears in
      * context of an $operator expression.
      *
-     * The purpose of this method is to provide meaningful failure description
+     * The purpose of this method is to provide meaningful failue description
      * in context of operators such as LogicalNot. Native PHPUnit constraints
      * are supported out of the box by LogicalNot, but externally developed
      * ones had no way to provide correct messages in this context.

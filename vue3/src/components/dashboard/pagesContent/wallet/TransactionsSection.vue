@@ -1,19 +1,19 @@
 <template>
   <div class="transaction-list">
     <h3>لیست تراکنش‌ها</h3>
-
     <div v-if="store.transactions.length === 0">تراکنشی وجود ندارد.</div>
-
     <ul>
       <li v-for="tx in paginatedTransactions" :key="tx.id" class="transaction-item">
-        <p><strong>مبلغ:</strong> {{ formatAmount(tx.amount) }} تومان</p>
-        <p><strong>نوع:</strong> {{ getType(tx) }}</p>
-        <p><strong>کارت مقصد:</strong> {{ tx.give_money_user_cart_id || '---' }}</p>
+        <!-- <p><strong>مبلغ:</strong> {{ formatAmount(tx.amount) }} تومان</p>
+        <p><strong>پرداخت‌کننده:</strong> {{ tx.pay_user_name }} {{ tx.pay_user_family }}</p>
+        <p><strong>گیرنده:</strong> {{ tx.give_user_name }} {{ tx.give_user_family }}</p>
+        <p><strong>محصول:</strong> {{ tx.product_name || '---' }}</p>
+        <p><strong>گزارش:</strong> {{ tx.report_title || '---' }}</p>
+        <p><strong>شماره کارت:</strong> {{ tx.give_cart || '---' }}</p>
         <p><strong>وضعیت:</strong> {{ getStatus(tx.status) }}</p>
-        <p><strong>تاریخ:</strong> {{ formatDate(tx.created_at) }}</p>
+        <p><strong>تاریخ:</strong> {{ formatDate(tx.created_at) }}</p> -->
       </li>
     </ul>
-
     <button v-if="hasMore" @click="loadMore">نمایش بیشتر</button>
   </div>
 </template>
@@ -38,26 +38,26 @@ const loadMore = () => {
   currentPage.value++
 }
 
-const formatAmount = (num) =>
-  Number(num).toLocaleString('fa-IR')
+// const formatAmount = (num) =>
+//   Number(num).toLocaleString('fa-IR')
 
-const formatDate = (datetime) =>
-  new Date(datetime).toLocaleString('fa-IR')
+// const formatDate = (datetime) =>
+//   new Date(datetime).toLocaleString('fa-IR')
 
-const getStatus = (status) => {
-  switch (status) {
-    case 'do': return 'انجام شده'
-    case 'dont': return 'در انتظار'
-    default: return 'نامشخص'
-  }
-}
+// const getStatus = (status) => {
+//   switch (status) {
+//     case 'do': return 'انجام شده'
+//     case 'dont': return 'در انتظار'
+//     default: return 'نامشخص'
+//   }
+// }
 
-const getType = (tx) => {
-  // تشخیص این که کاربر پرداخت کرده یا دریافت
-  return tx.pay_money_user_account_id === store.userAccountId
-    ? 'برداشت/خروج پول'
-    : 'دریافت/ورود پول'
-}
+// const getType = (tx) => {
+//   // تشخیص این که کاربر پرداخت کرده یا دریافت
+//   return tx.pay_money_user_account_id === store.userAccountId
+//     ? 'برداشت/خروج پول'
+//     : 'دریافت/ورود پول'
+// }
 
 const startPolling = () => {
   if (pollingInterval) return

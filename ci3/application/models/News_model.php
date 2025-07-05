@@ -10,6 +10,20 @@ class News_model extends CI_Model
 	private $tbl="news";
     private $report="report_list";
     private $category_relation='category_news';
+    private function select_where_array_by_limit_offset_order_table($tbl, $key, $limit, $offset, $where = []){
+        if (!empty($tbl) && is_string($tbl) && !empty($key) && is_string($key) && !empty($limit) && intval($limit) > 0 && isset($offset) && intval($offset) >= 0) {
+            $this->db->select('*');
+            $this->db->from($tbl);
+            if (!empty($where) && is_array($where)) {
+                $this->db->where($where);
+            }
+            $this->db->order_by($key, 'DESC');
+            $this->db->limit(intval($limit), intval($offset));
+            $query = $this->db->get();
+            return $query->result_array();
+        }
+        return false;
+    }
     private function select_where_array_table($tbl,$arr){
 	    return (!empty($tbl) && is_string($tbl) && !empty($arr) && is_array($arr)?$this->db->get_where($tbl,$arr)->result_array():false);
 	}
@@ -26,6 +40,38 @@ class News_model extends CI_Model
         return (!empty($tbl) && is_string($tbl) && !empty($arr) && is_array($arr) && !empty($where) && is_array($where) && $this->db->update($tbl,$arr,$where));
     }
     // costum
+    public function select_news_where_public_status_checking_limited($limit,$offset){
+	    return (!empty($limit) && intval($limit) > 0 && isset($offset) && intval($offset) >= 0?$this->select_where_array_by_limit_offset_order_table($this->tbl,'created_at',$limit,$offset,['status'=>'checking','privacy'=>'public']):false);
+	}
+    public function select_news_where_category_id_status_checking_private_limited($id, $limit = null, $offset = null){
+        if (!empty($id) && is_numeric($id)) {
+            $news = $this->select_where_array_table($this->category_relation, ['category_id' => $id]);
+            $news_array_id = [];
+            if (!empty($news)) {
+                foreach ($news as $a) {
+                    if (!empty($a) && !empty($a['news_id']) && intval($a['news_id']) > 0) {
+                        $news_array_id[] = intval($a['news_id']);
+                    }
+                }
+            }
+            if (!empty($news_array_id)) {
+                $this->db->from($this->tbl);
+                $this->db->group_start();
+                $this->db->where('status', 'checking');
+                $this->db->where('privacy', 'private');
+                $this->db->where_in('id', $news_array_id);
+                $this->db->group_end();
+                if (!is_null($limit) && is_numeric($limit)) {
+                    $offset = (!is_null($offset) && is_numeric($offset)) ? $offset : 0;
+                    $this->db->limit(intval($limit), intval($offset));
+                }
+                return $this->db->get()->result_array();
+            }
+        }
+        return [];
+    }
+
+
     public function select_news(){
         return $this->db->get($this->tbl)->result_array();
     }
@@ -38,6 +84,7 @@ class News_model extends CI_Model
     public function select_news_where_public_status_checking(){
 	    return $this->select_where_array_table($this->tbl,['status'=>'checking','privacy'=>'public']);
 	}
+
     public function select_news_where_category_id_status_checking_private($id){
         if (!empty($id) && is_numeric($id)) {
             $news=$this->select_where_array_table($this->category_relation,['category_id'=>$id]);
@@ -59,6 +106,8 @@ class News_model extends CI_Model
         }
         return [];
 	}
+
+
     public function select_news_where_status_seen(){
 	    return $this->select_where_array_table($this->tbl,['status'=>'seen']);
 	}

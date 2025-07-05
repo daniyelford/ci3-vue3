@@ -9,7 +9,6 @@
  */
 namespace PHPUnit\Util\Log;
 
-use const PHP_EOL;
 use function class_exists;
 use function count;
 use function explode;
@@ -78,7 +77,7 @@ final class TeamCity extends DefaultResultPrinter
                 'message'  => self::getMessage($t),
                 'details'  => self::getDetails($t),
                 'duration' => self::toMilliseconds($time),
-            ],
+            ]
         );
     }
 
@@ -87,7 +86,15 @@ final class TeamCity extends DefaultResultPrinter
      */
     public function addWarning(Test $test, Warning $e, float $time): void
     {
-        $this->write(self::getMessage($e) . PHP_EOL);
+        $this->printEvent(
+            'testFailed',
+            [
+                'name'     => $test->getName(),
+                'message'  => self::getMessage($e),
+                'details'  => self::getDetails($e),
+                'duration' => self::toMilliseconds($time),
+            ]
+        );
     }
 
     /**
@@ -170,7 +177,7 @@ final class TeamCity extends DefaultResultPrinter
                 'message'  => self::getMessage($t),
                 'details'  => self::getDetails($t),
                 'duration' => self::toMilliseconds($time),
-            ],
+            ]
         );
     }
 
@@ -190,7 +197,7 @@ final class TeamCity extends DefaultResultPrinter
 
             $this->printEvent(
                 'testCount',
-                ['count' => count($suite)],
+                ['count' => count($suite)]
             );
         }
 
@@ -272,7 +279,7 @@ final class TeamCity extends DefaultResultPrinter
             [
                 'name'     => $test->getName(),
                 'duration' => self::toMilliseconds($time),
-            ],
+            ]
         );
     }
 
@@ -352,7 +359,7 @@ final class TeamCity extends DefaultResultPrinter
         return str_replace(
             ['|', "'", "\n", "\r", ']', '['],
             ['||', "|'", '|n', '|r', '|]', '|['],
-            $text,
+            $text
         );
     }
 
@@ -367,8 +374,8 @@ final class TeamCity extends DefaultResultPrinter
         } catch (ReflectionException $e) {
             throw new Exception(
                 $e->getMessage(),
-                $e->getCode(),
-                $e,
+                (int) $e->getCode(),
+                $e
             );
         }
         // @codeCoverageIgnoreEnd

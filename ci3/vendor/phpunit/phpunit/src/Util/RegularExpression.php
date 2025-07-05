@@ -22,10 +22,9 @@ final class RegularExpression
     public static function safeMatch(string $pattern, string $subject)
     {
         return ErrorHandler::invokeIgnoringWarnings(
-            static function () use ($pattern, $subject)
-            {
+            static function () use ($pattern, $subject) {
                 return preg_match($pattern, $subject);
-            },
+            }
         );
     }
 }

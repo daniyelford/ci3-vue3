@@ -26,6 +26,9 @@
           </p>
           <small class="news-status">وضعیت: {{ getStatus(news.status) }}</small>
           <div class="actions">
+            <RouterLink class="c-d " :to="{ path:`/show-news/${news.id}`}">
+              مشاهده
+            </RouterLink>
             <RouterLink class="c-b" v-if="news.status === 'seen' && news?.reportList[0]?.id" :to="{ path:`/show-cartable/${news.reportList[0].id}`}">
               پیگیری
             </RouterLink>
@@ -174,7 +177,7 @@
   .actions {
     margin-top: 1rem;
   }
-  .actions button ,.c-b{
+  .actions button ,.c-b,.c-d{
     width: 100%;
     display: block;
     text-align: center;
@@ -186,6 +189,10 @@
     cursor: pointer;
     text-decoration: none;
     margin-top: 10px;
+    box-sizing: border-box;
+  }
+  .c-d {
+    background: #14035e !important;
   }
   .c-r {
     background: #ac3427 !important;

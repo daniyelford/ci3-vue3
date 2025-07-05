@@ -21,7 +21,6 @@ use function is_object;
 use function is_scalar;
 use function is_string;
 use function sprintf;
-use PHPUnit\Framework\Exception;
 
 /**
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
@@ -122,17 +121,17 @@ final class IsType extends Constraint
     private $type;
 
     /**
-     * @throws Exception
+     * @throws \PHPUnit\Framework\Exception
      */
     public function __construct(string $type)
     {
         if (!isset(self::KNOWN_TYPES[$type])) {
-            throw new Exception(
+            throw new \PHPUnit\Framework\Exception(
                 sprintf(
                     'Type specified for PHPUnit\Framework\Constraint\IsType <%s> ' .
                     'is not a valid type.',
-                    $type,
-                ),
+                    $type
+                )
             );
         }
 
@@ -146,7 +145,7 @@ final class IsType extends Constraint
     {
         return sprintf(
             'is of type "%s"',
-            $this->type,
+            $this->type
         );
     }
 

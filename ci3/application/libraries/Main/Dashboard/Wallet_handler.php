@@ -1,29 +1,31 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 class Wallet_handler
 {
-  private $CI;
-  private $user;
-  private $security;    
-  private $function;
-  public function __construct(){
-    $this->CI =& get_instance();
-    $this->CI->load->model('Users_model');
-    $this->CI->load->model('Wallet_model');
-    $this->CI->load->model('Media_model');
-    $this->CI->load->library('Tools/Functions_handler');
-    $this->CI->load->library('Tools/Security_handler');
-    $this->CI->load->library('Main/Dashboard/User_handler');
-    $this->user=new User_handler();
-    $this->security=new Security_handler();
-    $this->function= new Functions_handler();
-    // $this->CI->load->model('Category_model');
-    // $this->CI->load->model('News_model');
-    // $this->CI->load->model('Notification_model');
+  private Security_handler $security;
+  private Functions_handler $function;
+  private User_handler $user;
+  private Users_model $users_model;
+  private Wallet_model $wallet_model;
+  private Notification_model $notification_model;
+  public function __construct(
+    Security_handler $security_handler,
+    Functions_handler $functions_handler,
+    User_handler $user_handler,
+    Users_model $users_model,
+    Wallet_model $wallet_model,
+    Notification_model $notification_model
+  ){
+    $this->security = $security_handler;
+    $this->function = $functions_handler;
+    $this->user = $user_handler;
+    $this->users_model = $users_model;
+    $this->wallet_model = $wallet_model;
+    $this->notification_model = $notification_model;
 	}
   public function get_cards() {
     $user_id = $this->user->get_user_id();
     if (!$user_id) return ['status' => 'error', 'message' => 'شناسه کاربر یافت نشد'];
-    $cards = $this->CI->Wallet_model->select_carts_where_user_id($user_id);
+    $cards = $this->wallet_model->select_carts_where_user_id($user_id);
     return ['status' => 'success', 'data' => $cards];
   }
   public function add_card($data) {
@@ -36,7 +38,7 @@ class Wallet_handler
       if (!($cart || $shaba || $hesab)) {
         return ['status' => 'error', 'message' => 'شماره کارت یا شبا نامعتبر است'];
       }
-      return $this->CI->Wallet_model->add_cart([
+      return $this->wallet_model->add_cart([
         'shomare_shaba'=>$shaba??null,
         'shomare_hesab'=>$hesab??null,
         'shomare_cart'=>$cart??null,
@@ -46,7 +48,7 @@ class Wallet_handler
   }
   public function delete_card($data) {
     if($this->user->get_user_id() && !empty($data) && !empty($data['id']) && intval($data['id'])>0 && 
-    $this->CI->Wallet_model->remove_cart_where_id(intval($data['id']))){
+    $this->wallet_model->remove_cart_where_id(intval($data['id']))){
       return ['status'=>'success'];
     }
     return ['status'=>'error'];
@@ -54,9 +56,9 @@ class Wallet_handler
   public function get_withdrawals(){
     $user_id = $this->user->get_user_account_id();
     if(!empty($user_id) && intval($user_id)>0){
-      $withdraws = $this->CI->Wallet_model->select_account_withdraws_where_user_account_ids(intval($user_id));
+      $withdraws = $this->wallet_model->select_account_withdraws_where_user_account_ids(intval($user_id));
       $cart_ids = array_column($withdraws, 'user_cart_id');
-      $cards = $this->CI->Wallet_model->select_carts_where_in_cart_ids($cart_ids);
+      $cards = $this->wallet_model->select_carts_where_in_cart_ids($cart_ids);
       foreach ($withdraws as &$w) {
         if(!empty($w) && !empty($w['user_cart_id']) && intval($w['user_cart_id'])>0)
         $w['card_info'] = $cards[array_search(intval($w['user_cart_id']), array_column($cards, 'id'))];
@@ -76,7 +78,7 @@ class Wallet_handler
       return ['status' => 'error', 'message' => 'مبلغ یا کارت نامعتبر است'];
     }
     $user_id=intval($user_id);
-    $card = $this->CI->Wallet_model->select_carts_where_id($card_id);
+    $card = $this->wallet_model->select_carts_where_id($card_id);
     if (empty($card) || $card[0]['user_id'] != $this->user->get_user_id()) {
         return ['status' => 'error', 'message' => 'کارت متعلق به شما نیست'];
     }
@@ -87,7 +89,7 @@ class Wallet_handler
         'time' => date('Y-m-d H:i:s'),
         'vaziate_entghal' => 'pending'
     ];
-    $this->CI->Wallet_model->add_withdraw($insert);
+    $this->wallet_model->add_withdraw($insert);
      $paymentData = [
         'report_list_id' => 0,
         'pay_money_user_account_id' => $user_id,
@@ -101,15 +103,21 @@ class Wallet_handler
         'created_at' => date('Y-m-d H:i:s'),
         'updated_at' => date('Y-m-d H:i:s'),
     ];
-    $this->CI->Wallet_model->add_payement($paymentData);
-    $this->CI->Users_model->edit_account_weher_id(['balance'=>$result_money],$user_id);
+    $this->wallet_model->add_payement($paymentData);
+    $this->users_model->edit_account_weher_id(['balance'=>$result_money],$user_id);
+    $this->notification_model->insert([
+      'user_account_id'=>intval($this->user->get_user_account_id()),
+      'title'=>'درخواست برداشت',
+      'body'=>'درخواست شما برای برداشت وجه از کیف پولتان به مقدار'.number_format($amount).'تومان ثبت شد',
+      'url'=>base_url('wallet'),
+    ]);
     return ['status' => 'success'];
   }
   public function get_transactions() {
     $res=[];
     $user = $this->user->get_user_account_id();
     if (!$user) return ['status' => 'error', 'message' => 'کاربر یافت نشد'];
-    $info=$this->CI->Wallet_model->select_payment_info_where_user_account_id(intval($user));
+    $info=$this->wallet_model->select_payment_info_where_user_account_id(intval($user));
     $this->function->get_cartables_data();
     $this->function->set_cartables_data();
     foreach($info as $a){
@@ -123,7 +131,7 @@ class Wallet_handler
         if(intval($a['pay_money_user_account_id'])===intval($a['give_money_user_account_id'])){
           $arr['action']='w';
           if(!empty($a['give_money_user_cart_id']) && intval($a['give_money_user_cart_id'])>0){
-            $arr['cart']=$this->CI->Wallet_model->select_carts_where_id(intval($a['give_money_user_cart_id']));
+            $arr['cart']=$this->wallet_model->select_carts_where_id(intval($a['give_money_user_cart_id']));
           }
         }elseif(intval($a['pay_money_user_account_id'])===intval($user)){
           $arr['action']='p';

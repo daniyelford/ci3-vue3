@@ -6,7 +6,6 @@ class Migration_Create_product_table extends CI_Migration {
         parent::__construct();
         $this->load->dbforge();
     }
-
     public function up() {
         $this->dbforge->add_field([
             'id' => [
@@ -14,21 +13,12 @@ class Migration_Create_product_table extends CI_Migration {
                 'unsigned' => TRUE,
                 'auto_increment' => TRUE,
             ],
-            'category_id' => [
-                'type' => 'INT',
-                'unsigned' => TRUE,
-                'null' => TRUE,
-            ],
             'title' => [
                 'type' => 'VARCHAR',
                 'constraint' => 255,
                 'null' => FALSE,
             ],
             'description' => [
-                'type' => 'TEXT',
-                'null' => TRUE,
-            ],
-            'media_id' => [
                 'type' => 'TEXT',
                 'null' => TRUE,
             ],
@@ -75,9 +65,7 @@ class Migration_Create_product_table extends CI_Migration {
         $this->dbforge->create_table('product');
         $this->db->query("ALTER TABLE product MODIFY created_at DATETIME DEFAULT CURRENT_TIMESTAMP");
         $this->db->query("ALTER TABLE product MODIFY updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP");
-        $this->db->query('ALTER TABLE product ADD CONSTRAINT fk_product_category FOREIGN KEY (category_id) REFERENCES category(id) ON DELETE SET NULL ON UPDATE CASCADE');
     }
-
     public function down() {
         $this->dbforge->drop_table('product');
     }

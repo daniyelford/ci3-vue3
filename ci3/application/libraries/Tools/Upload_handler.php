@@ -3,13 +3,17 @@ class Upload_handler
 {
     // url must be have / in the end
     private $CI;
-    private $security;
-    public function __construct(){
-		$this->CI =& get_instance();
-        $this->CI->load->model('Media_model');
-        $this->CI->load->library('Tools/Security_handler');
-        $this->security= new Security_handler();
-	}
+    private Security_handler $security;
+    private Media_model $media_model;
+    public function __construct(
+        Security_handler $security_handler,
+        Media_model $media_model
+    ){
+        $this->CI =& get_instance();
+        $this->security = $security_handler;
+        $this->media_model = $media_model;
+
+    }
     private function add_retern_id($type,$filename,$url,$to_action){
         $sing='';
         if ($this->CI->session->has_userdata('id') && !empty($this->CI->session->userdata('id'))){
@@ -19,7 +23,7 @@ class Upload_handler
         }elseif($this->CI->session->has_userdata('mobile_id') && !empty($this->CI->session->userdata('mobile_id'))){
             $sing=json_encode(['mobile_id'=>$this->CI->session->userdata('mobile_id')]);
         }
-        return $this->CI->Media_model->add_return_id(['filename'=>$filename,'url'=>base_url('storage/'.$type.'s/'.$url),'type'=>$type,'user_sign'=>$sing,'upload_place'=>$to_action,'created_at'=>date('Y-m-d H:i:s')]);
+        return $this->media_model->add_return_id(['filename'=>$filename,'url'=>base_url('storage/'.$type.'s/'.$url),'type'=>$type,'user_sign'=>$sing,'upload_place'=>$to_action,'created_at'=>date('Y-m-d H:i:s')]);
     }
     private function upload_image_handler($image,$url,$to_action){
         $result=[];
@@ -219,11 +223,11 @@ class Upload_handler
     public function delete_media_by_id($data) {
         $id = intval($data['id'] ?? 0);
         if ($id > 0 && 
-        ($a = $this->CI->Media_model->select_where_id($id))!==false &&
+        ($a = $this->media_model->select_where_id($id))!==false &&
         !empty($a) && !empty(end($a)) && !empty(end($a)['id']) && 
         intval(end($a)['id'])>0 && !empty(end($a)['url']) &&
         @unlink(FCPATH . str_replace(base_url(), '', end($a)['url'])) &&
-        $this->CI->Media_model->remove_where_id($id)) 
+        $this->media_model->remove_where_id($id)) 
             return ['status' => 'success'];
         return ['status' => 'error', 'message' => 'فایل یافت نشد'];
     }
